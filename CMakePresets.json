@@ -1,0 +1,51 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 26,
+        "patch": 0
+    },
+    "configurePresets": [
+        { 
+            "hidden": true,
+            "name": "use_toolchain_file",
+            "toolchainFile": "/CMakeToolchain.txt"
+        },
+        {
+            "hidden": true,
+            "name": "base_configuration",
+            "inherits": [
+                "use_toolchain_file"
+            ],
+            "binaryDir": "${sourceDir}/build"
+        },
+        {
+            "displayName": "Ninja Multi-Config",
+            "name": "ninja-mc",
+            "description": "Use Ninja to generate a multiconfiguration output.",
+            "generator": "Ninja Multi-Config",
+            "environment": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+            },
+            "inherits": [
+                "base_configuration"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ninja-mc-release-all",
+            "displayName": "Release",
+            "configurePreset": "ninja-mc",
+            "configuration": "Release",
+            "targets": ["sdl","test_project"]
+        },
+        {
+            "name": "ninja-mc-debug-all",
+            "displayName": "Debug",
+            "configurePreset": "ninja-mc",
+            "configuration": "Debug",
+            "targets": ["sdl","test_project"]
+        }
+    ]
+}
