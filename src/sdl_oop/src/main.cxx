@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 #include <sdl.h>
 #include <color.h>
 #include <window.h>
@@ -21,7 +19,7 @@ int main()
     0
   };
 
-  Renderer renderer { window, -1, SDL_RENDERER_SOFTWARE };
+  Renderer renderer { window, -1, 0 };
   renderer.setRenderDrawColour(NamedColor::kMagenta);
   renderer.clear();
   renderer.present();

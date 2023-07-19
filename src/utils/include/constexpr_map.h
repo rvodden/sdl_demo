@@ -1,10 +1,10 @@
 #ifndef __CONSTEXPR_MAP_H__
 #define __CONSTEXPR_MAP_H__
 
-#include<algorithm>
-#include<array>
-#include<stdexcept>
-#include<tuple>
+#include <algorithm>
+#include <array>
+#include <stdexcept>
+#include <tuple>
 
 namespace vodden {
 

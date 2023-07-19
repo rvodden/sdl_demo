@@ -38,14 +38,14 @@
             "displayName": "Release",
             "configurePreset": "ninja-mc",
             "configuration": "Release",
-            "targets": ["sdl","test_project"]
+            "targets": ["sdl","sdl_oop", "sdl_c"]
         },
         {
             "name": "ninja-mc-debug-all",
             "displayName": "Debug",
             "configurePreset": "ninja-mc",
             "configuration": "Debug",
-            "targets": ["sdl","test_project"]
+            "targets": ["sdl","sdl_oop", "sdl_c"]
         }
     ]
 }
