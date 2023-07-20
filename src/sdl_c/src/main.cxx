@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <SDL2/SDL.h>
+#include <SDL_image.h>
 
 
 int main()
@@ -27,7 +28,20 @@ int main()
     return -1;
   }
   SDL_SetRenderDrawColor(renderer, 0xc2, 0x00, 0x78, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
+
+  SDL_Surface *image = IMG_Load("/workspaces/test_project/data/TicTacToe.png");
+  if(image == nullptr) {
+    std::cout << "Error loading image: " << SDL_GetError() << std::endl;
+    return -1;
+  }
+
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
+  if(texture == nullptr) {
+    std::cout << "Error creating texture: " << SDL_GetError() << std::endl;
+    return -1;
+  }
+
+  SDL_RenderCopy(renderer, texture, NULL, NULL);
   SDL_RenderPresent(renderer);
 
   bool quit = false;

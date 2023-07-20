@@ -5,14 +5,17 @@
 #include <unordered_set>
 
 #include "color.h"
+#include "texture.h"
 
 namespace sdl {
 
+class Texture;
 class Window;
 class RendererImpl;
 
 //! @brief A 2D Rendering Context
 class Renderer {
+  friend Texture;
   public:
     typedef uint8_t RendererFlag;
     
@@ -34,6 +37,9 @@ class Renderer {
 
     //! @brief Set the color used for drawing operations (Rect, Line and Clear).
     void setRenderDrawColour(const Color& color);
+
+    //! @brief Copy the texture to the renderer.
+    Renderer &copy(Texture& texture);
 
     //! @brief Clear the renderer with the drawing color.
     void clear();

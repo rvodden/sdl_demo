@@ -19,34 +19,31 @@ Window::Window(
   uint32_t flags
 ): _title { std::move(title) }, _windowImpl { std::make_unique<WindowImpl>() } {
 
-    _windowImpl->_sdl_window = SDL_CreateWindow(_title.c_str(), x, y, width, height, flags);
-    if (_windowImpl->_sdl_window == nullptr) throw Exception( "SDL_CreateWindow" );
+    _windowImpl->_sdlWindow = SDL_CreateWindow(_title.c_str(), x, y, width, height, flags);
+    if (_windowImpl->_sdlWindow == nullptr) throw Exception( "SDL_CreateWindow" );
 }
 
-Window::Window(Window&& other) noexcept {
-  other._windowImpl->_sdl_window = nullptr;
-}
-
-Window& Window::operator=(Window&& other) noexcept {
-  if(&other == this) return *this;
-  if(_windowImpl->_sdl_window != nullptr) SDL_DestroyWindow( _windowImpl->_sdl_window );
-  _windowImpl->_sdl_window = other._windowImpl->_sdl_window;
-  other._windowImpl->_sdl_window = nullptr;
-  return *this;
-}
+Window::Window(Window&& other) noexcept : _windowImpl { std::move(other._windowImpl ) } { }
 
 Window::~Window() {
-  if(_windowImpl->_sdl_window != nullptr) SDL_DestroyWindow( _windowImpl->_sdl_window );
+  if(_windowImpl->_sdlWindow != nullptr) SDL_DestroyWindow( _windowImpl->_sdlWindow );
+}
+
+Window& Window::operator=(Window &&other) noexcept {
+  if(&other == this) return *this;
+  if(_windowImpl->_sdlWindow != nullptr) SDL_DestroyWindow( _windowImpl->_sdlWindow );
+  _windowImpl = std::move(other._windowImpl);
+  return *this;
 }
 
 std::string_view Window::getTitle()
 {
-  return std::string_view(SDL_GetWindowTitle( _windowImpl->_sdl_window ));
+  return std::string_view(SDL_GetWindowTitle( _windowImpl->_sdlWindow ));
 }
 
 void Window::setTitle(std::string newTitle)
 {
-  SDL_SetWindowTitle(_windowImpl->_sdl_window, newTitle.c_str());
+  SDL_SetWindowTitle(_windowImpl->_sdlWindow, newTitle.c_str());
 }
 
 }

@@ -22,8 +22,17 @@ FetchContent_MakeAvailable(googlebenchmark)
 
 ###
 FetchContent_Declare(
-        sdl2
+        SDL2
         URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.1/SDL2-2.28.1.zip
         DOWNLOAD_EXTRACT_TIMESTAMP false
 )
-FetchContent_MakeAvailable(sdl2)
+FetchContent_MakeAvailable(SDL2)
+
+# set(SDL2IMAGE_SAMPLES False)
+FetchContent_Declare(
+        SDL2_image
+        URL https://github.com/libsdl-org/SDL_image/releases/download/release-2.6.3/SDL2_image-2.6.3.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP false
+)
+set(SDL2IMAGE_INSTALL OFF)
+FetchContent_MakeAvailable(SDL2_image)

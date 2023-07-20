@@ -13,7 +13,7 @@ class WindowImpl {
   friend Renderer;
 
   private:
-    SDL_Window *_sdl_window { nullptr };
+    SDL_Window *_sdlWindow { nullptr };
 };
 
 }
