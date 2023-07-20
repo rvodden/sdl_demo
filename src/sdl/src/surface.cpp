@@ -18,9 +18,18 @@ Surface::Surface(std::filesystem::path filePath) {
   _surfaceImpl->_sdlSurface = IMG_Load(filePath.c_str());
 }
 
+Surface::Surface(Surface&& other) noexcept : _surfaceImpl( std::move(other._surfaceImpl) ) {}
+
 Surface::~Surface() {
   if(_surfaceImpl->_sdlSurface != nullptr)
     SDL_FreeSurface(_surfaceImpl->_sdlSurface);
+}
+
+Surface &Surface::operator=(Surface &&other) noexcept {
+  if(this == &other) return *this;
+  if(_surfaceImpl->_sdlSurface != nullptr) SDL_FreeSurface(_surfaceImpl->_sdlSurface);
+  _surfaceImpl = std::move(other._surfaceImpl);
+  return *this;
 }
 
 }

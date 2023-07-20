@@ -13,14 +13,14 @@ Texture::Texture(const Renderer& renderer, std::filesystem::path filePath) : _te
   if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
 }
 
-Texture::Texture(Texture &&other) : _textureImpl { std::move(other._textureImpl) } { }
+Texture::Texture(Texture &&other) noexcept : _textureImpl { std::move(other._textureImpl) } { }
 
 
 Texture::~Texture() {
   if(_textureImpl->_sdlTexture != nullptr) SDL_DestroyTexture(_textureImpl->_sdlTexture);
 }
 
-Texture &Texture::operator=(Texture &&other) {
+Texture &Texture::operator=(Texture &&other) noexcept {
   if(&other == this) return *this;
   if(_textureImpl->_sdlTexture != nullptr) SDL_DestroyTexture(_textureImpl->_sdlTexture);
   _textureImpl = std::move(other._textureImpl);

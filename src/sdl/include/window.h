@@ -17,11 +17,12 @@ class Window {
   public:
     Window(std::string title, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t flags);
     Window(Window&& other) noexcept;
-    Window& operator=(Window&& other) noexcept;
     Window(const Window& other) = delete;
-    Window& operator=(const Window& other) = delete;
     ~Window();
 
+    Window& operator=(const Window& other) = delete;
+    Window& operator=(Window&& other) noexcept;
+    
     //! @brief Get the title of the window.
     std::string_view getTitle();
 

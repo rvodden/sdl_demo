@@ -16,11 +16,11 @@ class Texture {
   public:
     Texture(const Renderer& renderer, std::filesystem::path filePath);
     Texture(Texture& other) = delete;
-    Texture(Texture&& other);
+    Texture(Texture&& other) noexcept;
     ~Texture();
 
     Texture& operator=(Texture& other) = delete;
-    Texture& operator=(Texture&& other);
+    Texture& operator=(Texture&& other) noexcept;
 
     //TODO: implement other constructors and operators
 

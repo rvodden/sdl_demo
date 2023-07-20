@@ -14,9 +14,13 @@ class Surface {
   public:
     Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask, uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask );
     Surface(std::filesystem::path filePath);
+    Surface(Surface&) = delete;
+    Surface(Surface&& other) noexcept;
     ~Surface();
 
-    //TODO: implement move & copy constructors and operators
+    Surface& operator=(Surface&) = delete;
+    Surface& operator=(Surface&& other) noexcept;
+
 
   private:
     std::unique_ptr<SurfaceImpl> _surfaceImpl;

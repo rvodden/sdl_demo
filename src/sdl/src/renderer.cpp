@@ -26,16 +26,17 @@ Renderer::Renderer(Window& window, int16_t index, std::unordered_set<RendererFla
   if(_rendererImpl->_sdlRenderer == nullptr) throw Exception("SDL_CreateRendere");
 }
 
-Renderer& Renderer::operator=(Renderer&& other) noexcept {
-  if(this == &other) return *this;
-  if(_rendererImpl->_sdlRenderer != nullptr) SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
-  _rendererImpl->_sdlRenderer = other._rendererImpl->_sdlRenderer;
-  other._rendererImpl->_sdlRenderer = nullptr;
-  return *this;
-}
+Renderer::Renderer(Renderer&& other) noexcept : _rendererImpl { std::move(other._rendererImpl) } { };
 
 Renderer::~Renderer() noexcept {
   SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
+}
+
+Renderer& Renderer::operator=(Renderer&& other) noexcept {
+  if(this == &other) return *this;
+  if(_rendererImpl->_sdlRenderer != nullptr) SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
+  _rendererImpl = std::move(other._rendererImpl);
+  return *this;
 }
 
 void Renderer::setRenderDrawColour(const Color& color) {

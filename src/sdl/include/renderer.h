@@ -24,7 +24,7 @@ class Renderer {
      */
     Renderer( Window& window, int16_t index, const std::unordered_set<RendererFlag> flags );
     //! @brief move constructor
-    Renderer( Renderer&& other );
+    Renderer( Renderer&& other ) noexcept;
     //! @brief Renderer cannot be copied
     Renderer( const Renderer& other ) = delete;
     //! @brief destructor
