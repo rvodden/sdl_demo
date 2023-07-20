@@ -13,9 +13,17 @@
         },
         {
             "hidden": true,
+            "name": "generate_compile_commands",
+            "environment": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "hidden": true,
             "name": "base_configuration",
             "inherits": [
-                "use_toolchain_file"
+                "use_toolchain_file",
+                "generate_compile_commands"
             ],
             "binaryDir": "${sourceDir}/build"
         },

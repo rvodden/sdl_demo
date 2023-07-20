@@ -1,6 +1,6 @@
 {
-    "image": "ha-dev:x86_64-linux-pc-gcc-x11",
-    "remoteUser": "root",
+    "image": "rvodden/ha-dev:x86_64-linux-pc-gcc-x11",
+    "remoteUser": "hadev",
     "runArgs": ["--device=/dev/dri/card0", "--cap-add=CAP_PERFMON"]
     // ,
     // "containerEnv": {

@@ -30,7 +30,19 @@ int main()
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
-  SDL_Delay(3000);
+  bool quit = false;
+  SDL_Event event;
+  while (not quit) {        
+    SDL_WaitEvent(&event);        
+    
+    switch(event.type)        
+    {        
+      case SDL_QUIT:        
+        quit = true;        
+        break;        
+    }        
+  }   
+
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 
