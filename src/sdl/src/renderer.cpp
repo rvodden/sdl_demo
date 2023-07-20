@@ -7,25 +7,21 @@
 #include "window.h"
 
 #include "renderer.h"
+
 #include "window_impl.h"
+#include "renderer_impl.h"
 
 namespace sdl {
 
-class RendererImpl {
-  friend Renderer;
-  private:
-    // This is ownned by the Window which was passed in - i.e. not us or the Renderer
-    SDL_Window* _sdl_window;
-    // Owning Renderer class owns the SDL_Renderer
-    SDL_Renderer* _sdl_renderer;
-
-};
-
-Renderer::Renderer(Window& window, int16_t index, uint32_t flags) 
+Renderer::Renderer(Window& window, int16_t index, std::unordered_set<RendererFlag> flags) 
   : _rendererImpl { std::make_unique<RendererImpl>() } {
   
   _rendererImpl->_sdl_window = window._windowImpl->_sdl_window;
-  _rendererImpl->_sdl_renderer = SDL_CreateRenderer(_rendererImpl->_sdl_window, index, flags);
+
+  uint32_t flagValue = 0;
+  for(const RendererFlag& flag : flags) flagValue |= sdlRendererFlagMap[flag];
+
+  _rendererImpl->_sdl_renderer = SDL_CreateRenderer(_rendererImpl->_sdl_window, index, flagValue);
   if(_rendererImpl->_sdl_renderer == nullptr) throw Exception("SDL_CreateRendere");
 }
 

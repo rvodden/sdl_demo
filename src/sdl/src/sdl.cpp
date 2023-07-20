@@ -1,25 +1,12 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
-#include "constexpr_map.h"
 #include "exception.h"
 
 #include "sdl.h"
 #include "sdl_impl.h"
 
 namespace sdl {
-
-static constexpr vodden::Map<SDL::SubSystem, uint32_t, 9> sdlSubSystemMap {{
-  { SDL::kAudio, SDL_INIT_AUDIO },
-  { SDL::kEvents, SDL_INIT_EVENTS },
-  { SDL::kEverything, SDL_INIT_EVERYTHING },
-  { SDL::kGameController, SDL_INIT_GAMECONTROLLER },
-  { SDL::kHaptic, SDL_INIT_HAPTIC },
-  { SDL::kJoystick, SDL_INIT_JOYSTICK },
-  { SDL::kNoParachute, SDL_INIT_NOPARACHUTE },
-  { SDL::kTimer, SDL_INIT_TIMER },
-  { SDL::kVideo, SDL_INIT_VIDEO }
-}};
 
 SDL::SDL() {
   _sdlImpl = std::make_unique<SDLImpl>();

@@ -2,6 +2,7 @@
 #define __SDL_RENDERER_H__
 
 #include <memory>
+#include <unordered_set>
 
 #include "color.h"
 
@@ -13,10 +14,12 @@ class RendererImpl;
 //! @brief A 2D Rendering Context
 class Renderer {
   public:
+    typedef uint8_t RendererFlag;
+    
     /**
      * @brief Construct a renderer associated with the provided window
      */
-    Renderer( Window& window, int16_t index, uint32_t flags );
+    Renderer( Window& window, int16_t index, const std::unordered_set<RendererFlag> flags );
     //! @brief move constructor
     Renderer( Renderer&& other );
     //! @brief Renderer cannot be copied
@@ -37,6 +40,11 @@ class Renderer {
 
     //! @brief Update the screen with any rendering performed since the previous call.
     void present();
+
+    static constexpr RendererFlag kSoftware = 0;
+    static constexpr RendererFlag kAccelerated = 1;
+    static constexpr RendererFlag kPresentVSync = 2;
+    static constexpr RendererFlag kTargetTexture = 3;
 
   private:
     std::unique_ptr<RendererImpl> _rendererImpl;
