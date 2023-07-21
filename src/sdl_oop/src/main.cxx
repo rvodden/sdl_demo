@@ -1,6 +1,8 @@
 #include <exception>
 #include <iostream>
 
+#include <images.h>
+
 #include <color.h>
 #include <event_processor.h>
 #include <renderer.h>
@@ -20,15 +22,15 @@ int main()
       "SDL2Test",
       100,
       100,
-      640,
-      480,
+      448,
+      461,
       0
     };
 
     Renderer renderer { window, -1, { Renderer::kSoftware } };
     renderer.setRenderDrawColour(NamedColor::kMagenta);
 
-    Texture texture { renderer, "/workspaces/test_project/data/TicTacToe.png" }; 
+    Texture texture { renderer, &_binary_tic_tac_toe_png_start, ticTacToeSize() };
     renderer.copy(texture);
     renderer.present();
 

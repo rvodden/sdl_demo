@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 
+#include <images.h>
 
 int main()
 {
@@ -12,8 +13,8 @@ int main()
     "SDL2Test",
     100,
     100,
-    640,
-    480,
+    448,
+    461,
     0
   );
   if(window == nullptr) {
@@ -28,14 +29,14 @@ int main()
     return -1;
   }
   SDL_SetRenderDrawColor(renderer, 0xc2, 0x00, 0x78, SDL_ALPHA_OPAQUE);
-
-  SDL_Surface *image = IMG_Load("/workspaces/test_project/data/TicTacToe.png");
-  if(image == nullptr) {
-    std::cout << "Error loading image: " << SDL_GetError() << std::endl;
+  std::cout << ticTacToeSize() << std::endl;
+  auto rwops = SDL_RWFromConstMem(&_binary_tic_tac_toe_png_start, ticTacToeSize());
+  if(rwops == nullptr) {
+    std::cout << "Error extracting image from embedded binary: " << SDL_GetError() << std::endl;
     return -1;
   }
 
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
+  SDL_Texture *texture = IMG_LoadTexture_RW(renderer, rwops, 1);
   if(texture == nullptr) {
     std::cout << "Error creating texture: " << SDL_GetError() << std::endl;
     return -1;
@@ -57,6 +58,7 @@ int main()
     }        
   }   
 
+  SDL_DestroyTexture(texture);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 

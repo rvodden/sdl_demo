@@ -13,6 +13,20 @@ Texture::Texture(const Renderer& renderer, std::filesystem::path filePath) : _te
   if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
 }
 
+Texture::Texture(const Renderer &renderer, const void *location, std::size_t size) : _textureImpl { std::make_unique<TextureImpl>() } {
+  SDL_RWops* rwOps = SDL_RWFromConstMem(location, size);
+  
+  _textureImpl->_sdlTexture = IMG_LoadTexture_RW(renderer._rendererImpl->_sdlRenderer, rwOps, 1);
+  if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
+}
+
+Texture::Texture(const Renderer &renderer, void *location, std::size_t size) : _textureImpl { std::make_unique<TextureImpl>() } {
+  SDL_RWops* rwOps = SDL_RWFromMem(location, size);
+  
+  _textureImpl->_sdlTexture = IMG_LoadTexture_RW(renderer._rendererImpl->_sdlRenderer, rwOps, 1);
+  if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
+}
+
 Texture::Texture(Texture &&other) noexcept : _textureImpl { std::move(other._textureImpl) } { }
 
 

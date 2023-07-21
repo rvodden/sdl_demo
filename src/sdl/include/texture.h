@@ -14,7 +14,13 @@ class TextureImpl;
 class Texture {
   friend Renderer;
   public:
+    //! @brief creates a texture from a file on disk.
     Texture(const Renderer& renderer, std::filesystem::path filePath);
+
+    //! @brief creates a file from data already held in cpu memory.
+    Texture(const Renderer& renderer, const void* location, std::size_t size);
+    Texture(const Renderer& renderer, void* location, std::size_t size);
+
     Texture(Texture& other) = delete;
     Texture(Texture&& other) noexcept;
     ~Texture();

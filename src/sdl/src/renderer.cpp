@@ -51,6 +51,7 @@ void Renderer::setRenderDrawColour(const Color& color) {
 
 Renderer &Renderer::copy(Texture &texture) {
   auto returnValue = SDL_RenderCopy(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, nullptr, nullptr);
+  if(returnValue < 0) throw Exception("SDL_RenderCopy");
 
   return *this;
 }
