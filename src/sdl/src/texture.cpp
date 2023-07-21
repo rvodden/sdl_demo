@@ -29,7 +29,6 @@ Texture::Texture(const Renderer &renderer, void *location, std::size_t size) : _
 
 Texture::Texture(Texture &&other) noexcept : _textureImpl { std::move(other._textureImpl) } { }
 
-
 Texture::~Texture() {
   if(_textureImpl->_sdlTexture != nullptr) SDL_DestroyTexture(_textureImpl->_sdlTexture);
 }
@@ -39,6 +38,11 @@ Texture &Texture::operator=(Texture &&other) noexcept {
   if(_textureImpl->_sdlTexture != nullptr) SDL_DestroyTexture(_textureImpl->_sdlTexture);
   _textureImpl = std::move(other._textureImpl);
   return *this;
+}
+
+void Texture::setTextureBlendMode(const BlendMode &blendMode) {
+  int returnValue = SDL_SetTextureBlendMode(_textureImpl->_sdlTexture, sdlBlendModeMap[blendMode]);
+  if( returnValue < 0 ) throw Exception("SDL_SetTextureBlendMode");
 }
 
 }

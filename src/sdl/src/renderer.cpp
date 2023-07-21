@@ -9,6 +9,7 @@
 #include "renderer.h"
 
 #include "window_impl.h"
+#include "rectangle_impl.h"
 #include "renderer_impl.h"
 #include "texture_impl.h"
 
@@ -49,8 +50,19 @@ void Renderer::setRenderDrawColour(const Color& color) {
   if (retVal < 0) throw Exception("SDL_SetRenderDrawColor");
 }
 
-Renderer &Renderer::copy(Texture &texture) {
+Renderer &Renderer::copy(Texture &texture)
+{
   auto returnValue = SDL_RenderCopy(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, nullptr, nullptr);
+  if(returnValue < 0) throw Exception("SDL_RenderCopy");
+
+  return *this;
+}
+
+Renderer &Renderer::copy(Texture &texture, const Rectangle &source, const Rectangle &destination) {
+  SDL_Rect* sourceRect = source._rectangleImpl->getSDLRect();
+  SDL_Rect* destRect = destination._rectangleImpl->getSDLRect();
+
+  auto returnValue = SDL_RenderCopy(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, sourceRect, destRect);
   if(returnValue < 0) throw Exception("SDL_RenderCopy");
 
   return *this;

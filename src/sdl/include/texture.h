@@ -14,6 +14,8 @@ class TextureImpl;
 class Texture {
   friend Renderer;
   public:
+    typedef uint8_t BlendMode;
+    
     //! @brief creates a texture from a file on disk.
     Texture(const Renderer& renderer, std::filesystem::path filePath);
 
@@ -28,7 +30,15 @@ class Texture {
     Texture& operator=(Texture& other) = delete;
     Texture& operator=(Texture&& other) noexcept;
 
-    //TODO: implement other constructors and operators
+    void setTextureBlendMode(const BlendMode& blendMode);
+    BlendMode getTextureBlendMode();
+    
+    static constexpr BlendMode kNone = 0;
+    static constexpr BlendMode kBlend = 1;
+    static constexpr BlendMode kAdd = 2;
+    static constexpr BlendMode kMod = 3;
+    static constexpr BlendMode kMul = 4;
+
 
   private:
     std::unique_ptr<TextureImpl> _textureImpl;

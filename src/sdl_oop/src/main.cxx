@@ -5,6 +5,7 @@
 
 #include <color.h>
 #include <event_processor.h>
+#include <rectangle.h>
 #include <renderer.h>
 #include <sdl.h>
 #include <texture.h>
@@ -22,8 +23,8 @@ int main()
       "SDL2Test",
       100,
       100,
-      448,
-      461,
+      384,
+      384,
       0
     };
 
@@ -31,7 +32,10 @@ int main()
     renderer.setRenderDrawColour(NamedColor::kMagenta);
 
     Texture texture { renderer, &_binary_tic_tac_toe_png_start, ticTacToeSize() };
-    renderer.copy(texture);
+    renderer.setRenderDrawColour(NamedColor::kWhite);
+    renderer.clear();
+    texture.setTextureBlendMode(Texture::kBlend);
+    renderer.copy(texture, Rectangle{ 0, 0, 384, 384 }, Rectangle{ 0, 0, 384, 384 });
     renderer.present();
 
     EventProcessor eventProcessor;

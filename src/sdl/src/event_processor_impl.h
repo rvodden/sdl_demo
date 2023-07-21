@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "constexpr_map.h"
+
 #include "event_processor.h"
 
 namespace sdl {

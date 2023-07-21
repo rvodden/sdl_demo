@@ -13,8 +13,8 @@ int main()
     "SDL2Test",
     100,
     100,
-    448,
-    461,
+    384,
+    384,
     0
   );
   if(window == nullptr) {
@@ -28,8 +28,8 @@ int main()
     SDL_DestroyWindow(window);
     return -1;
   }
-  SDL_SetRenderDrawColor(renderer, 0xc2, 0x00, 0x78, SDL_ALPHA_OPAQUE);
-  std::cout << ticTacToeSize() << std::endl;
+  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
+  SDL_RenderClear(renderer);
   auto rwops = SDL_RWFromConstMem(&_binary_tic_tac_toe_png_start, ticTacToeSize());
   if(rwops == nullptr) {
     std::cout << "Error extracting image from embedded binary: " << SDL_GetError() << std::endl;
@@ -41,8 +41,9 @@ int main()
     std::cout << "Error creating texture: " << SDL_GetError() << std::endl;
     return -1;
   }
-
-  SDL_RenderCopy(renderer, texture, NULL, NULL);
+  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+  SDL_Rect rect = { 0, 0, 384, 384 };
+  SDL_RenderCopy(renderer, texture, &rect , &rect);
   SDL_RenderPresent(renderer);
 
   bool quit = false;

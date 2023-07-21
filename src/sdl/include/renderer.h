@@ -1,14 +1,17 @@
 #ifndef __SDL_RENDERER_H__
 #define __SDL_RENDERER_H__
 
+#include <optional>
 #include <memory>
 #include <unordered_set>
 
 #include "color.h"
+#include "rectangle.h"
 #include "texture.h"
 
 namespace sdl {
 
+class Rectangle;
 class Texture;
 class Window;
 class RendererImpl;
@@ -38,8 +41,17 @@ class Renderer {
     //! @brief Set the color used for drawing operations (Rect, Line and Clear).
     void setRenderDrawColour(const Color& color);
 
-    //! @brief Copy the texture to the renderer.
-    Renderer &copy(Texture& texture);
+    //! @brief Copy a region of the texture to a region of the renderer.
+    Renderer &copy(
+      Texture& texture
+    );
+    
+    //! @brief Copy a region of the texture to a region of the renderer.
+    Renderer &copy(
+      Texture& texture, 
+      const Rectangle &source, 
+      const Rectangle &destination
+    );
 
     //! @brief Clear the renderer with the drawing color.
     void clear();
