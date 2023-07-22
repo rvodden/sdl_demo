@@ -24,6 +24,40 @@ Rectangle &Rectangle::operator=(Rectangle &other) {
 Rectangle &Rectangle::operator=(Rectangle &&other){
   _rectangleImpl = std::move(other._rectangleImpl);
   return *this;
+}
+
+uint32_t Rectangle::getX()
+{
+  return _rectangleImpl->_sdlRect.x;
+}
+
+uint32_t Rectangle::getY()
+{
+  return _rectangleImpl->_sdlRect.y;
+}
+
+uint32_t Rectangle::getHeight()
+{
+  return _rectangleImpl->_sdlRect.h;
+}
+
+uint32_t Rectangle::getWidth()
+{
+  return _rectangleImpl->_sdlRect.w;
 };
+
+bool Rectangle::contains(const uint32_t &x, const uint32_t &y) {
+  uint32_t rx = getX();
+  uint32_t ry = getY();
+  uint32_t height = getHeight();
+  uint32_t width = getWidth();
+
+  if ( x < rx ) return false;
+  if ( x > rx + width ) return false;
+  if ( y < ry ) return false;
+  if ( y > ry + height ) return false;
+
+  return true;
+}
 
 }

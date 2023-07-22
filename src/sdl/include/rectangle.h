@@ -35,6 +35,13 @@ class Rectangle {
     //! @brief move assignment operator
     Rectangle& operator=(Rectangle&& other);
 
+    uint32_t getX();
+    uint32_t getY();
+    uint32_t getHeight();
+    uint32_t getWidth();
+
+    bool contains(const uint32_t &x, const uint32_t &y);
+
   private:
     std::unique_ptr<RectangleImpl> _rectangleImpl;
 };

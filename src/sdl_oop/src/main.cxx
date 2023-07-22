@@ -1,10 +1,14 @@
 #include <exception>
+#include <forward_list>
+#include <functional>
 #include <iostream>
+#include <ranges>
 
 #include <images.h>
 
+#include <button.h>
 #include <color.h>
-#include <event_processor.h>
+#include <event.h>
 #include <rectangle.h>
 #include <renderer.h>
 #include <sdl.h>
@@ -12,6 +16,11 @@
 #include <window.h>
 
 using namespace sdl;
+using namespace sdl::tools;
+
+static void mouseButtonEventHandler(uint8_t number, [[maybe_unused]] const MousePositionEvent& mousePositionEvent) {
+  std::cout << "Got a mouse button event : " << +number << std::endl;
+}
 
 int main()
 {
@@ -39,6 +48,15 @@ int main()
     renderer.present();
 
     EventProcessor eventProcessor;
+    std::vector<std::unique_ptr<Button>> buttons;
+    buttons.reserve(9);
+    for( uint32_t i : std::ranges::iota_view{ 0, 3 } ) {
+      for( uint32_t j : std::ranges::iota_view{ 0, 3 } ) {
+        auto button = std::make_unique<Button>(eventProcessor, Rectangle{ j * 128 + 1, i * 128 + 1, 128u, 128u} );
+        button->registerEventHandler(std::bind(mouseButtonEventHandler, 3*i + j, std::placeholders::_1));
+        buttons.emplace_back(std::move(button));
+      }
+    }
     eventProcessor.run();
 
   } catch ( std::exception &e ) {

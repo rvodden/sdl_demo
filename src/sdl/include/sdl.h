@@ -11,7 +11,7 @@ class SDLImpl;
 class SDL {
   public:
     SDL();
-    ~SDL();
+    ~SDL() noexcept;
 
     typedef uint8_t SubSystem; 
     static constexpr SubSystem kTimer = 0;

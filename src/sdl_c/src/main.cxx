@@ -52,7 +52,11 @@ int main()
     SDL_WaitEvent(&event);        
     
     switch(event.type)        
-    {        
+    {
+      case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
+        std::cout << "Got a mouse button event!" << std::endl;
+        break;
       case SDL_QUIT:        
         quit = true;        
         break;        
