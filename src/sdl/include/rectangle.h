@@ -23,24 +23,24 @@ class Rectangle {
     */
 
     //! @brief copy constructor
-    Rectangle(Rectangle& other);
+    Rectangle(const Rectangle& other);
     //! @brief move constructor
     Rectangle(Rectangle&& other);
 
     ~Rectangle();
 
     //! @brief copy assignment operator
-    Rectangle& operator=(Rectangle& other);
+    Rectangle& operator=(const Rectangle& other);
     
     //! @brief move assignment operator
     Rectangle& operator=(Rectangle&& other);
 
-    uint32_t getX();
-    uint32_t getY();
-    uint32_t getHeight();
-    uint32_t getWidth();
+    uint32_t getX() const;
+    uint32_t getY() const;
+    uint32_t getHeight() const;
+    uint32_t getWidth() const;
 
-    bool contains(const uint32_t &x, const uint32_t &y);
+    bool contains(const uint32_t &x, const uint32_t &y) const;
 
   private:
     std::unique_ptr<RectangleImpl> _rectangleImpl;

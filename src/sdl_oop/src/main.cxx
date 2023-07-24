@@ -16,6 +16,8 @@
 
 #include <button.h>
 #include <event_dispatcher.h>
+#include <sprite.h>
+#include <sprite_renderer.h>
 
 using namespace sdl;
 using namespace sdl::tools;
@@ -41,12 +43,16 @@ int main()
 
     Renderer renderer { window, -1, { Renderer::kSoftware } };
     renderer.setRenderDrawColour(NamedColor::kMagenta);
+    SpriteRenderer spriteRenderer( renderer );
 
     Texture texture { renderer, &_binary_tic_tac_toe_png_start, ticTacToeSize() };
+    const Sprite board {texture, {0, 0, 384, 384}};
+
     renderer.setRenderDrawColour(NamedColor::kWhite);
     renderer.clear();
     texture.setTextureBlendMode(Texture::kBlend);
-    renderer.copy(texture, Rectangle{ 0, 0, 384, 384 }, Rectangle{ 0, 0, 384, 384 });
+    
+    spriteRenderer.render(board, 0, 0);
     renderer.present();
 
     EventProducer eventProducer { }; 

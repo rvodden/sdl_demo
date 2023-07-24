@@ -75,5 +75,6 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "Vodden",
         "projectKey": "rvodden_sdl_demo"
-    }
+    },
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
 }

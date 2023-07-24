@@ -42,16 +42,16 @@ class Renderer {
     void setRenderDrawColour(const Color& color);
 
     //! @brief Copy a region of the texture to a region of the renderer.
-    Renderer &copy(
-      Texture& texture
-    );
+    const Renderer &copy(
+      const Texture& texture
+    ) const;
     
     //! @brief Copy a region of the texture to a region of the renderer.
-    Renderer &copy(
-      Texture& texture, 
+    const Renderer &copy(
+      const Texture& texture, 
       const Rectangle &source, 
       const Rectangle &destination
-    );
+    ) const;
 
     //! @brief Clear the renderer with the drawing color.
     void clear();
