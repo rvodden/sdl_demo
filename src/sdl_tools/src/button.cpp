@@ -12,7 +12,7 @@ void ButtonImpl::MouseEventHandler::handle([[maybe_unused]] const sdl::MouseButt
   }
 }
 
-Button::Button(sdl::EventProcessor &eventProcessor, sdl::Rectangle rectangle) : _buttonImpl { std::make_unique<ButtonImpl>(eventProcessor, rectangle) } {
+Button::Button(EventDispatcher &eventProcessor, sdl::Rectangle rectangle) : _buttonImpl { std::make_unique<ButtonImpl>(eventProcessor, rectangle) } {
   _buttonImpl->_eventProcessor.registerEventHandler(_buttonImpl->_mouseEventHandler);
 }
 

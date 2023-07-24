@@ -13,7 +13,7 @@ namespace sdl::tools {
 class ButtonImpl {
   friend Button;
   public:
-    ButtonImpl(sdl::EventProcessor &eventProcessor, sdl::Rectangle& rectangle) : 
+    ButtonImpl(EventDispatcher &eventProcessor, sdl::Rectangle& rectangle) : 
       _rectangle { rectangle },
       _eventProcessor { eventProcessor } { };
 
@@ -32,8 +32,8 @@ class ButtonImpl {
   private:
     void eventHandler(const sdl::MousePositionEvent &mousePositionEvent);
 
-    sdl::EventProcessor& _eventProcessor;
     sdl::Rectangle _rectangle;
+    EventDispatcher& _eventProcessor;
     std::forward_list<Button::Handler> _eventHandlers { };
     MouseEventHandler _mouseEventHandler { _rectangle , _eventHandlers };
 };

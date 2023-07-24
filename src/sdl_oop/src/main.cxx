@@ -6,7 +6,6 @@
 
 #include <images.h>
 
-#include <button.h>
 #include <color.h>
 #include <event.h>
 #include <rectangle.h>
@@ -14,6 +13,9 @@
 #include <sdl.h>
 #include <texture.h>
 #include <window.h>
+
+#include <button.h>
+#include <event_dispatcher.h>
 
 using namespace sdl;
 using namespace sdl::tools;
@@ -47,17 +49,18 @@ int main()
     renderer.copy(texture, Rectangle{ 0, 0, 384, 384 }, Rectangle{ 0, 0, 384, 384 });
     renderer.present();
 
-    EventProcessor eventProcessor;
+    EventProducer eventProducer { }; 
+    EventDispatcher eventDispatcher { eventProducer };
     std::vector<std::unique_ptr<Button>> buttons;
     buttons.reserve(9);
     for( uint32_t i : std::ranges::iota_view{ 0, 3 } ) {
       for( uint32_t j : std::ranges::iota_view{ 0, 3 } ) {
-        auto button = std::make_unique<Button>(eventProcessor, Rectangle{ j * 128 + 1, i * 128 + 1, 128u, 128u} );
+        auto button = std::make_unique<Button>(eventDispatcher, Rectangle{ j * 128 + 1, i * 128 + 1, 128u, 128u} );
         button->registerEventHandler(std::bind(mouseButtonEventHandler, 3*i + j, std::placeholders::_1));
         buttons.emplace_back(std::move(button));
       }
     }
-    eventProcessor.run();
+    eventDispatcher.run();
 
   } catch ( std::exception &e ) {
     std::cout << "Some kind of error happened!" << std::endl;

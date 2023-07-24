@@ -47,6 +47,7 @@ int main()
   SDL_RenderPresent(renderer);
 
   bool quit = false;
+  int bx, by, button_number;
   SDL_Event event;
   while (not quit) {        
     SDL_WaitEvent(&event);        
@@ -55,7 +56,11 @@ int main()
     {
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
-        std::cout << "Got a mouse button event!" << std::endl;
+        bx = event.button.x / 128;
+        by = event.button.y / 128;
+        button_number = 3 * by + bx;
+        std::cout << button_number << std::endl;
+        std::cout << "Got a mouse event : " << button_number << std::endl;
         break;
       case SDL_QUIT:        
         quit = true;        

@@ -9,50 +9,27 @@
 
 namespace sdl {
 
-void DefaultQuitEventHandler::handle( [[maybe_unused]] const QuitEvent& quitEvent ) {
-  _eventProcessorImpl.quit();
-}
-
-EventProcessor::EventProcessor() : _eventProcessorImpl { std::make_unique<EventProcessorImpl>() } {
-  registerEventHandler( _eventProcessorImpl->defaultQuitEventHandler );
-}
-
-EventProcessor::~EventProcessor() {};
-
-void EventProcessor::run() {
-  SDL_Event event;  
-  while ( not _eventProcessorImpl->quitFlag ) {
-    SDL_WaitEvent(&event);
-      try {
-        for(const auto &eventHandler : _eventProcessorImpl->_eventHandlers) {
-            switch (event.type) {
-              case SDL_EventType::SDL_MOUSEBUTTONDOWN:
-              case SDL_EventType::SDL_MOUSEBUTTONUP:
-                createMouseButtonEvent((SDL_MouseButtonEvent*)(&event)).handle(eventHandler);
-                break;
-              case SDL_EventType::SDL_QUIT:
-                createQuitEvent((SDL_QuitEvent*)(&event)).handle(eventHandler);
-                break;
-            }
-        }
-      } catch (std::range_error& rangeError) {} // TODO: map all the event types
+std::unique_ptr<BaseEvent> EventProducer::wait() {
+  SDL_Event event;
+  SDL_WaitEvent(&event);
+  switch (event.type) {
+    case SDL_EventType::SDL_MOUSEBUTTONDOWN:
+    case SDL_EventType::SDL_MOUSEBUTTONUP:
+      return createMouseButtonEvent((SDL_MouseButtonEvent*)(&event));
+    case SDL_EventType::SDL_QUIT:
+      return createQuitEvent((SDL_QuitEvent*)(&event));
+    default:
+      throw UnknownEventException("I don't know what this event is!");
   }
 }
 
-void EventProcessor::registerEventHandler(BaseEventHandler& baseEventHandler ) {
-  _eventProcessorImpl->_eventHandlers.push_front(std::ref(baseEventHandler));
+
+std::unique_ptr<QuitEvent> createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent) {
+  return std::make_unique<QuitEvent>( std::chrono::milliseconds( SDL_GetTicks64() ) );
 }
 
-
-QuitEvent createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent) {
-  QuitEvent quitEvent {
-    std::chrono::milliseconds( SDL_GetTicks64() )
-  };
-  return quitEvent;
-}
-
-MouseButtonEvent createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent) {
-  MouseButtonEvent mouseButtonEvent {
+std::unique_ptr<MouseButtonEvent> createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent) {
+  return std::make_unique<MouseButtonEvent>(
     std::chrono::milliseconds( SDL_GetTicks64() ),
     sdlMouseButtonEvent->windowID,
     sdlMouseButtonEvent->which,
@@ -61,8 +38,7 @@ MouseButtonEvent createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButt
     sdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
     sdlMouseButtonEventStateMap[sdlMouseButtonEvent->state],
     sdlMouseButtonEvent->clicks
-  };
-  return mouseButtonEvent;
+  );
 }
 
 }

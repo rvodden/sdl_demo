@@ -2,17 +2,16 @@
 #define __SDL_EVENT_H__
 
 #include <chrono>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
 
 namespace sdl {
 
-typedef uint32_t EventType;
-static constexpr EventType kQuit = 0;
-static constexpr EventType kMouseButtonEvent = 15;
-
-class EventProcessorImpl;
+class UnknownEventException : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
 
 //! @brief a superclass for all event handler
 class BaseEventHandler {
@@ -31,7 +30,7 @@ class EventHandler {
 class BaseEvent {
   public:
     virtual void handle(BaseEventHandler &baseEventHandler) = 0;
-    ~BaseEvent() {};
+    virtual ~BaseEvent() {};
 };
 
 template <class EventClass>
@@ -142,16 +141,16 @@ class MouseButtonEvent : public MousePositionEvent {
     uint8_t clicks;
 };
 
-class EventProcessor {
+class BaseEventProducer {
   public:
-    EventProcessor();
-    ~EventProcessor();
-    void run();
-    void registerEventHandler(BaseEventHandler& baseEventHandler);
-
-  private:
-    std::unique_ptr<EventProcessorImpl> _eventProcessorImpl;
+    virtual std::unique_ptr<BaseEvent> wait() = 0;
 };
+
+class EventProducer : public BaseEventProducer {
+  public:
+    virtual std::unique_ptr<BaseEvent> wait();  
+};
+
 
 }
 

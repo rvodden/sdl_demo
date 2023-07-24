@@ -6,6 +6,8 @@
 #include <event.h>
 #include <rectangle.h>
 
+#include <event_dispatcher.h>
+
 namespace sdl::tools {
 
 class ButtonImpl;
@@ -14,7 +16,7 @@ class Button {
   public:
     typedef std::function<void(const MousePositionEvent&)> Handler;
 
-    Button(sdl::EventProcessor& eventProcessor, sdl::Rectangle rectangle);
+    Button(EventDispatcher& eventProcessor, sdl::Rectangle rectangle);
     Button(Button&& other);
     ~Button();
 
