@@ -1,0 +1,16 @@
+{
+    "name": "GCC (Windows)",
+    "image": "ha-dev:x86_64-pc-ubuntu-gcc-x11",
+    "remoteUser": "hadev",
+    "runArgs": ["--gpus", "all", "--cap-add=CAP_PERFMON"],
+    "customizations": {
+        "vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {},
+			"extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "EditorConfig.EditorConfig"
+            ]
+		}
+    }
+}

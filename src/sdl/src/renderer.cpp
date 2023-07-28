@@ -67,12 +67,12 @@ const Renderer &Renderer::copy(const Texture &texture, const Rectangle &source, 
   return *this;
 }
 
-void Renderer::clear() {
+void Renderer::clear() const {
   auto retVal = SDL_RenderClear(_rendererImpl->_sdlRenderer);
   if (retVal < 0) throw Exception("SDL_SetRenderClear");
 }
 
-void Renderer::present() {
+void Renderer::present() const {
   SDL_RenderPresent(_rendererImpl->_sdlRenderer);
 }
 

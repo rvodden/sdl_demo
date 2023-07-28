@@ -43,20 +43,18 @@
     "buildPresets": [
         {
             "name": "targets",
-            "hidden": true,
-            "targets": ["sdl","sdl_tools","sdl_oop","sdl_c","snippets"]
+            "configurePreset": "ninja-mc",
+            "hidden": true
         },
         {
             "name": "ninja-mc-release-all",
             "displayName": "Release",
-            "configurePreset": "ninja-mc",
             "configuration": "Release",
             "inherits": ["targets"]
         },
         {
             "name": "ninja-mc-debug-all",
             "displayName": "Debug",
-            "configurePreset": "ninja-mc",
             "configuration": "Debug",
             "inherits": ["targets"]
         }

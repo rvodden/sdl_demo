@@ -1,0 +1,24 @@
+{
+    "name": "Intel (Windows)",
+    "image": "ha-dev:x86_64-pc-ubuntu-icc-x11",
+    "remoteUser": "hadev",
+    "runArgs": ["--gpus", "all", "--cap-add=CAP_PERFMON"],
+    "mounts": [{
+        "source": "/usr/lib/wsl",
+        "target": "/usr/lib/wsl",
+        "type": "bind"
+    }],
+    "containerEnv": {
+        "LD_LIBRARY_PATH": "/usr/lib/wsl/lib"
+    },
+    "customizations": {
+        "vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {},
+			"extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "EditorConfig.EditorConfig"
+            ]
+		}
+    }
+}

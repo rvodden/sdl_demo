@@ -23,7 +23,6 @@ std::unique_ptr<BaseEvent> EventProducer::wait() {
   }
 }
 
-
 std::unique_ptr<QuitEvent> createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent) {
   return std::make_unique<QuitEvent>( std::chrono::milliseconds( SDL_GetTicks64() ) );
 }

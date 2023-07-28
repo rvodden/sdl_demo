@@ -15,13 +15,14 @@ class SpriteRendererImpl;
 class SpriteRenderer {
   public:
     SpriteRenderer(const Renderer& renderer);
+    SpriteRenderer(SpriteRenderer&& other);
     ~SpriteRenderer();
 
     //! @brief render the provided sprite at the provided locations
     void render(const Sprite& sprite, const uint32_t x, const uint32_t y) const;
   
   private:
-    std::unique_ptr<SpriteRendererImpl> _spriteRendereImpl;
+    std::unique_ptr<SpriteRendererImpl> _spriteRendererImpl;
 };
 
 }

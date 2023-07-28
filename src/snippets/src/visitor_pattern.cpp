@@ -5,9 +5,9 @@
 
 class Event;
 
-class AbstractHandler { 
+class BaseEventHandler { 
   public:
-    virtual ~AbstractHandler() {};
+    virtual ~BaseEventHandler() {};
 };
 
 template <class EventClass>
@@ -18,7 +18,7 @@ class EventHandler {
 };
 
 template <class EventClass>
-void castHandler(const EventClass& eventClass, AbstractHandler& abstractHandler) {
+void castHandler(const EventClass& eventClass, BaseEventHandler& abstractHandler) {
   try {
     EventHandler<EventClass> &eventHandler = dynamic_cast<EventHandler<EventClass>&>(abstractHandler);
     eventHandler.handle(eventClass);
@@ -27,20 +27,20 @@ void castHandler(const EventClass& eventClass, AbstractHandler& abstractHandler)
 
 class Event {
   public:
-    virtual void handle(AbstractHandler& abstractHandler) = 0;
+    virtual void handle(BaseEventHandler& abstractHandler) = 0;
     virtual std::string getName() const { return "Event"; }
     std::string name { "Event" };
 };
 
 class MouseEvent : public Event {
   public:
-    virtual void handle(AbstractHandler& abstractHandler) {
+    virtual void handle(BaseEventHandler& abstractHandler) {
       castHandler(*this, abstractHandler);
     }
     virtual std::string getName() const { return "MouseEvent"; }
 };
 
-class MouseEventHandler: public AbstractHandler, public EventHandler<MouseEvent> {
+class MouseEventHandler: public BaseEventHandler, public EventHandler<MouseEvent> {
   public:
     void handle(const MouseEvent& mouseEvent) {
       std::cout << "I am handling a mouse event." << std::endl;
@@ -49,7 +49,7 @@ class MouseEventHandler: public AbstractHandler, public EventHandler<MouseEvent>
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
   
-  std::vector<std::unique_ptr<AbstractHandler>> eventHandlers;
+  std::vector<std::unique_ptr<BaseEventHandler>> eventHandlers;
   eventHandlers.push_back( std::make_unique<MouseEventHandler>() );
 
   for(const auto &eventHandler : eventHandlers) {

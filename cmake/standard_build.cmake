@@ -1,10 +1,4 @@
-macro(standard_build)
-
-    ## Library Build
-
-    get_filename_component( LibraryName ${CMAKE_CURRENT_SOURCE_DIR} NAME )    
-    
-    message( CHECK_START "Loading ${LibraryName}..." )
+macro(get_sources)
 
     # Has HEADER Files?
     if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include )
@@ -16,24 +10,14 @@ macro(standard_build)
     endif()
     list(APPEND SOURCE_FILES ${HEADER_FILES})
 
-    if( SOURCE_FILES )
+    if(SOURCE_FILES)
         foreach( SOURCE_FILE ${SOURCE_FILES} )
-            message( "   Adding file: ${SOURCE_FILE}" )
+            message( "   Found: ${SOURCE_FILE}" )
         endforeach()
-        add_library( ${LibraryName} SHARED ${SOURCE_FILES} )
-
-        target_include_directories( 
-            ${LibraryName}
-            PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
-        )
     endif()
-        
-    message( CHECK_PASS "done." )
- 
-    ## Test Build
+endmacro()
 
+macro(add_test_target)
     if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test )
         if(NOT CMAKE_TESTING_ENABLED)
             include(GoogleTest)
@@ -56,21 +40,61 @@ macro(standard_build)
 
         set(LibraryName ${LibraryName} PARENT_SCOPE)
     endif()
+endmacro()
 
-    # ## Documentation Build
+macro(standard_libarary_build)
 
-    # set( DocName "${LibraryName}_docs" )
+    ## Library Build
+
+    get_filename_component( LibraryName ${CMAKE_CURRENT_SOURCE_DIR} NAME )    
     
-    # doxygen_add_docs( ${DocName} ${SOURCE_FILES} )
-        
-    # ## Benchmark Build
+    message( CHECK_START "Loading ${LibraryName}..." )
+    get_sources()
 
-    # if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bench)
-    #     set(BenchName "${LibraryName}_bench")
-    #     file(GLOB_RECURSE BENCH_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bench/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/bench/*.h)
-    #     add_executable(${BenchName} ${BENCH_SOURCE_FILES})
-    #     target_link_libraries(${BenchName} PUBLIC ${LibraryName})
-    #     target_link_libraries(${BenchName} PRIVATE benchmark::benchmark_main)
-    # endif()
+    if( SOURCE_FILES )    
+        add_library( ${LibraryName} SHARED ${SOURCE_FILES} )
+
+        target_include_directories( 
+            ${LibraryName}
+            PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
+        )
+    endif()
+        
+    message( CHECK_PASS "done." )
+
+    add_test_target()
 
 endmacro()
+
+macro(standard_executable_build)
+
+    ## Library Build
+
+    get_filename_component( LibraryName ${CMAKE_CURRENT_SOURCE_DIR} NAME )    
+    
+    message( CHECK_START "Loading ${LibraryName}..." )
+    get_sources()
+
+    if( SOURCE_FILES )    
+        add_executable( ${LibraryName} ${SOURCE_FILES} )
+
+        target_include_directories( 
+            ${LibraryName}
+            PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        )
+    endif()
+        
+    message( CHECK_PASS "done." )
+
+    add_test_target()
+
+endmacro()
+
+macro(standard_build)
+    standard_libarary_build()
+endmacro()
+
+

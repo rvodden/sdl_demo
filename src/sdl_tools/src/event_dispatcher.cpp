@@ -24,7 +24,7 @@ void EventDispatcher::run() {
       for(const auto& handler : _eventDispatcherImpl->_eventHandlers) {
         event->handle(handler);
       }
-    } catch (sdl::UnknownEventException &uee) { } // TODO: unknown events are "fine"
+    } catch ([[maybe_unused]] sdl::UnknownEventException &_) { } // TODO: unknown events are "fine"
   }
 }
 

@@ -54,10 +54,10 @@ class Renderer {
     ) const;
 
     //! @brief Clear the renderer with the drawing color.
-    void clear();
+    void clear() const;
 
     //! @brief Update the screen with any rendering performed since the previous call.
-    void present();
+    void present() const;
 
     static constexpr RendererFlag kSoftware = 0;
     static constexpr RendererFlag kAccelerated = 1;

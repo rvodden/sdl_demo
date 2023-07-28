@@ -29,8 +29,8 @@ class EventHandler {
 //! @brief a superclass for all events
 class BaseEvent {
   public:
-    virtual void handle(BaseEventHandler &baseEventHandler) = 0;
     virtual ~BaseEvent() {};
+    virtual void handle(BaseEventHandler &baseEventHandler) = 0;
 };
 
 template <class EventClass>
@@ -44,9 +44,9 @@ void castHandler(const EventClass& eventClass, BaseEventHandler& baseEventHandle
 class Event : public BaseEvent {
   public:
     //! @brief constructor
-    Event(std::chrono::duration<int64_t, std::milli> ts) : timestamp{ts} {};
+    Event(std::chrono::duration<uint64_t, std::milli> ts) : timestamp{ts} {};
     //! @brief timestamp of the event
-    std::chrono::duration<int64_t, std::milli> timestamp;
+    std::chrono::duration<uint64_t, std::milli> timestamp;
 
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -144,11 +144,13 @@ class MouseButtonEvent : public MousePositionEvent {
 class BaseEventProducer {
   public:
     virtual std::unique_ptr<BaseEvent> wait() = 0;
+    virtual void produce(std::unique_ptr<Event>) {};
 };
 
 class EventProducer : public BaseEventProducer {
   public:
-    virtual std::unique_ptr<BaseEvent> wait();  
+    virtual std::unique_ptr<BaseEvent> wait();
+    virtual void produce(std::unique_ptr<Event>) {};
 };
 
 
