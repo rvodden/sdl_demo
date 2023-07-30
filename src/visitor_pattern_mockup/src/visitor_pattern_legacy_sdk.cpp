@@ -6,82 +6,103 @@
 #include <vector>
 
 #include "visitor_pattern_legacy_sdk_impl.h"
+#include "visitor_pattern_legacy_sdk.h"
 
-BaseEvent::BaseEvent(BaseEventImpl* impl): _impl { impl,  [](BaseEventImpl* i ) { delete i; } } {};
-UserEvent::UserEvent(): BaseEvent(new UserEventImpl(this))  {};
-SystemEvent::SystemEvent(): BaseEvent(new SystemEventImpl(this)) {};
-CustomEvent::CustomEvent(): BaseEvent(new CustomEventImpl(this)) {};
-CustomEvent::CustomEvent(CustomEventImpl* impl): BaseEvent ( static_cast<BaseEventImpl*>(impl) ) {};
+BaseEvent::BaseEvent(const BaseConvertable* impl):
+  _convertable { impl, [](const BaseConvertable* i ) { delete i; } } 
+{ }
 
-CustomEvent& CustomEvent::clone() const {
-  auto customEventImpl = static_cast<CustomEventImpl*>(this->_impl.get())->clone();
-  auto newCustomEvent =  new CustomEvent(
-    customEventImpl
+BaseEvent::BaseEvent(const BaseEvent& other) : 
+  _convertable( 
+      std::unique_ptr<const BaseConvertable, void(*)(const BaseConvertable*)>( other.createConvertable(this), [](const BaseConvertable* i){ delete i; } ) 
+  ) {} ;
+
+BaseEvent& BaseEvent::operator=(const BaseEvent& other) {
+  this->setConvertable(other.createConvertable(this));
+  return *this;
+}
+
+BaseConvertable::~BaseConvertable() {}
+
+void BaseEvent::setConvertable(const BaseConvertable* convertable) {
+  this->_convertable = std::move(
+    std::unique_ptr<const BaseConvertable, void(*)(const BaseConvertable*)>(convertable, [](const BaseConvertable* i){ delete i; })
   );
-  newCustomEvent->customEventNumber = customEventNumber;
-  return *newCustomEvent;
 }
 
-CustomEventImpl* CustomEvent::cloneImpl() const {
-  return static_cast<CustomEventImpl*>(this->_impl.get())->clone();
+void BaseEvent::setConvertableParent() {
+  this->_convertable->setParent(this);
 }
 
-CustomEventImpl* CustomEventImpl::clone() const {
-  return new CustomEventImpl( *this );
+BaseConvertable* BaseEvent::createConvertable(const BaseEvent* parent) const {
+  return this->_convertable->clone(parent);
 }
 
-UserEvent& createUserEvent(OLD_Event* event) {
-  auto *userEvent = new UserEvent();
+void BaseConvertable::setParent(BaseEvent *baseEvent) const {
+  this->_baseEvent = baseEvent;
+};
+
+UserEvent::UserEvent(): Event(new ConvertableUserEvent(this)) {};
+SystemEvent::SystemEvent(): Event(new ConvertableSystemEvent(this)) {};
+
+
+UserEvent& UserEventFactory::createUserEvent(OLD_Event* event) {
+  UserEvent *userEvent = new UserEvent();
+  userEvent->setConvertable(userEvent->createConvertable(userEvent));
   userEvent->userNumber = event->user.userNumber;
   return *userEvent;
 }
 
-SystemEvent& createSystemEvent(OLD_Event* event) {
-  auto *systemEvent = new SystemEvent();
+SystemEvent& SystemEventFactory::createSystemEvent(OLD_Event* event) {
+  SystemEvent *systemEvent = new SystemEvent();
+  systemEvent->setConvertable(systemEvent->createConvertable(systemEvent));
   systemEvent->systemNumber = event->system.systemNumber;
   return *systemEvent;
 }
 
-CustomEvent& createCustomEvent(OLD_Event* event) {
-  auto* customEvent = static_cast<CustomEvent*>(event->custom.payload);
+BaseEvent& CustomEventFactory::createCustomEvent(OLD_Event* event) {
+  auto* customEvent = static_cast<BaseEvent*>(event->custom.payload);
   return *customEvent;
+}
+
+BaseConvertable* ConvertableCustomEventFactory::createConvertableCustomEvent(BaseEvent* parent) {
+  return new ConvertableCustomEvent(parent);
 }
 
 BaseEvent& createEvent(OLD_Event* oldEvent) {
   switch(oldEvent->eventType) {
     case OLD_USEREVENT:
-      return createUserEvent(oldEvent);
+      return UserEventFactory::createUserEvent(oldEvent);
     case OLD_SYSTEMEVENT:
-      return createSystemEvent(oldEvent);
+      return SystemEventFactory::createSystemEvent(oldEvent);
     case OLD_CUSTOMEVENT:
-      return createCustomEvent(oldEvent);
+      return CustomEventFactory::createCustomEvent(oldEvent);
     default:
       throw UnknownEventException("Unknown Event"); //TODO: render type number
   }
 }
 
-OLD_Event* EventConverter::convert(const UserEventImpl& userEvent) const {
+OLD_Event* EventConverter::convert(const ConvertableUserEvent& userEvent) const {
   OLD_Event* oldEvent = new OLD_Event{ .user={
     OLD_USEREVENT,
-    static_cast<UserEvent*>(userEvent._baseEvent)->userNumber
+    static_cast<const UserEvent*>(userEvent._baseEvent)->userNumber
   }};
   return oldEvent;
 }
 
-OLD_Event* EventConverter::convert(const SystemEventImpl& systemEvent) const {
+OLD_Event* EventConverter::convert(const ConvertableSystemEvent& systemEvent) const {
   OLD_Event* oldEvent = new OLD_Event{ .system={
     OLD_SYSTEMEVENT,
-    static_cast<SystemEvent*>(systemEvent._baseEvent)->systemNumber
+    static_cast<const SystemEvent*>(systemEvent._baseEvent)->systemNumber
   }};
   return oldEvent;
 }
 
-OLD_Event* EventConverter::convert(const CustomEventImpl& customEventImpl) const {
-  auto& customEvent = static_cast<CustomEvent&>(*customEventImpl._baseEvent);
+OLD_Event* EventConverter::convert(const ConvertableCustomEvent& customEventImpl) const {
+  const auto& customEvent = static_cast<const BaseEvent&>(*customEventImpl._baseEvent);
   OLD_Event* oldEvent = new OLD_Event{ .custom={
     OLD_CUSTOMEVENT,
-    customEvent.customEventNumber,
-    static_cast<void *>(&customEvent.clone())
+    &customEvent.clone()
   }};
   return oldEvent;
 }
@@ -96,7 +117,8 @@ BaseEvent& getEvent() {
 
 void pushEvent(const BaseEvent& event) {
   EventConverter eventConverter {};
-  OLD_Event* oldEvent = event._impl->acceptConverter(eventConverter);
+  OLD_Event* oldEvent = event._convertable->acceptConverter(eventConverter);
+  if(oldEvent == nullptr) throw UnknownEventException("I don't know what this event is!");
   pushOldEvent(oldEvent);
   delete oldEvent;
 };

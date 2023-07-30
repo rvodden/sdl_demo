@@ -8,7 +8,7 @@
 #define VALUABLE_DECLSPEC_EMPTY_BASES
 #endif
 
-namespace valuable {
+namespace vodden {
 
 namespace detail {
   struct spacer {};

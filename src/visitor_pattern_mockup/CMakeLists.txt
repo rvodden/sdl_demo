@@ -1,1 +1,2 @@
-standard_executable_build("EXECUTABLE")
+standard_build()
+add_dependency(${LibraryName} PRIVATE utils)

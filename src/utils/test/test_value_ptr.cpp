@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <value_ptr.hpp>
+#include <value_ptr.h>
 
-using namespace valuable;
+using namespace vodden;
 
 TEST(value_ptr, lifetime) {
 

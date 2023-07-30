@@ -24,7 +24,6 @@ struct OLD_SystemEvent {
 
 struct OLD_CustomEvent {
   OLD_EventType eventType;
-  uint16_t customEventNumber;
   void* payload;
 };
 

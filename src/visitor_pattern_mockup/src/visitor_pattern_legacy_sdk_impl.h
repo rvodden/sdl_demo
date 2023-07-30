@@ -16,68 +16,72 @@ class Converter {
     virtual OLD_Event* convert(const EventClass& event) const = 0;
 };
 
-template<class EventClass>
-OLD_Event* castConverter(const EventClass& event, const BaseConverter& baseConverter){
-  try {
-    const Converter<EventClass> &eventConverter = dynamic_cast<const Converter<EventClass>&>(baseConverter);
-    return eventConverter.convert(event);
-  } catch (std::bad_cast &e) { return nullptr; } // bad cast just means this handler can't handle this event
-}
-
-class EventConverter;
-
-class BaseEventImpl {
+class BaseConvertable {
   friend EventConverter;
+  friend BaseEvent;
   public:
-    BaseEventImpl(BaseEvent* baseEvent) : _baseEvent { baseEvent } {};
-    virtual ~BaseEventImpl() {};
+    BaseConvertable(const BaseEvent* baseEvent) : _baseEvent { baseEvent } {};
+    virtual ~BaseConvertable() noexcept;
     virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const = 0;
+    virtual BaseConvertable* clone(const BaseEvent*) const = 0;
+    void setParent(BaseEvent* _baseEvent) const;
   protected:
-    BaseEvent* _baseEvent;
+    mutable const BaseEvent* _baseEvent;
 };
 
-
-class UserEventImpl : public BaseEventImpl {
-  using BaseEventImpl::BaseEventImpl;
-  friend EventConverter;
+template<class ConvertableEventClass>
+class Convertable : public BaseConvertable {
   public:
-    virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const { 
-      OLD_Event* event = castConverter(*this, baseConverter);
-      return event;
-    };
+    using BaseConvertable::BaseConvertable;
+  
+    virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const override {
+      try {
+        const Converter<ConvertableEventClass> &eventConverter = dynamic_cast<const Converter<ConvertableEventClass>&>(baseConverter);
+        return eventConverter.convert(*static_cast<const ConvertableEventClass*>(this));
+      } catch (std::bad_cast &e) { return nullptr; } // bad cast just means this handler can't handle this event
+    }
+
+    virtual BaseConvertable* clone(const BaseEvent* parent) const {
+      return new ConvertableEventClass(parent);
+    }
 };
 
-class SystemEventImpl : public BaseEventImpl {
-  using BaseEventImpl::BaseEventImpl;
-  friend EventConverter;
-  public:
-    SystemEventImpl(std::unique_ptr<SystemEventImpl, void(*) (SystemEventImpl *)>& impl);
-    virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const { 
-      OLD_Event* event = castConverter(*this, baseConverter);
-      return event;
-    };
+class ConvertableUserEvent : public Convertable<ConvertableUserEvent> {
+  using Convertable<ConvertableUserEvent>::Convertable;
 };
 
-class CustomEventImpl : public BaseEventImpl {
-  using BaseEventImpl::BaseEventImpl;
-  friend EventConverter;
+class ConvertableSystemEvent : public Convertable<ConvertableSystemEvent> {
+  using Convertable<ConvertableSystemEvent>::Convertable;
+};
+
+class ConvertableCustomEvent : public Convertable<ConvertableCustomEvent> {
+  using Convertable<ConvertableCustomEvent>::Convertable;
+};
+
+class UserEventFactory {
   public:
-    CustomEventImpl(std::unique_ptr<CustomEventImpl, void(*) (CustomEventImpl *)>& impl);
-    virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const { 
-      OLD_Event* event = castConverter(*this, baseConverter);
-      return event;
-    };
-    CustomEventImpl* clone() const;
+    static UserEvent& createUserEvent(OLD_Event* event);
+};
+
+class SystemEventFactory {
+  public:
+    static SystemEvent& createSystemEvent(OLD_Event* event);
+};
+
+class CustomEventFactory {
+  public:
+    static BaseEvent& createCustomEvent(OLD_Event* event);
 };
 
 class EventConverter : public BaseConverter, 
-  public Converter<UserEventImpl>, 
-  public Converter<SystemEventImpl>,
-  public Converter<CustomEventImpl> {
+  public Converter<ConvertableUserEvent>, 
+  public Converter<ConvertableSystemEvent>, 
+  public Converter<ConvertableCustomEvent> 
+{
   public:
-   virtual OLD_Event* convert(const UserEventImpl& event) const override;
-   virtual OLD_Event* convert(const SystemEventImpl& event) const override;
-   virtual OLD_Event* convert(const CustomEventImpl& event) const override;
+    virtual OLD_Event* convert(const ConvertableUserEvent& event) const override;
+    virtual OLD_Event* convert(const ConvertableSystemEvent& event) const override;
+    virtual OLD_Event* convert(const ConvertableCustomEvent& event) const override;
 };
 
 #endif

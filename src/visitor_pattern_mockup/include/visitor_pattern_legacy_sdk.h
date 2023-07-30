@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <typeinfo>
+#include <experimental/propagate_const>
 
 class NoEventsException: public std::runtime_error {
   using std::runtime_error::runtime_error;
@@ -18,71 +19,95 @@ class BaseEventHandler {
     virtual ~BaseEventHandler() noexcept {};
 };
 
+class EventConverter;
+template<class EventClass>
+class Event;
+
 template <class EventClass>
 class InternalEventHandler {
   public:
     virtual ~InternalEventHandler() noexcept {};
-    virtual void handle(const EventClass& event) const = 0;
+    virtual void handle(const EventClass& event) const = 0; // TODO: this should be pure virtual?
 };
 
-template <class EventClass>
-void castHandler(const EventClass& eventClass, const BaseEventHandler& abstractHandler) {
-  try {
-    const InternalEventHandler<EventClass> &eventHandler = dynamic_cast<const InternalEventHandler<EventClass>&>(abstractHandler);
-    eventHandler.handle(eventClass);
-  } catch (std::bad_cast &e) { } // bad cast just means this handler can't handle this event
-}
-
-class BaseEventImpl;
+class BaseConvertable;
 class BaseEvent {
-  friend BaseEventImpl;
   friend void pushEvent(const BaseEvent& event);
   public:
-    explicit BaseEvent(BaseEventImpl* impl);
+    explicit BaseEvent(const BaseConvertable* convertable);
+    
+    BaseEvent(const BaseEvent& other);
+    BaseEvent& operator=(const BaseEvent& other);
+    BaseEvent(BaseEvent&& other) = default;
+    BaseEvent& operator=(BaseEvent&& other) = default;
+    
     virtual ~BaseEvent() noexcept {};
-    virtual void operator()(const BaseEventHandler& abstractHandler) const = 0;
+    virtual void acceptHandler(const BaseEventHandler& abstractHandler) const = 0;
+    virtual BaseEvent& clone() const = 0;
 
   protected:
-    std::unique_ptr<BaseEventImpl, void(*) (BaseEventImpl *)> _impl;
+    BaseConvertable* createConvertable(const BaseEvent* parent) const;
+    void setConvertable(const BaseConvertable* convertable);
+    void setConvertableParent();
+    
+    std::unique_ptr<const BaseConvertable, void(*)(const BaseConvertable*)> _convertable;
 };
 
 void pushEvent(const BaseEvent& event);
 
-class UserEvent : public BaseEvent {
+template<class EventClass>
+class Event : public BaseEvent {
   public:
-    UserEvent();
-    uint16_t userNumber;
-    virtual void operator()(const BaseEventHandler& abstractHandler) const {
-      castHandler(*this, abstractHandler);
+    using BaseEvent::BaseEvent;
+    Event(const Event&) = default;
+    Event& operator=(const Event&) = default;
+    Event(Event&&) = default;
+    Event& operator=(Event&&) = default;
+
+    virtual void acceptHandler(const BaseEventHandler& abstractHandler) const {
+      try {
+        const InternalEventHandler<EventClass> &eventHandler = dynamic_cast<const InternalEventHandler<EventClass>&>(abstractHandler);
+        eventHandler.handle(*static_cast<const EventClass*>(this));
+      } catch (std::bad_cast &e) { } // bad cast just means this handler can't handle this event
+    }
+    BaseEvent& clone() const {
+      auto newEvent = new EventClass(*static_cast<const EventClass*>(this));
+      return *newEvent;
     }
 };
 
-class SystemEvent : public BaseEvent {
+class UserEventFactory;
+class UserEvent : public Event<UserEvent> {
+  friend UserEventFactory;
+  public:
+    UserEvent();
+    uint16_t userNumber;
+};
+
+class SystemEventFactory;
+class SystemEvent : public Event<SystemEvent> {
+  friend SystemEventFactory;
   public:
     SystemEvent();
     uint16_t systemNumber;
-    virtual void operator()(const BaseEventHandler& abstractHandler) const {
-      castHandler(*this, abstractHandler);
-    };
 };
 
-class CustomEventImpl;
-class CustomEvent : public BaseEvent {
-  friend CustomEventImpl;
+class ConvertableCustomEvent;
+class ConvertableCustomEventFactory {
   public:
-    CustomEvent();
-    CustomEvent(CustomEventImpl* impl);
-    virtual ~CustomEvent() {};
-    
-    uint16_t customEventNumber;
-    void* payload;
-    virtual void operator()(const BaseEventHandler& abstractHandler) const {
-      castHandler(*this, abstractHandler);
+    static BaseConvertable* createConvertableCustomEvent(BaseEvent* baseEvent);
+};
+
+template <class EventClass>
+class CustomEventTemplate: public Event<EventClass> {
+  public:
+    CustomEventTemplate() : Event<EventClass>(ConvertableCustomEventFactory::createConvertableCustomEvent(this)) {};
+    virtual void acceptHandler(const BaseEventHandler& abstractHandler) const {
+      Event<EventClass>::acceptHandler(abstractHandler);
+    }
+    virtual BaseEvent& clone() const {
+      return Event<EventClass>::clone();
     };
-
-    virtual CustomEvent& clone() const;
-    virtual CustomEventImpl* cloneImpl() const;
-
 };
 
 template<class EventClass>

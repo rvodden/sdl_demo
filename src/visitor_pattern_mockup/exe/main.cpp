@@ -1,30 +1,16 @@
 #include <functional>
 #include <vector>
 
-#include "legacy_sdk.h"
 #include "visitor_pattern_legacy_sdk.h"
 
-class ConcreteCustomEvent: public CustomEvent {
+class ConcreteCustomEvent: public CustomEventTemplate<ConcreteCustomEvent> {
   public:
-    ConcreteCustomEvent() : CustomEvent() {};
-    ConcreteCustomEvent(CustomEventImpl* impl) : CustomEvent(impl) {};
-    ConcreteCustomEvent(uint16_t customEventNumber, std::string message): CustomEvent(),  message { message } {
-      (*this).customEventNumber = customEventNumber;
-    };
-    
-    virtual void operator()(const BaseEventHandler& abstractHandler) const override {
-      castHandler(*this, abstractHandler);
-    };
+    ConcreteCustomEvent(uint16_t customEventNumber, std::string message):
+      customEventNumber { customEventNumber },
+      message { message }
+    { };
 
-    virtual CustomEvent& clone() const override {
-      auto newCustomEvent = new ConcreteCustomEvent(
-        this->cloneImpl()
-      );
-      newCustomEvent->customEventNumber = this->customEventNumber;
-      newCustomEvent->message = this->message;
-      return *newCustomEvent;
-    };
-
+    uint16_t customEventNumber;
     std::string message;
 };
 
@@ -72,7 +58,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     BaseEvent& newEvent = std::move(newEvents.back());
     newEvents.pop_back();
     for(const BaseEventHandler& handler : eventHandlers) {
-      newEvent(handler);
+      newEvent.acceptHandler(handler);
     }
     delete &newEvent;
   }
@@ -90,7 +76,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
   while(std::size(newEvents) > 0) {
     const BaseEvent& newEvent = newEvents.back();
     for(const BaseEventHandler& handler : eventHandlers) {
-      newEvent(handler);
+      newEvent.acceptHandler(handler);
     }
     newEvents.pop_back();
     delete &newEvent;

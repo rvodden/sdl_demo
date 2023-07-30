@@ -76,5 +76,6 @@
         "connectionId": "Vodden",
         "projectKey": "rvodden_sdl_demo"
     },
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "C_Cpp.errorSquiggles": "enabled"
 }
