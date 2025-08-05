@@ -1,7 +1,6 @@
 {
     "name": "GCC (Linux)",
-    "image": "ha-dev:x86_64-pc-ubuntu-gcc-x11",
-    "remoteUser": "root",
+    "image": "gcc:15.1.0",
     "runArgs": ["--device=/dev/dri/card0", "--cap-add=CAP_PERFMON"],
     "containerEnv": {
         "LIBGL_ALWAYS_SOFTWARE": "true"

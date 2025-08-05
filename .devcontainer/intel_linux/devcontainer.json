@@ -1,7 +1,6 @@
 {
     "name": "Intel (Linux)",
     "image": "ha-dev:x86_64-pc-ubuntu-icc-x11",
-    "remoteUser": "root",
     "runArgs": ["--device=/dev/dri/card0", "--cap-add=CAP_PERFMON"],
     "containerEnv": {
         "LIBGL_ALWAYS_SOFTWARE": "true"

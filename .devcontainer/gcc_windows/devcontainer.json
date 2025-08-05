@@ -1,7 +1,13 @@
 {
     "name": "GCC (Windows)",
-    "image": "ha-dev:x86_64-pc-ubuntu-gcc-x11",
-    "remoteUser": "hadev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "..",
+        "args": {
+            "GCC_VERSION": "14"
+        }
+    },
+    "remoteUser": "ubuntu",
     "runArgs": ["--gpus", "all", "--cap-add=CAP_PERFMON"],
     "customizations": {
         "vscode": {
@@ -9,7 +15,8 @@
 			"settings": {},
 			"extensions": [
                 "ms-vscode.cpptools-extension-pack",
-                "EditorConfig.EditorConfig"
+                "EditorConfig.EditorConfig",
+                "Anthropic.claude-code"
             ]
 		}
     }

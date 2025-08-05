@@ -1,3 +1,6 @@
+add_library(standard_compiler_options INTERFACE)
+target_compile_options(standard_compiler_options INTERFACE -Werror -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 -Wimplicit-fallthrough -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wuseless-cast)
+
 macro(get_sources)
 
     # Has HEADER Files?
@@ -60,6 +63,9 @@ macro(standard_libarary_build)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
         )
+
+        target_link_libraries(${LibraryName} PRIVATE standard_compile_options)
+        target_link_libraries(${LibraryName} PUBLIC stdc++ )
     endif()
         
     message( CHECK_PASS "done." )
@@ -70,7 +76,7 @@ endmacro()
 
 macro(standard_executable_build)
 
-    ## Library Build
+    ## Executable Build
 
     get_filename_component( LibraryName ${CMAKE_CURRENT_SOURCE_DIR} NAME )    
     
@@ -85,6 +91,11 @@ macro(standard_executable_build)
             PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         )
+        
+        target_link_libraries(${LibraryName} PRIVATE standard_compile_options)
+        
+        # Link with standard C++ library for executables
+        target_link_libraries( ${LibraryName} PRIVATE stdc++ )
     endif()
         
     message( CHECK_PASS "done." )

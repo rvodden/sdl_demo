@@ -1,7 +1,6 @@
 {
     "name": "Intel (Windows)",
     "image": "ha-dev:x86_64-pc-ubuntu-icc-x11",
-    "remoteUser": "hadev",
     "runArgs": ["--gpus", "all", "--cap-add=CAP_PERFMON"],
     "mounts": [{
         "source": "/usr/lib/wsl",

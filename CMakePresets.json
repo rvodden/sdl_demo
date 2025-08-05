@@ -6,11 +6,6 @@
         "patch": 0
     },
     "configurePresets": [
-        { 
-            "hidden": true,
-            "name": "use_toolchain_file",
-            "toolchainFile": "/CMakeToolchain.txt"
-        },
         {
             "hidden": true,
             "name": "generate_compile_commands",
@@ -22,10 +17,9 @@
             "hidden": true,
             "name": "base_configuration",
             "inherits": [
-                "use_toolchain_file",
                 "generate_compile_commands"
             ],
-            "binaryDir": "${sourceDir}/build"
+            "binaryDir": "${sourceDir}/build/${presetName}"
         },
         {
             "displayName": "Ninja Multi-Config",
