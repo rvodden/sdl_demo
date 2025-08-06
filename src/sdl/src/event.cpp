@@ -15,9 +15,9 @@ std::unique_ptr<BaseEvent> EventProducer::wait() {
   switch (event.type) {
     case SDL_EventType::SDL_MOUSEBUTTONDOWN:
     case SDL_EventType::SDL_MOUSEBUTTONUP:
-      return createMouseButtonEvent((SDL_MouseButtonEvent*)(&event));
+      return createMouseButtonEvent(reinterpret_cast<SDL_MouseButtonEvent*>(&event));
     case SDL_EventType::SDL_QUIT:
-      return createQuitEvent((SDL_QuitEvent*)(&event));
+      return createQuitEvent(reinterpret_cast<SDL_QuitEvent*>(&event));
     default:
       throw UnknownEventException("I don't know what this event is!");
   }

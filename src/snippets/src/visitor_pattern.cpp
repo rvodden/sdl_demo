@@ -27,6 +27,7 @@ void castHandler(const EventClass& eventClass, BaseEventHandler& abstractHandler
 
 class Event {
   public:
+    virtual ~Event() = default;
     virtual void handle(BaseEventHandler& abstractHandler) = 0;
     virtual std::string getName() const { return "Event"; }
     std::string name { "Event" };
@@ -42,7 +43,7 @@ class MouseEvent : public Event {
 
 class MouseEventHandler: public BaseEventHandler, public EventHandler<MouseEvent> {
   public:
-    void handle(const MouseEvent& mouseEvent) {
+    void handle([[maybe_unused]] const MouseEvent& mouseEvent) {
       std::cout << "I am handling a mouse event." << std::endl;
     }; //note no override
 };

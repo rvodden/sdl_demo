@@ -27,7 +27,7 @@ static void mouseButtonEventHandler(
   const Sprite& sprite,
   const MousePositionEvent& mousePositionEvent ) {
   std::cout << "Got a mouse button event." << std::endl;
-  spriteRenderer.render(sprite, ( mousePositionEvent.x / 128 ) * 128, ( mousePositionEvent.y / 128 ) * 128);
+  spriteRenderer.render(sprite, (mousePositionEvent.x / 128) * 128, (mousePositionEvent.y / 128) * 128);
 }
 
 int main()
@@ -65,10 +65,10 @@ int main()
     EventDispatcher eventDispatcher { eventProducer };
     std::vector<std::unique_ptr<Button>> buttons;
     buttons.reserve(9);
-    bool crossesTurn = false;
-    for( uint32_t i : std::ranges::iota_view{ 0, 3 } ) {
-      for( uint32_t j : std::ranges::iota_view{ 0, 3 } ) {
-        auto button = std::make_unique<Button>(eventDispatcher, Rectangle{ j * 128 + 1, i * 128 + 1, 128u, 128u} );
+    [[maybe_unused]] bool crossesTurn = false;
+    for( int32_t i : std::ranges::iota_view{ 0, 3 } ) {
+      for( int32_t j : std::ranges::iota_view{ 0, 3 } ) {
+        auto button = std::make_unique<Button>(eventDispatcher, Rectangle{ j * 128 + 1, i * 128 + 1, 128, 128} );
         button->registerEventHandler([&spriteRenderer, &letterO](const MousePositionEvent& mousePositionEvent){ 
           mouseButtonEventHandler(spriteRenderer, letterO, mousePositionEvent);
         });

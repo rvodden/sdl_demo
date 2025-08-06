@@ -27,15 +27,15 @@ class Color {
   
   private:
     std::tuple<uint8_t, uint8_t, uint8_t> _color { 0, 0, 0 };
-    uint8_t _alpha { (uint8_t) Alpha::kOpaque };
+    uint8_t _alpha { static_cast<uint8_t>(Alpha::kOpaque) };
 
 };
 
 class NamedColor {
   public:
-    static constexpr Color kBlack = Color{ 0, 0, 0, (uint8_t) Alpha::kTranparent };
-    static constexpr Color kWhite = Color{ 255, 255, 255, (uint8_t) Alpha::kTranparent };
-    static constexpr Color kMagenta = Color{ 0xc2, 0x00, 0x78, (uint8_t) Alpha::kTranparent };
+    static constexpr Color kBlack = Color{ 0, 0, 0, static_cast<uint8_t>(Alpha::kTranparent) };
+    static constexpr Color kWhite = Color{ 255, 255, 255, static_cast<uint8_t>(Alpha::kTranparent) };
+    static constexpr Color kMagenta = Color{ 0xc2, 0x00, 0x78, static_cast<uint8_t>(Alpha::kTranparent) };
 };
 
 }

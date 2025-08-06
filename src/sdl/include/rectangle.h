@@ -13,7 +13,7 @@ class RectangleImpl;
 class Rectangle {
   friend Renderer;
   public:
-    Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+    Rectangle(int32_t x, int32_t y, int32_t width, int32_t height);
 
     /**
      * RectangleImpl is incomplete here, so the compiler cannot
@@ -35,12 +35,12 @@ class Rectangle {
     //! @brief move assignment operator
     Rectangle& operator=(Rectangle&& other);
 
-    uint32_t getX() const;
-    uint32_t getY() const;
-    uint32_t getHeight() const;
-    uint32_t getWidth() const;
+    int32_t getX() const;
+    int32_t getY() const;
+    int32_t getHeight() const;
+    int32_t getWidth() const;
 
-    bool contains(const uint32_t &x, const uint32_t &y) const;
+    bool contains(const int32_t &x, const int32_t &y) const;
 
   private:
     std::unique_ptr<RectangleImpl> _rectangleImpl;

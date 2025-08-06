@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <value_ptr.hpp>
+#include <value_ptr.h>
 
 using namespace valuable;
 
@@ -44,7 +44,7 @@ TEST(value_ptr, lifetime) {
 
     Sideeffect::reset();
     value_ptr<Sideeffect> z;
-    ASSERT_FALSE((bool)z);
+    ASSERT_FALSE(static_cast<bool>(z));
     ASSERT_EQ(constructions, 0);
     ASSERT_EQ(destructions, 0);
     ASSERT_EQ(copys, 0);
@@ -59,8 +59,8 @@ TEST(value_ptr, lifetime) {
 
     Sideeffect::reset();
     value_ptr<Sideeffect> m = std::move(z);
-    ASSERT_FALSE((bool)z);
-    ASSERT_TRUE((bool)m);
+    ASSERT_FALSE(static_cast<bool>(z));
+    ASSERT_TRUE(static_cast<bool>(m));
     ASSERT_EQ(constructions, 0);
     ASSERT_EQ(destructions, 0);
     ASSERT_EQ(copys, 0);
@@ -112,13 +112,13 @@ TEST(value_ptr, C_full_api) {
   struct API {
     static Value *create() {
       ++constructions;
-      auto val = (Value*)malloc(sizeof(Value));
+      auto val = static_cast<Value*>(malloc(sizeof(Value)));
       val->data = -1;
       return val;
     }
     static Value *clone(const Value *src) {
       ++clones;
-      auto dst = (Value*)malloc(sizeof(Value));
+      auto dst = static_cast<Value*>(malloc(sizeof(Value)));
       dst->data = src->data;
       return dst;
     }

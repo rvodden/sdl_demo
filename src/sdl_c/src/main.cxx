@@ -30,7 +30,7 @@ int main()
   }
   SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
-  auto rwops = SDL_RWFromConstMem(&_binary_tic_tac_toe_png_start, ticTacToeSize());
+  auto rwops = SDL_RWFromConstMem(&_binary_tic_tac_toe_png_start, static_cast<int>(ticTacToeSize()));
   if(rwops == nullptr) {
     std::cout << "Error extracting image from embedded binary: " << SDL_GetError() << std::endl;
     return -1;

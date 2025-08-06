@@ -1,5 +1,6 @@
 add_library(standard_compiler_options INTERFACE)
 target_compile_options(standard_compiler_options INTERFACE -Werror -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 -Wimplicit-fallthrough -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wuseless-cast)
+target_link_libraries(standard_compiler_options INTERFACE stdc++)
 
 macro(get_sources)
 
@@ -34,6 +35,7 @@ macro(add_test_target)
         endforeach()
         add_executable( ${TestName} ${TEST_SOURCE_FILES} )
 
+        target_link_libraries( ${TestName} PRIVATE standard_compiler_options )
         target_link_libraries( ${TestName} PUBLIC ${LibraryName} )
         target_link_libraries( ${TestName} PUBLIC gtest )
         target_link_libraries( ${TestName} PUBLIC gmock )
@@ -64,8 +66,7 @@ macro(standard_libarary_build)
             $<INSTALL_INTERFACE:include>
         )
 
-        target_link_libraries(${LibraryName} PRIVATE standard_compile_options)
-        target_link_libraries(${LibraryName} PUBLIC stdc++ )
+        target_link_libraries(${LibraryName} PRIVATE standard_compiler_options)
     endif()
         
     message( CHECK_PASS "done." )
@@ -92,10 +93,7 @@ macro(standard_executable_build)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         )
         
-        target_link_libraries(${LibraryName} PRIVATE standard_compile_options)
-        
-        # Link with standard C++ library for executables
-        target_link_libraries( ${LibraryName} PRIVATE stdc++ )
+        target_link_libraries(${LibraryName} PRIVATE standard_compiler_options)
     endif()
         
     message( CHECK_PASS "done." )

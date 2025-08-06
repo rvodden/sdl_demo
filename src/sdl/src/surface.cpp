@@ -10,7 +10,7 @@ namespace sdl {
 
 
 Surface::Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask, uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask) {
-  _surfaceImpl->_sdlSurface = SDL_CreateRGBSurface(0, width, height, depth, redMask, greenMask, blueMask, alphaMask);
+  _surfaceImpl->_sdlSurface = SDL_CreateRGBSurface(0, static_cast<int>(width), static_cast<int>(height), depth, redMask, greenMask, blueMask, alphaMask);
   if (_surfaceImpl->_sdlSurface == nullptr) throw Exception("SDL_CreateRGBSurface");
 }
 

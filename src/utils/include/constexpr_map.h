@@ -12,7 +12,10 @@ namespace vodden {
 template <class Key, class Value, std::size_t Size>
 struct Map {
     constexpr Map(std::initializer_list<std::pair<Key, Value>> _initList) {
-      std::copy_n(std::begin(_initList), Size, _data.begin());
+      auto it = _initList.begin();
+      for (std::size_t i = 0; i < Size; ++i) {
+        _data[i] = *it++;
+      }
     };
     constexpr Map(const std::array<std::pair<Key, Value>, Size>& data) : _data { data } {};
     constexpr Map(std::array<std::pair<Key, Value>, Size>&& data) : _data(std::move(data)) {};

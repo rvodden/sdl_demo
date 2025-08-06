@@ -2,4 +2,5 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src
 foreach(SOURCE_FILE ${SOURCE_FILES})
     get_filename_component(ExecutableName ${SOURCE_FILE} NAME_WLE)
     add_executable(${ExecutableName} ${SOURCE_FILE})
+    target_link_libraries(${ExecutableName} PRIVATE standard_compiler_options)
 endforeach()

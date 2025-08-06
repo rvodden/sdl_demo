@@ -66,9 +66,9 @@ class MouseEvent : public Event {
     MouseEvent(
       std::chrono::duration<int64_t, 
       std::milli> ts,
-      uint32_t windowId,
-      u_int32_t which
-    ) : Event(ts), windowId { windowId }, which { which } {};
+      uint32_t winId,
+      u_int32_t mouseId
+    ) : Event(ts), windowId { winId }, which { mouseId } {};
     
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -85,11 +85,11 @@ class MousePositionEvent : public MouseEvent {
   public:
     MousePositionEvent(
       std::chrono::duration<int64_t, std::milli> ts, 
-      uint32_t windowId, 
-      uint32_t which,
-      int32_t x,
-      int32_t y
-    ) : MouseEvent(ts, windowId, which), x { x }, y { y } {};
+      uint32_t winId, 
+      uint32_t mouseId,
+      int32_t xPos,
+      int32_t yPos
+    ) : MouseEvent(ts, winId, mouseId), x { xPos }, y { yPos } {};
     
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -118,14 +118,14 @@ class MouseButtonEvent : public MousePositionEvent {
 
     MouseButtonEvent(
       std::chrono::duration<int64_t, std::milli> ts,
-      uint32_t windowId, 
-      uint32_t which,
-      int32_t x,
-      int32_t y,
-      Button button,
-      State state,
-      uint8_t clicks
-    ) : MousePositionEvent(ts, windowId, which, x, y) , button { button }, state{ state } , clicks { clicks } { };
+      uint32_t winId, 
+      uint32_t mouseId,
+      int32_t xPos,
+      int32_t yPos,
+      Button btn,
+      State btnState,
+      uint8_t clickCount
+    ) : MousePositionEvent(ts, winId, mouseId, xPos, yPos) , button { btn }, state{ btnState } , clicks { clickCount } { };
 
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -143,12 +143,14 @@ class MouseButtonEvent : public MousePositionEvent {
 
 class BaseEventProducer {
   public:
+    virtual ~BaseEventProducer() = default;
     virtual std::unique_ptr<BaseEvent> wait() = 0;
     virtual void produce(std::unique_ptr<Event>) {};
 };
 
 class EventProducer : public BaseEventProducer {
   public:
+    virtual ~EventProducer() = default;
     virtual std::unique_ptr<BaseEvent> wait();
     virtual void produce(std::unique_ptr<Event>) {};
 };

@@ -3,7 +3,7 @@
 
 namespace sdl {
 
-Rectangle::Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : _rectangleImpl {std::make_unique<RectangleImpl>() } {
+Rectangle::Rectangle(int32_t x, int32_t y, int32_t width, int32_t height) : _rectangleImpl {std::make_unique<RectangleImpl>() } {
   _rectangleImpl->_sdlRect.x = x;
   _rectangleImpl->_sdlRect.y = y;
   _rectangleImpl->_sdlRect.w = width;
@@ -26,31 +26,31 @@ Rectangle &Rectangle::operator=(Rectangle &&other){
   return *this;
 }
 
-uint32_t Rectangle::getX() const
+int32_t Rectangle::getX() const
 {
   return _rectangleImpl->_sdlRect.x;
 }
 
-uint32_t Rectangle::getY() const
+int32_t Rectangle::getY() const
 {
   return _rectangleImpl->_sdlRect.y;
 }
 
-uint32_t Rectangle::getHeight() const
+int32_t Rectangle::getHeight() const
 {
   return _rectangleImpl->_sdlRect.h;
 }
 
-uint32_t Rectangle::getWidth() const
+int32_t Rectangle::getWidth() const
 {
   return _rectangleImpl->_sdlRect.w;
 };
 
-bool Rectangle::contains(const uint32_t &x, const uint32_t &y) const {
-  uint32_t rx = getX();
-  uint32_t ry = getY();
-  uint32_t height = getHeight();
-  uint32_t width = getWidth();
+bool Rectangle::contains(const int32_t &x, const int32_t &y) const {
+  int32_t rx = getX();
+  int32_t ry = getY();
+  int32_t height = getHeight();
+  int32_t width = getWidth();
 
   if ( x < rx ) return false;
   if ( x > rx + width ) return false;

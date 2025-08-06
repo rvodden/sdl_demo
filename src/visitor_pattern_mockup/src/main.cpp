@@ -8,8 +8,8 @@ class ConcreteCustomEvent: public CustomEvent {
   public:
     ConcreteCustomEvent() : CustomEvent() {};
     ConcreteCustomEvent(CustomEventImpl* impl) : CustomEvent(impl) {};
-    ConcreteCustomEvent(uint16_t customEventNumber, std::string message): CustomEvent(),  message { message } {
-      (*this).customEventNumber = customEventNumber;
+    ConcreteCustomEvent(uint16_t eventNumber, std::string msg): CustomEvent(),  message { msg } {
+      (*this).customEventNumber = eventNumber;
     };
     
     virtual void operator()(const BaseEventHandler& abstractHandler) const override {
