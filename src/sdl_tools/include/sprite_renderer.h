@@ -19,7 +19,7 @@ class SpriteRenderer {
     ~SpriteRenderer();
 
     //! @brief render the provided sprite at the provided locations
-    void render(const Sprite& sprite, const int32_t x, const int32_t y) const;
+    void render(const Sprite& sprite, const float x, const float y) const;
   
   private:
     std::unique_ptr<SpriteRendererImpl> _spriteRendererImpl;

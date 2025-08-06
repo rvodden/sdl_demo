@@ -1,56 +1,56 @@
-#include "rectangle_impl.h"
-#include "rectangle.h"
+#include "float_rectangle_impl.h"
+#include "float_rectangle.h"
 
 namespace sdl {
 
-Rectangle::Rectangle(int32_t x, int32_t y, int32_t width, int32_t height) : _rectangleImpl {std::make_unique<RectangleImpl>() } {
-  _rectangleImpl->_sdlRect.x = x;
-  _rectangleImpl->_sdlRect.y = y;
-  _rectangleImpl->_sdlRect.w = width;
-  _rectangleImpl->_sdlRect.h = height;
+FloatRectangle::FloatRectangle(float x, float y, float width, float height) : _rectangleImpl {std::make_unique<FloatRectangleImpl>() } {
+  _rectangleImpl->_sdlFRect.x = x;
+  _rectangleImpl->_sdlFRect.y = y;
+  _rectangleImpl->_sdlFRect.w = width;
+  _rectangleImpl->_sdlFRect.h = height;
 }
 
-Rectangle::Rectangle(const Rectangle &other) : _rectangleImpl{ std::make_unique<RectangleImpl>(other._rectangleImpl->_sdlRect) } { }
+FloatRectangle::FloatRectangle(const FloatRectangle &other) : _rectangleImpl{ std::make_unique<FloatRectangleImpl>(other._rectangleImpl->_sdlFRect) } { }
 
-Rectangle::Rectangle(Rectangle &&other) : _rectangleImpl{ std::move(other._rectangleImpl) } {}
+FloatRectangle::FloatRectangle(FloatRectangle &&other) : _rectangleImpl{ std::move(other._rectangleImpl) } {}
 
-Rectangle::~Rectangle(){};
+FloatRectangle::~FloatRectangle(){};
 
-Rectangle &Rectangle::operator=(const Rectangle &other) {
-  _rectangleImpl = std::make_unique<RectangleImpl>(other._rectangleImpl->_sdlRect);
+FloatRectangle &FloatRectangle::operator=(const FloatRectangle &other) {
+  _rectangleImpl = std::make_unique<FloatRectangleImpl>(other._rectangleImpl->_sdlFRect);
   return *this;
 }
 
-Rectangle &Rectangle::operator=(Rectangle &&other){
+FloatRectangle &FloatRectangle::operator=(FloatRectangle &&other){
   _rectangleImpl = std::move(other._rectangleImpl);
   return *this;
 }
 
-int32_t Rectangle::getX() const
+float FloatRectangle::getX() const
 {
-  return _rectangleImpl->_sdlRect.x;
+  return _rectangleImpl->_sdlFRect.x;
 }
 
-int32_t Rectangle::getY() const
+float FloatRectangle::getY() const
 {
-  return _rectangleImpl->_sdlRect.y;
+  return _rectangleImpl->_sdlFRect.y;
 }
 
-int32_t Rectangle::getHeight() const
+float FloatRectangle::getHeight() const
 {
-  return _rectangleImpl->_sdlRect.h;
+  return _rectangleImpl->_sdlFRect.h;
 }
 
-int32_t Rectangle::getWidth() const
+float FloatRectangle::getWidth() const
 {
-  return _rectangleImpl->_sdlRect.w;
+  return _rectangleImpl->_sdlFRect.w;
 };
 
-bool Rectangle::contains(const int32_t &x, const int32_t &y) const {
-  int32_t rx = getX();
-  int32_t ry = getY();
-  int32_t height = getHeight();
-  int32_t width = getWidth();
+bool FloatRectangle::contains(const float &x, const float &y) const {
+  float rx = getX();
+  float ry = getY();
+  float height = getHeight();
+  float width = getWidth();
 
   if ( x < rx ) return false;
   if ( x > rx + width ) return false;

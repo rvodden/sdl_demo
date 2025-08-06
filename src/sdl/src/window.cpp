@@ -1,6 +1,6 @@
 #include <memory>
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include "exception.h"
 #include "renderer.h"
@@ -12,14 +12,12 @@ namespace sdl {
 
 Window::Window(
   std::string title, 
-  uint16_t x, 
-  uint16_t y, 
   uint16_t width, 
   uint16_t height, 
   uint32_t flags
 ): _title { std::move(title) }, _windowImpl { std::make_unique<WindowImpl>() } {
 
-    _windowImpl->_sdlWindow = SDL_CreateWindow(_title.c_str(), x, y, width, height, flags);
+    _windowImpl->_sdlWindow = SDL_CreateWindow(_title.c_str(), width, height, flags);
     if (_windowImpl->_sdlWindow == nullptr) throw Exception( "SDL_CreateWindow" );
 }
 

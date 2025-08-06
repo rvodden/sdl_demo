@@ -4,7 +4,7 @@
 namespace sdl {
 
 UserEvent::UserEvent() : 
-  Event( std::chrono::duration<int64_t, std::milli>(SDL_GetTicks64()) ),  
+  Event( std::chrono::duration<int64_t, std::milli>(SDL_GetTicks()) ),  
   _userEventImpl{ std::make_unique<UserEventImpl>() } {
     _userEventImpl->_userEvent = this;
   };
@@ -33,12 +33,12 @@ UserEventImpl::UserEventImpl() {
 std::unique_ptr<SDL_Event> UserEventImpl::_createSDLUserEvent()
 {
   return std::unique_ptr<SDL_Event>(new SDL_Event{ .user={
-    *_eventType,
-    static_cast<uint32_t>(_userEvent->timestamp.count()),
-    0,
-    0,
-    _userEvent,
-    nullptr
+    .type=*_eventType,
+    .timestamp = static_cast<uint32_t>(_userEvent->timestamp.count()),
+    .windowID = 0,
+    .code = 0,
+    .data1 = _userEvent,
+    .data2 = nullptr
   }});
 }
 

@@ -1,7 +1,7 @@
 #include <cinttypes>
 #include <memory>
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include "exception.h"
 #include "window.h"
@@ -9,21 +9,18 @@
 #include "renderer.h"
 
 #include "window_impl.h"
-#include "rectangle_impl.h"
+#include "float_rectangle_impl.h"
 #include "renderer_impl.h"
 #include "texture_impl.h"
 
 namespace sdl {
 
-Renderer::Renderer(Window& window, int16_t index, std::unordered_set<RendererFlag> flags) 
+Renderer::Renderer(Window& window, const std::string& name) 
   : _rendererImpl { std::make_unique<RendererImpl>() } {
   
   _rendererImpl->_sdlWindow = window._windowImpl->_sdlWindow;
 
-  uint32_t flagValue = 0;
-  for(const RendererFlag& flag : flags) flagValue |= sdlRendererFlagMap[flag];
-
-  _rendererImpl->_sdlRenderer = SDL_CreateRenderer(_rendererImpl->_sdlWindow, index, flagValue);
+  _rendererImpl->_sdlRenderer = SDL_CreateRenderer(_rendererImpl->_sdlWindow, name.c_str());
   if(_rendererImpl->_sdlRenderer == nullptr) throw Exception("SDL_CreateRendere");
 }
 
@@ -47,29 +44,29 @@ void Renderer::setRenderDrawColour(const Color& color) {
     color.getGreen(), 
     color.getBlue(), 
     color.getAlpha() );
-  if (retVal < 0) throw Exception("SDL_SetRenderDrawColor");
+  if (!retVal) throw Exception("SDL_SetRenderDrawColor");
 }
 
 const Renderer &Renderer::copy(const Texture &texture) const {
-  auto returnValue = SDL_RenderCopy(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, nullptr, nullptr);
-  if(returnValue < 0) throw Exception("SDL_RenderCopy");
+  auto returnValue = SDL_RenderTexture(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, nullptr, nullptr);
+  if(!returnValue) throw Exception("SDL_RenderCopy");
 
   return *this;
 }
 
-const Renderer &Renderer::copy(const Texture &texture, const Rectangle &source, const Rectangle &destination) const {
-  SDL_Rect* sourceRect = source._rectangleImpl->getSDLRect();
-  SDL_Rect* destRect = destination._rectangleImpl->getSDLRect();
+const Renderer &Renderer::copy(const Texture &texture, const FloatRectangle &source, const FloatRectangle &destination) const {
+  SDL_FRect* sourceRect = source._rectangleImpl->getSDLRect();
+  SDL_FRect* destRect = destination._rectangleImpl->getSDLRect();
 
-  auto returnValue = SDL_RenderCopy(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, sourceRect, destRect);
-  if(returnValue < 0) throw Exception("SDL_RenderCopy");
+  auto returnValue = SDL_RenderTexture(_rendererImpl->_sdlRenderer, texture._textureImpl->_sdlTexture, sourceRect, destRect);
+  if(!returnValue) throw Exception("SDL_RenderCopy");
 
   return *this;
 }
 
 void Renderer::clear() const {
   auto retVal = SDL_RenderClear(_rendererImpl->_sdlRenderer);
-  if (retVal < 0) throw Exception("SDL_SetRenderClear");
+  if (!retVal) throw Exception("SDL_SetRenderClear");
 }
 
 void Renderer::present() const {

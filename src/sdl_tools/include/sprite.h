@@ -15,7 +15,7 @@ class SpriteRenderer;
 class Sprite {
   friend SpriteRenderer;
   public:
-    Sprite(const Texture& texture, const Rectangle& rectangle);
+    Sprite(const Texture& texture, const FloatRectangle& rectangle);
     Sprite(Sprite&& other);
 
     ~Sprite();

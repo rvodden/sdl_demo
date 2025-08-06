@@ -15,7 +15,7 @@ class WindowImpl;
 class Window {
   friend Renderer;
   public:
-    Window(std::string title, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t flags);
+    Window(std::string title, uint16_t width, uint16_t height, uint32_t flags);
     Window(Window&& other) noexcept;
     Window(const Window& other) = delete;
     ~Window();

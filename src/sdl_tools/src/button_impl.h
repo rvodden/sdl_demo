@@ -4,7 +4,7 @@
 #include <forward_list>
 
 #include <event.h>
-#include <rectangle.h>
+#include <float_rectangle.h>
 
 #include "button.h"
 
@@ -13,26 +13,26 @@ namespace sdl::tools {
 class ButtonImpl {
   friend Button;
   public:
-    ButtonImpl(EventDispatcher &eventProcessor, sdl::Rectangle& rectangle) : 
+    ButtonImpl(EventDispatcher &eventProcessor, sdl::FloatRectangle& rectangle) : 
       _rectangle { rectangle },
       _eventProcessor { eventProcessor } { };
 
     class MouseEventHandler : public sdl::EventHandler<sdl::MouseButtonEvent>, public sdl::BaseEventHandler {
       public:
         MouseEventHandler(
-          Rectangle& rectangle,
+          FloatRectangle& rectangle,
           std::forward_list<Button::Handler>& eventHandlers
         ) : _rectangle{ rectangle }, _eventHandlers { eventHandlers } { };
         virtual void handle(const sdl::MouseButtonEvent& mouseEvent);
       private:
-        Rectangle& _rectangle;
+        FloatRectangle& _rectangle;
         std::forward_list<Button::Handler>& _eventHandlers;
     };
 
   private:
     void eventHandler(const sdl::MousePositionEvent &mousePositionEvent);
 
-    sdl::Rectangle _rectangle;
+    sdl::FloatRectangle _rectangle;
     EventDispatcher& _eventProcessor;
     std::forward_list<Button::Handler> _eventHandlers { };
     MouseEventHandler _mouseEventHandler { _rectangle , _eventHandlers };

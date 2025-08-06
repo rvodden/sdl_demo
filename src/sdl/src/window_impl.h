@@ -1,7 +1,7 @@
 #ifndef __SDL_WINDOW_IMPL_H__
 #define __SDL_WINDOW_IMPL_H__
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 namespace sdl {
 

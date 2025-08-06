@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <event.h>
-#include <rectangle.h>
+#include <float_rectangle.h>
 
 #include <event_dispatcher.h>
 
@@ -16,7 +16,7 @@ class Button {
   public:
     typedef std::function<void(const MousePositionEvent&)> Handler;
 
-    Button(EventDispatcher& eventProcessor, sdl::Rectangle rectangle);
+    Button(EventDispatcher& eventProcessor, sdl::FloatRectangle rectangle);
     Button(Button&& other);
     ~Button();
 

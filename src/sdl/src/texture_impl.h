@@ -1,7 +1,7 @@
 #ifndef __SDL_TEXTURE_IMPL_H__
 #define __SDL_TEXTURE_IMPL_H__
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include "renderer.h"
 #include "texture.h"

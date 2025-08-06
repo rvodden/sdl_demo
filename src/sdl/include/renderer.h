@@ -6,12 +6,12 @@
 #include <unordered_set>
 
 #include "color.h"
-#include "rectangle.h"
+#include "float_rectangle.h"
 #include "texture.h"
 
 namespace sdl {
 
-class Rectangle;
+class FloatRectangle;
 class Texture;
 class Window;
 class RendererImpl;
@@ -25,7 +25,7 @@ class Renderer {
     /**
      * @brief Construct a renderer associated with the provided window
      */
-    Renderer( Window& window, int16_t index, const std::unordered_set<RendererFlag> flags );
+    Renderer( Window& window, const std::string& name);
     //! @brief move constructor
     Renderer( Renderer&& other ) noexcept;
     //! @brief Renderer cannot be copied
@@ -49,8 +49,8 @@ class Renderer {
     //! @brief Copy a region of the texture to a region of the renderer.
     const Renderer &copy(
       const Texture& texture, 
-      const Rectangle &source, 
-      const Rectangle &destination
+      const FloatRectangle &source, 
+      const FloatRectangle &destination
     ) const;
 
     //! @brief Clear the renderer with the drawing color.

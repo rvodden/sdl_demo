@@ -1,5 +1,7 @@
-#include <SDL2/SDL.h>
 #include <iostream>
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);

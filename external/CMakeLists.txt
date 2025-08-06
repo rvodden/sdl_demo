@@ -2,18 +2,23 @@ include(FetchContent)
 
 ### Google Test ###
 
-FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.17.0
-        DOWNLOAD_EXTRACT_TIMESTAMP false
-        SYSTEM
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+option(SDLXX_USE_VENDORED_GTEST "Download GTest from GitHub" ON)
+if(SDLXX_USE_VENDORED_GTEST)
+        FetchContent_Declare(
+                googletest
+                GIT_REPOSITORY https://github.com/google/googletest.git
+                GIT_TAG v1.17.0
+                DOWNLOAD_EXTRACT_TIMESTAMP false
+                OVERRIDE_FIND_PACKAGE
+                SYSTEM
+        )
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        FetchContent_MakeAvailable(googletest)
+endif()
 
 ### Google Benchmark ###
 
+# option(SDLXX_USE_VENDORED_GBENCH "Download Google Benchmark from GitHub" ON)
 # FetchContent_Declare(
 #         googlebenchmark
 #         GIT_REPOSITORY https://github.com/google/benchmark.git
@@ -27,21 +32,28 @@ FetchContent_MakeAvailable(googletest)
 # FetchContent_MakeAvailable(googletest googlebenchmark)
 
 
-###
-FetchContent_Declare(
-        SDL2
-        URL https://github.com/libsdl-org/SDL/releases/download/release-2.32.8/SDL2-2.32.8.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP false
-        SYSTEM
-)
-FetchContent_MakeAvailable(SDL2)
+option(SDLXX_USE_VENDORED_SDL3 "Download SDL3 from GitHub" ON)
 
-# set(SDL2IMAGE_SAMPLES False)
-FetchContent_Declare(
-        SDL2_image
-        URL https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.8/SDL2_image-2.8.8.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP false
-        SYSTEM
-)
-set(SDL2IMAGE_INSTALL OFF)
-FetchContent_MakeAvailable(SDL2_image)
+if(SDLXX_USE_VENDORED_SDL3)
+        ###
+        FetchContent_Declare(
+                SDL3
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL
+                GIT_TAG release-3.2.20
+                DOWNLOAD_EXTRACT_TIMESTAMP false
+                OVERRIDE_FIND_PACKAGE
+                SYSTEM
+        )
+        FetchContent_MakeAvailable(SDL3)
+        
+        FetchContent_Declare(
+                SDL3_image
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
+                GIT_TAG release-3.2.4
+                DOWNLOAD_EXTRACT_TIMESTAMP false
+                OVERRIDE_FIND_PACKAGE
+                SYSTEM
+        )
+        set(SDL3IMAGE_INSTALL OFF)
+        FetchContent_MakeAvailable(SDL3_image)
+endif()

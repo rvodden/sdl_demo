@@ -13,10 +13,10 @@ SpriteRenderer::SpriteRenderer(SpriteRenderer &&other) : _spriteRendererImpl { s
 
 SpriteRenderer::~SpriteRenderer() {};
 
-void SpriteRenderer::render(const Sprite &sprite, const int32_t x, const int32_t y) const
+void SpriteRenderer::render(const Sprite &sprite, const float x, const float y) const
 {
   std::cout << "I am rendering a sprite at (" << x << ", " << y << ");" << std::endl;
-  const Rectangle destination = {
+  const FloatRectangle destination = {
       x,
       y,
       sprite._spriteImpl->_rectangle.getWidth(),

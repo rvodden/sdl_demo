@@ -8,7 +8,7 @@
 
 #include <color.h>
 #include <event.h>
-#include <rectangle.h>
+#include <float_rectangle.h>
 #include <renderer.h>
 #include <sdl.h>
 #include <texture.h>
@@ -68,7 +68,7 @@ int main()
     [[maybe_unused]] bool crossesTurn = false;
     for( int32_t i : std::ranges::iota_view{ 0, 3 } ) {
       for( int32_t j : std::ranges::iota_view{ 0, 3 } ) {
-        auto button = std::make_unique<Button>(eventDispatcher, Rectangle{ j * 128 + 1, i * 128 + 1, 128, 128} );
+        auto button = std::make_unique<Button>(eventDispatcher, FloatRectangle{ j * 128 + 1, i * 128 + 1, 128, 128} );
         button->registerEventHandler([&spriteRenderer, &letterO](const MousePositionEvent& mousePositionEvent){ 
           mouseButtonEventHandler(spriteRenderer, letterO, mousePositionEvent);
         });

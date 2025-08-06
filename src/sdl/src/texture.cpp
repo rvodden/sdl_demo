@@ -1,5 +1,5 @@
-#include <SDL2/SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "exception.h"
 #include "renderer_impl.h"
@@ -14,16 +14,16 @@ Texture::Texture(const Renderer& renderer, std::filesystem::path filePath) : _te
 }
 
 Texture::Texture(const Renderer &renderer, const void *location, std::size_t size) : _textureImpl { std::make_unique<TextureImpl>() } {
-  SDL_RWops* rwOps = SDL_RWFromConstMem(location, static_cast<int>(size));
+  SDL_IOStream* ioStream = SDL_IOFromConstMem(location, size);
   
-  _textureImpl->_sdlTexture = IMG_LoadTexture_RW(renderer._rendererImpl->_sdlRenderer, rwOps, 1);
+  _textureImpl->_sdlTexture = IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, 1);
   if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
 }
 
 Texture::Texture(const Renderer &renderer, void *location, std::size_t size) : _textureImpl { std::make_unique<TextureImpl>() } {
-  SDL_RWops* rwOps = SDL_RWFromMem(location, static_cast<int>(size));
+  SDL_IOStream* ioStream = SDL_IOFromMem(location, size);
   
-  _textureImpl->_sdlTexture = IMG_LoadTexture_RW(renderer._rendererImpl->_sdlRenderer, rwOps, 1);
+  _textureImpl->_sdlTexture = IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, 1);
   if  (_textureImpl->_sdlTexture == nullptr ) throw Exception("IMG_LoadTexture");
 }
 
