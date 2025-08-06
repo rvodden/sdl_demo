@@ -11,7 +11,7 @@ class EventDispatcherImpl;
 
 class EventDispatcher {
   public:
-    EventDispatcher(sdl::EventProducer eventProducer);
+    EventDispatcher(sdl::EventProducer& eventProducer);
     ~EventDispatcher();
     void run();
     void registerEventHandler(sdl::BaseEventHandler& baseEventHandler);

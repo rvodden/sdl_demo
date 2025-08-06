@@ -13,7 +13,7 @@ class UnknownEventException : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-//! @brief a superclass for all event handler
+//! @brief a superclass for all event handlers
 class BaseEventHandler {
   public:
     virtual ~BaseEventHandler() {};

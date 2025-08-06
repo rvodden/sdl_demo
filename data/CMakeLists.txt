@@ -9,6 +9,7 @@ foreach (DataFile IN LISTS DataFiles)
             OUTPUT ${OutFile}
             MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/data/${DataName}"
             COMMAND "${CMAKE_LINKER}" --relocatable --format binary --output=${OutFile} ${DataName}
+            COMMAND objcopy --add-section .note.GNU-stack=/dev/null --set-section-flags .note.GNU-stack=noload ${OutFile}
             DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/data/${DataName}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data"
             )

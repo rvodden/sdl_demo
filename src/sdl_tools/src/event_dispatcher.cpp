@@ -8,7 +8,7 @@ void DefaultQuitEventHandler::handle( [[maybe_unused]] const QuitEvent& quitEven
   _eventDispatcherImpl.quit();
 }
 
-EventDispatcher::EventDispatcher( EventProducer eventProducer ) : 
+EventDispatcher::EventDispatcher( EventProducer& eventProducer ) : 
     _eventDispatcherImpl { std::make_unique<EventDispatcherImpl>( eventProducer ) }
 {
   registerEventHandler( _eventDispatcherImpl->defaultQuitEventHandler );

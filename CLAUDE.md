@@ -34,7 +34,7 @@ This is a C++20 SDL2 demonstration project with a layered architecture:
 ### Sample Applications
 - **sdl_c** - Basic C-style SDL usage
 - **sdl_oop** - Object-oriented SDL demonstration
-- **snippets** - C++ pattern demonstrations (visitor pattern, polymorphic collections)
+- **snippets** - C++ pattern demonstrations and debugging utilities (visitor pattern, polymorphic collections, SDL diagnostics)
 - **visitor_pattern_mockup** - Advanced visitor pattern implementation
 
 ## Development Conventions
@@ -50,6 +50,7 @@ This is a C++20 SDL2 demonstration project with a layered architecture:
 - Implementation details are hidden in `*_impl.h` files (pimpl pattern)
 - Public headers expose clean interfaces without SDL dependencies
 - Namespaces follow directory structure (`sdl::`, `sdl::tools::`)
+- **Test/Debug code should be placed in the `snippets` project** - use this for temporary diagnostic tools, debugging utilities, and experimental code
 
 ### Dependencies
 - SDL2 and SDL2_image are fetched automatically via CMake FetchContent
