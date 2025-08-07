@@ -8,7 +8,7 @@
 
 namespace sdl {
 
-static constexpr vodden::Map<SDL::SubSystem, uint32_t, 9> sdlSubSystemMap {{
+static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap {{
   { SDL::kAudio, SDL_INIT_AUDIO },
   { SDL::kEvents, SDL_INIT_EVENTS },
   { SDL::kGameController, SDL_INIT_GAMEPAD },

@@ -24,11 +24,11 @@ void Button::registerEventHandler(Handler handler) {
   _buttonImpl->_eventHandlers.push_front(handler);
 };
 
-void ButtonImpl::eventHandler([[maybe_unused]] const sdl::MousePositionEvent &mousePositionEvent)
+void ButtonImpl::eventHandler([[maybe_unused]] const sdl::MouseButtonEvent &mouseButtonEvent)
 {
-  if(_rectangle.contains(mousePositionEvent.x, mousePositionEvent.y)) {
+  if(_rectangle.contains(mouseButtonEvent.x, mouseButtonEvent.y)) {
     for(const auto& handler : _eventHandlers) {
-      handler(mousePositionEvent);
+      handler(mouseButtonEvent);
     }
   };
 }

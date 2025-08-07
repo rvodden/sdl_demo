@@ -14,11 +14,11 @@ class SpriteImpl {
   friend Sprite;
   friend SpriteRenderer;
   public:
-    SpriteImpl(const Texture& texture, const FloatRectangle& rectangle ) : _texture { texture }, _rectangle { rectangle } {};
-    SpriteImpl(const SpriteImpl& other) : _texture { other._texture }, _rectangle { other._rectangle } {};
+    SpriteImpl(const Texture& texture, const FloatRectangle& rectangle ) : _spriteSheet { texture }, _rectangle { rectangle } {};
+    SpriteImpl(const SpriteImpl& other) : _spriteSheet { other._spriteSheet }, _rectangle { other._rectangle } {};
 
   private:
-    const Texture& _texture;
+    const Texture& _spriteSheet;
     const FloatRectangle _rectangle;
 };
 

@@ -15,14 +15,13 @@ SpriteRenderer::~SpriteRenderer() {};
 
 void SpriteRenderer::render(const Sprite &sprite, const float x, const float y) const
 {
-  std::cout << "I am rendering a sprite at (" << x << ", " << y << ");" << std::endl;
   const FloatRectangle destination = {
       x,
       y,
       sprite._spriteImpl->_rectangle.getWidth(),
       sprite._spriteImpl->_rectangle.getHeight()};
 
-  _spriteRendererImpl->_renderer.copy(sprite._spriteImpl->_texture, sprite._spriteImpl->_rectangle, destination);
-  _spriteRendererImpl->_renderer.present(); // TODO: doing this here is horribly inefficient
+  _spriteRendererImpl->_renderer.copy(sprite._spriteImpl->_spriteSheet, sprite._spriteImpl->_rectangle, destination);
 }
+
 }

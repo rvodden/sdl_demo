@@ -70,4 +70,4 @@ RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> 
 RUN echo '[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"' >> "$HOME/.bashrc"
 RUN echo "export NVM_DIR=${NVM_DIR}"                                         >> "$HOME/.zshrc"
 RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.zshrc"
-RUN RUN bash -c 'source ${NVM_DIR}/nvm.sh && npm install -g @anthropic-ai/claude-code'
+RUN bash -c 'source ${NVM_DIR}/nvm.sh && npm install -g @anthropic-ai/claude-code'

@@ -70,6 +70,11 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "csignal": "cpp",
+        "ranges": "cpp",
+        "stdfloat": "cpp",
+        "text_encoding": "cpp",
+        "cfenv": "cpp"
     },
 }

@@ -25,7 +25,7 @@ class Renderer {
     /**
      * @brief Construct a renderer associated with the provided window
      */
-    Renderer( Window& window, const std::string& name);
+    Renderer( Window& window, const char* name = nullptr);
     //! @brief move constructor
     Renderer( Renderer&& other ) noexcept;
     //! @brief Renderer cannot be copied

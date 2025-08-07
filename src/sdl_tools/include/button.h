@@ -14,7 +14,7 @@ class ButtonImpl;
 
 class Button {
   public:
-    typedef std::function<void(const MousePositionEvent&)> Handler;
+    typedef std::function<void(const MouseButtonEvent&)> Handler;
 
     Button(EventDispatcher& eventProcessor, sdl::FloatRectangle rectangle);
     Button(Button&& other);

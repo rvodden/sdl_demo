@@ -18,7 +18,6 @@ class UserEventImpl {
     std::unique_ptr<SDL_Event> _createSDLUserEvent();
   
   private:
-    static std::optional<uint32_t> _eventType;
     UserEvent* _userEvent;
 };
 

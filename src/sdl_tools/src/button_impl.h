@@ -30,7 +30,7 @@ class ButtonImpl {
     };
 
   private:
-    void eventHandler(const sdl::MousePositionEvent &mousePositionEvent);
+    void eventHandler(const sdl::MouseButtonEvent &mouseButtonEvent);
 
     sdl::FloatRectangle _rectangle;
     EventDispatcher& _eventProcessor;

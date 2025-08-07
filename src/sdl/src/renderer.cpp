@@ -15,13 +15,13 @@
 
 namespace sdl {
 
-Renderer::Renderer(Window& window, const std::string& name) 
+Renderer::Renderer(Window& window, const char* name) 
   : _rendererImpl { std::make_unique<RendererImpl>() } {
   
   _rendererImpl->_sdlWindow = window._windowImpl->_sdlWindow;
 
-  _rendererImpl->_sdlRenderer = SDL_CreateRenderer(_rendererImpl->_sdlWindow, name.c_str());
-  if(_rendererImpl->_sdlRenderer == nullptr) throw Exception("SDL_CreateRendere");
+  _rendererImpl->_sdlRenderer = SDL_CreateRenderer(_rendererImpl->_sdlWindow, name);
+  if(_rendererImpl->_sdlRenderer == nullptr) throw Exception("SDL_CreateRenderer");
 }
 
 Renderer::Renderer(Renderer&& other) noexcept : _rendererImpl { std::move(other._rendererImpl) } { };
