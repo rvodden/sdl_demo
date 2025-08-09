@@ -11,10 +11,10 @@
 namespace valuable {
 
 namespace detail {
-  struct spacer {};
+  struct spacer = default;
   // For details of class_tag use here, see
   // https://mortoray.com/2013/06/03/overriding-the-broken-universal-reference-t/
-  template <typename T> struct class_tag {};
+  template <typename T> struct class_tag = default;
 
   template <class T, class Deleter, class T2>
   struct VALUABLE_DECLSPEC_EMPTY_BASES compressed_ptr : std::unique_ptr<T, Deleter>, T2 {
@@ -22,29 +22,29 @@ namespace detail {
     compressed_ptr() = default;
     compressed_ptr(compressed_ptr &&) = default;
     compressed_ptr(const compressed_ptr &) = default;
-    compressed_ptr(T2 &&a2) : T2(std::move(a2)) {}
-    compressed_ptr(const T2 &a2) : T2(a2) {}
+    compressed_ptr(T2 &&a2) : T2(std::move(a2)) = default
+    compressed_ptr(const T2 &a2) : T2(a2) = default
     template <typename A1>
     compressed_ptr(A1 &&a1)
         : compressed_ptr(std::forward<A1>(a1), class_tag<typename std::decay<A1>::type>(),
-                         spacer(), spacer()) {}
+                         spacer(), spacer()) = default
     template <typename A1, typename A2>
     compressed_ptr(A1 &&a1, A2 &&a2)
         : compressed_ptr(std::forward<A1>(a1), std::forward<A2>(a2),
-                         class_tag<typename std::decay<A2>::type>(), spacer()) {}
+                         class_tag<typename std::decay<A2>::type>(), spacer()) = default
     template <typename A1, typename A2, typename A3>
     compressed_ptr(A1 &&a1, A2 &&a2, A3 &&a3)
-        : T1(std::forward<A1>(a1), std::forward<A2>(a2)), T2(std::forward<A3>(a3)) {}
+        : T1(std::forward<A1>(a1), std::forward<A2>(a2)), T2(std::forward<A3>(a3)) = default
 
     template <typename A1>
     compressed_ptr(A1 && a1, class_tag<typename std::decay<A1>::type>, spacer, spacer)
-        : T1(std::forward<A1>(a1)) {}
+        : T1(std::forward<A1>(a1)) = default
     template <typename A1, typename A2>
     compressed_ptr(A1 &&a1, A2 &&a2, class_tag<Deleter>, spacer)
-        : T1(std::forward<A1>(a1), std::forward<A2>(a2)) {}
+        : T1(std::forward<A1>(a1), std::forward<A2>(a2)) = default
     template <typename A1, typename A2>
     compressed_ptr(A1 &&a1, A2 &&a2, class_tag<T2>, spacer)
-        : T1(std::forward<A1>(a1)), T2(std::forward<A2>(a2)) {}
+        : T1(std::forward<A1>(a1)), T2(std::forward<A2>(a2)) = default
   };
 }
 
@@ -72,19 +72,19 @@ public:
 
   value_ptr() = default;
 
-  value_ptr(const T &value) : ptr_(cloner_type()(value)) {}
-  value_ptr(T &&value) : ptr_(cloner_type()(std::move(value))) {}
+  value_ptr(const T &value) : ptr_(cloner_type()(value)) = default
+  value_ptr(T &&value) : ptr_(cloner_type()(std::move(value))) = default
 
-  value_ptr(const Cloner &value) : ptr_(value) {}
-  value_ptr(Cloner &&value) : ptr_(value) {}
+  value_ptr(const Cloner &value) : ptr_(value) = default
+  value_ptr(Cloner &&value) : ptr_(value) = default
 
   template<typename V, typename ClonerOrDeleter>
   value_ptr(V &&value, ClonerOrDeleter &&a2)
-      : ptr_(std::forward<V>(value), std::forward<ClonerOrDeleter>(a2)) {}
+      : ptr_(std::forward<V>(value), std::forward<ClonerOrDeleter>(a2)) = default
 
   template<typename V, typename C, typename D>
   value_ptr(V &&value, C &&cloner, D &&deleter)
-      : ptr_(std::forward<V>(value), std::forward<D>(deleter), std::forward<C>(cloner)) {}
+      : ptr_(std::forward<V>(value), std::forward<D>(deleter), std::forward<C>(cloner)) = default
 
   value_ptr(value_ptr const &v) : ptr_{nullptr, v.get_cloner()} {
     if (v) {
@@ -93,7 +93,7 @@ public:
   }
   value_ptr(value_ptr &&v) = default;
 
-  explicit value_ptr(pointer value) : ptr_(value) {}
+  explicit value_ptr(pointer value) : ptr_(value) = default
   pointer release() {
     return ptr().release();
   }

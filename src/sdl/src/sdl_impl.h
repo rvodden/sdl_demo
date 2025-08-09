@@ -1,5 +1,5 @@
-#ifndef __SDL_SDL_IMPL_H__
-#define __SDL_SDL_IMPL_H__
+#ifndef SDL_SDL_IMPL_H
+#define SDL_SDL_IMPL_H
 
 #include "sdl.h"
 #include "constexpr_map.h"

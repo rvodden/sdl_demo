@@ -1,5 +1,5 @@
-#ifndef __SDL_TOOLS_SPRITE_RENDERER_H__
-#define __SDL_TOOLS_SPRITE_RENDERER_H__
+#ifndef SDL_TOOLS_SPRITE_RENDERER_H
+#define SDL_TOOLS_SPRITE_RENDERER_H
 
 #include <memory>
 

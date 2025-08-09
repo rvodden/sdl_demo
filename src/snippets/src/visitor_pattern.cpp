@@ -8,48 +8,65 @@ class Event;
 
 class BaseEventHandler { 
   public:
+    BaseEventHandler() {};
     virtual ~BaseEventHandler() {};
+    BaseEventHandler(BaseEventHandler&&) = delete;
+    auto operator=(BaseEventHandler&&) -> BaseEventHandler& = delete;
+    BaseEventHandler(const BaseEventHandler&) = delete;
+    auto operator=(const BaseEventHandler&) -> BaseEventHandler& = delete;
 };
 
 template <class EventClass>
 class EventHandler {
   public:
+    EventHandler() {};
     virtual ~EventHandler() {};
+    EventHandler(EventHandler&&) = delete;
+    auto operator=(EventHandler&&) -> EventHandler& = delete;
+    EventHandler(const EventHandler&) = delete;
+    auto operator=(const EventHandler&) -> EventHandler& = delete;
+    
     virtual void handle(const EventClass& event) = 0;
 };
 
 template <class EventClass>
 void castHandler(const EventClass& eventClass, BaseEventHandler& abstractHandler) {
   try {
-    EventHandler<EventClass> &eventHandler = dynamic_cast<EventHandler<EventClass>&>(abstractHandler);
+    auto &eventHandler = dynamic_cast<EventHandler<EventClass>&>(abstractHandler);
     eventHandler.handle(eventClass);
-  } catch (std::bad_cast &e) { } // bad cast just means this handler can't handle this event
+  } catch (std::bad_cast &e) { } // NOLINT(bugprone-empty-catch)
 }
 
 class Event {
   public:
-    virtual ~Event() = default;
+    Event() {};
+    virtual ~Event() {};
+    Event(Event&&) = delete;
+    auto operator=(Event&&) -> Event& {};
+    Event(const Event&) = delete;
+    auto operator=(const Event&) -> Event& {};
+    
     virtual void handle(BaseEventHandler& abstractHandler) = 0;
-    virtual std::string getName() const { return "Event"; }
+    [[nodiscard]] virtual auto getName() const -> std::string { return "Event"; }
     std::string name { "Event" };
 };
 
 class MouseEvent : public Event {
   public:
-    virtual void handle(BaseEventHandler& abstractHandler) {
+    void handle(BaseEventHandler& abstractHandler) override {
       castHandler(*this, abstractHandler);
     }
-    virtual std::string getName() const { return "MouseEvent"; }
+    [[nodiscard]] auto getName() const -> std::string override { return "MouseEvent"; }
 };
 
 class MouseEventHandler: public BaseEventHandler, public EventHandler<MouseEvent> {
   public:
-    void handle([[maybe_unused]] const MouseEvent& mouseEvent) {
-      std::cout << "I am handling a mouse event." << std::endl;
+    void handle([[maybe_unused]] const MouseEvent& mouseEvent) override {
+      std::cout << "I am handling a mouse event." << "\n";
     }; //note no override
 };
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
+auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
   
   std::vector<std::unique_ptr<BaseEventHandler>> eventHandlers;
   eventHandlers.push_back( std::make_unique<MouseEventHandler>() );

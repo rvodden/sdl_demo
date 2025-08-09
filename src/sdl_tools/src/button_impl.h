@@ -1,5 +1,5 @@
-#ifndef __SDL_TOOLS_BUTTON_IMPL_H__
-#define __SDL_TOOLS_BUTTON_IMPL_H__
+#ifndef SDL_TOOLS_BUTTON_IMPL_H
+#define SDL_TOOLS_BUTTON_IMPL_H
 
 #include <forward_list>
 

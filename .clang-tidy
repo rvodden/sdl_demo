@@ -1,0 +1,19 @@
+---
+# clang-tidy configuration for SDL demo project
+
+# Header filter to only analyze project headers, not dependencies
+HeaderFilterRegex: '^.*/(src|include)/.*\.(h|hpp)$'
+
+# Checks to run (customize as needed)
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*
+
+# Don't check headers from these paths
+WarningsAsErrors: ''

@@ -1,5 +1,5 @@
-#ifndef __SDL_TEXTURE_H__
-#define __SDL_TEXTURE_H__
+#ifndef SDL_TEXTURE_H
+#define SDL_TEXTURE_H
 
 #include <filesystem>
 

@@ -1,18 +1,18 @@
-#ifndef __VISITOR_PATTERN_LEGACY_SDK_IMPL_H__
-#define __VISITOR_PATTERN_LEGACY_SDK_IMPL_H__
+#ifndef VISITOR_PATTERN_LEGACY_SDK_IMPL_H
+#define VISITOR_PATTERN_LEGACY_SDK_IMPL_H
 
 #include "visitor_pattern_legacy_sdk.h"
 #include "legacy_sdk.h"
 
 class BaseConverter {
   public:
-    virtual ~BaseConverter() {};
+    virtual ~BaseConverter() = default;
 };
 
 template<class EventClass>
 class Converter {
   public:
-    virtual ~Converter() {};
+    virtual ~Converter() = default;
     virtual OLD_Event* convert(const EventClass& event) const = 0;
 };
 
@@ -29,8 +29,8 @@ class EventConverter;
 class BaseEventImpl {
   friend EventConverter;
   public:
-    BaseEventImpl(BaseEvent* baseEvent) : _baseEvent { baseEvent } {};
-    virtual ~BaseEventImpl() {};
+    BaseEventImpl(BaseEvent* baseEvent) : _baseEvent { baseEvent } = default;
+    virtual ~BaseEventImpl() = default;
     virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const = 0;
   protected:
     BaseEvent* _baseEvent;

@@ -1,5 +1,5 @@
-#ifndef __SDL_TOOLS_SPRITE_SHEET_H__
-#define __SDL_TOOLS_SPRITE_SHEET_H__
+#ifndef SDL_TOOLS_SPRITE_SHEET_H
+#define SDL_TOOLS_SPRITE_SHEET_H
 
 #include <memory>
 

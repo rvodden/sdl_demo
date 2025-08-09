@@ -1,5 +1,5 @@
-#ifndef __IMAGES_H__
-#define __IMAGES_H__
+#ifndef IMAGES_H
+#define IMAGES_H
 
 #include <cinttypes>
 

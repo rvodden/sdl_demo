@@ -4,6 +4,6 @@
 
 namespace sdl {
 
-Exception::Exception(std::string cause) : std::runtime_error(cause + " : " + SDL_GetError()), _cause{ cause }, _error { SDL_GetError() } {}
+Exception::Exception(const std::string& cause) : std::runtime_error(cause + " : " + SDL_GetError()), _cause{ cause }, _error { SDL_GetError() } {}
 
 }

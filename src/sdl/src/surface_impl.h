@@ -1,5 +1,5 @@
-#ifndef __SDL_SURFACE_IMPL_H__
-#define __SDL_SURFACE_IMPL_H__
+#ifndef SDL_SURFACE_IMPL_H
+#define SDL_SURFACE_IMPL_H
 
 #include <SDL3/SDL.h>
 

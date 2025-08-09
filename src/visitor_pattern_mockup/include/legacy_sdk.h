@@ -1,5 +1,5 @@
-#ifndef __LEGACY_SDK_H__
-#define __LEGACY_SDK_H__
+#ifndef LEGACY_SDK_H
+#define LEGACY_SDK_H
 
 #include <cinttypes>
 #include <deque>

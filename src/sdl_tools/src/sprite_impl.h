@@ -1,5 +1,5 @@
-#ifndef __SPRITE_SHEET_IMPL_H__
-#define __SPRITE_SHEET_IMPL_H__
+#ifndef SPRITE_SHEET_IMPL_H
+#define SPRITE_SHEET_IMPL_H
 
 #include <unordered_map>
 
@@ -14,8 +14,8 @@ class SpriteImpl {
   friend Sprite;
   friend SpriteRenderer;
   public:
-    SpriteImpl(const Texture& texture, const FloatRectangle& rectangle ) : _spriteSheet { texture }, _rectangle { rectangle } {};
-    SpriteImpl(const SpriteImpl& other) : _spriteSheet { other._spriteSheet }, _rectangle { other._rectangle } {};
+    SpriteImpl(const Texture& texture, const FloatRectangle& rectangle ) : _spriteSheet { texture }, _rectangle { rectangle } = default;
+    SpriteImpl(const SpriteImpl& other) : _spriteSheet { other._spriteSheet }, _rectangle { other._rectangle } = default;
 
   private:
     const Texture& _spriteSheet;

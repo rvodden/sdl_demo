@@ -1,5 +1,5 @@
-#ifndef __SDL_EXCEPTION_H__
-#define __SDL_EXCEPTION_H__
+#ifndef SDL_EXCEPTION_H
+#define SDL_EXCEPTION_H
 
 #include <stdexcept>
 #include <string>
@@ -13,12 +13,13 @@ class Exception : public std::runtime_error {
      * 
      * @param[cause] The cause of the error, usually the SDL function name which returned < 0
     */
-    explicit Exception(std::string cause);
+    explicit Exception(const std::string& cause);
 
-    //! @brief copy constructor;
     Exception(const Exception& other) = default;
-    //! @brief destructor;  
-    ~Exception() noexcept {};
+    auto operator=(const Exception& other) -> Exception& = default;
+    Exception(Exception&& other) = default;
+    auto operator=(Exception&& other) -> Exception& = default;
+    ~Exception() override = default;
 
   private:
     std::string _cause;
@@ -27,4 +28,4 @@ class Exception : public std::runtime_error {
 
 }
 
-#endif
+#endif // SDL_EXCEPTION_H

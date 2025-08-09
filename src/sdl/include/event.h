@@ -6,8 +6,8 @@
  * a type-safe, polymorphic event handling system built on top of SDL's event system.
  */
 
-#ifndef __SDL_EVENT_H__
-#define __SDL_EVENT_H__
+#ifndef SDL_EVENT_H
+#define SDL_EVENT_H
 
 #include <chrono>
 #include <exception>
@@ -37,7 +37,7 @@ class UnknownEventException : public std::runtime_error {
  */
 class BaseEventHandler {
   public:
-    virtual ~BaseEventHandler() {};
+    virtual ~BaseEventHandler() = default;
 };
 
 /**
@@ -52,7 +52,7 @@ class BaseEventHandler {
 template <class EventClass>
 class EventHandler {
   public:
-    virtual ~EventHandler() {};
+    virtual ~EventHandler() = default;
     /**
      * @brief Handle a specific event type
      * @param event The event to handle
@@ -69,7 +69,7 @@ class EventHandler {
  */
 class BaseEvent {
   public:
-    virtual ~BaseEvent() {};
+    virtual ~BaseEvent() = default;
     /**
      * @brief Handle this event using the provided handler
      * @param baseEventHandler The handler to process this event
@@ -109,7 +109,7 @@ class Event : public BaseEvent {
      * @brief Construct an event with a timestamp
      * @param ts The timestamp when this event occurred
      */
-    Event(std::chrono::duration<uint64_t, std::milli> ts) : timestamp{ts} {};
+    Event(std::chrono::duration<uint64_t, std::milli> ts) : timestamp{ts} = default;
     
 
     /** @brief Timestamp indicating when this event occurred */
@@ -154,7 +154,7 @@ class MouseEvent : public Event {
       std::milli> ts,
       uint32_t winId,
       u_int32_t mouseId
-    ) : Event(ts), windowId { winId }, which { mouseId } {};
+    ) : Event(ts), windowId { winId }, which { mouseId } = default;
     
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -189,7 +189,7 @@ class MousePositionEvent : public MouseEvent {
       uint32_t mouseId,
       float xPos,
       float yPos
-    ) : MouseEvent(ts, winId, mouseId), x { xPos }, y { yPos } {};
+    ) : MouseEvent(ts, winId, mouseId), x { xPos }, y { yPos } = default;
     
     virtual void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
@@ -279,7 +279,7 @@ class BaseEventProducer {
      * @brief Inject a custom event into the event stream
      * @param event The event to inject
      */
-    virtual void produce(std::unique_ptr<UserEvent>) {};
+    virtual void produce(std::unique_ptr<UserEvent>) = default;
 };
 
 /**

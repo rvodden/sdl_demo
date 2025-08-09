@@ -1,5 +1,5 @@
-#ifndef __SDL_WINDOW_IMPL_H__
-#define __SDL_WINDOW_IMPL_H__
+#ifndef SDL_WINDOW_IMPL_H
+#define SDL_WINDOW_IMPL_H
 
 #include <SDL3/SDL.h>
 

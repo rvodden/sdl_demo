@@ -1,24 +1,24 @@
-#ifndef __SDL_COLOR_H__
-#define __SDL_COLOR_H__
+#ifndef SDL_COLOR_H
+#define SDL_COLOR_H
 
 #include <cstdint>
 #include <tuple>
 
 namespace sdl {
 
-enum class Alpha {
+enum class Alpha : uint8_t {
   kOpaque = 255,
   kTranparent = 0
 };
 
 class Color {
   public:
-    Color() {};
+    Color() = default;
     constexpr Color(
       const uint8_t& red, 
       const uint8_t& green, 
       const uint8_t& blue, 
-      const uint8_t& alpha) : _color { std::make_tuple(red, green, blue) }, _alpha { alpha } {};
+      const uint8_t& alpha) : _color { std::make_tuple(red, green, blue) }, _alpha { alpha } = default;
 
     uint8_t getRed() const { return std::get<0>(_color); };
     uint8_t getGreen() const { return std::get<1>(_color); };

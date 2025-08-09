@@ -1,5 +1,5 @@
-#ifndef __SDL_TOOLS_BUTTON_H__
-#define __SDL_TOOLS_BUTTON_H__
+#ifndef SDL_TOOLS_BUTTON_H
+#define SDL_TOOLS_BUTTON_H
 
 #include <memory>
 

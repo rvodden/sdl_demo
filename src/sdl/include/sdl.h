@@ -1,5 +1,5 @@
-#ifndef __SDL_SDL_H__
-#define __SDL_SDL_H__
+#ifndef SDL_SDL_H
+#define SDL_SDL_H
 
 #include <chrono>
 #include <memory>

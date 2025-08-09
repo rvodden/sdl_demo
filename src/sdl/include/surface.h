@@ -1,5 +1,5 @@
-#ifndef __SDL_SURFACE_H__
-#define __SDL_SURFACE_H__
+#ifndef SDL_SURFACE_H
+#define SDL_SURFACE_H
 
 #include <cinttypes>
 #include <filesystem>
@@ -13,13 +13,13 @@ class SurfaceImpl;
 class Surface {
   public:
     Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask, uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask );
-    Surface(std::filesystem::path filePath);
-    Surface(Surface&) = delete;
+    Surface(const std::filesystem::path& filePath);
+    Surface(const Surface&) = delete;
     Surface(Surface&& other) noexcept;
     ~Surface();
 
-    Surface& operator=(Surface&) = delete;
-    Surface& operator=(Surface&& other) noexcept;
+    auto operator=(const Surface&) -> Surface& = delete;
+    auto operator=(Surface&& other) noexcept -> Surface&;
 
 
   private:

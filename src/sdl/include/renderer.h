@@ -1,5 +1,5 @@
-#ifndef __SDL_RENDERER_H__
-#define __SDL_RENDERER_H__
+#ifndef SDL_RENDERER_H
+#define SDL_RENDERER_H
 
 #include <optional>
 #include <memory>

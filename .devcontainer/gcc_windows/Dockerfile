@@ -49,6 +49,13 @@ RUN apt update && \
     apt install -y git && \
     rm -rf /var/lib/apt/lists/*
 
+# Add up to date clang-tidy and clang-format
+RUN  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | gpg --dearmor - >/usr/share/keyrings/llvm-snapshot.gpg && \
+    echo 'deb [signed-by=/usr/share/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble main' > /etc/apt/sources.list.d/llvm.list && \
+    apt update && \
+    apt install -y clang-format clang-tidy && \
+    rm -rf /var/lib/apt/lists/*
+
 ADD --chmod=0644 CMakeToolchain.txt /CMakeToolchain.txt
 ENV CMAKE_TOOLCHAIN_FILE="/CMakeToolchain.txt"
 

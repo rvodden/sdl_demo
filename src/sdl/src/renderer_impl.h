@@ -1,5 +1,5 @@
-#ifndef __RENDERER_IMPL_H__
-#define __RENDERER_IMPL_H__
+#ifndef RENDERER_IMPL_H
+#define RENDERER_IMPL_H
 
 #include <SDL3/SDL.h>
 

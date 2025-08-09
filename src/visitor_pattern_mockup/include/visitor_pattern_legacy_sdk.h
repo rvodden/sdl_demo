@@ -1,5 +1,5 @@
-#ifndef __VISITOR_PATTERN_LEGACY_SDK_H__
-#define __VISITOR_PATTERN_LEGACY_SDK_H__
+#ifndef VISITOR_PATTERN_LEGACY_SDK_H
+#define VISITOR_PATTERN_LEGACY_SDK_H
 
 #include <iostream>
 #include <memory>
@@ -15,13 +15,13 @@ class UnknownEventException: public std::runtime_error {
 
 class BaseEventHandler { 
   public:
-    virtual ~BaseEventHandler() noexcept {};
+    virtual ~BaseEventHandler() noexcept = default;
 };
 
 template <class EventClass>
 class InternalEventHandler {
   public:
-    virtual ~InternalEventHandler() noexcept {};
+    virtual ~InternalEventHandler() noexcept = default;
     virtual void handle(const EventClass& event) const = 0;
 };
 
@@ -39,7 +39,7 @@ class BaseEvent {
   friend void pushEvent(const BaseEvent& event);
   public:
     explicit BaseEvent(BaseEventImpl* impl);
-    virtual ~BaseEvent() noexcept {};
+    virtual ~BaseEvent() noexcept = default;
     virtual void operator()(const BaseEventHandler& abstractHandler) const = 0;
 
   protected:
@@ -72,7 +72,7 @@ class CustomEvent : public BaseEvent {
   public:
     CustomEvent();
     CustomEvent(CustomEventImpl* impl);
-    virtual ~CustomEvent() {};
+    virtual ~CustomEvent() = default;
     
     uint16_t customEventNumber;
     void* payload;
@@ -86,7 +86,7 @@ class CustomEvent : public BaseEvent {
 };
 
 template<class EventClass>
-class EventHandler: public BaseEventHandler, public InternalEventHandler<EventClass> {};
+class EventHandler: public BaseEventHandler, public InternalEventHandler<EventClass> = default;
 
 BaseEvent& getEvent();
 

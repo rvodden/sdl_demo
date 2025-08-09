@@ -7,8 +7,8 @@
  * them to all registered event handlers using the visitor pattern.
  */
 
-#ifndef __SDL_TOOLS_EVENT_DISPATCHER_H__
-#define __SDL_TOOLS_EVENT_DISPATCHER_H__
+#ifndef SDL_TOOLS_EVENT_DISPATCHER_H
+#define SDL_TOOLS_EVENT_DISPATCHER_H
 
 #include <memory>
 

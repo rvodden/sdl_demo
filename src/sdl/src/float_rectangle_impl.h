@@ -1,5 +1,5 @@
-#ifndef __SDL_RECTANGLE_IMPL_H__
-#define __SDL_RECTANGLE_IMPL_H__
+#ifndef SDL_RECTANGLE_IMPL_H
+#define SDL_RECTANGLE_IMPL_H
 
 #include <SDL3/SDL.h>
 
@@ -14,7 +14,7 @@ class FloatRectangleImpl{
   friend FloatRectangle;
   public:
     FloatRectangleImpl() = default;
-    FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect { sdlFRect } {};
+    FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect { sdlFRect } = default;
     SDL_FRect* getSDLRect() { return &_sdlFRect; };
 
   private:

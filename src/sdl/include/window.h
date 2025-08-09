@@ -1,5 +1,5 @@
-#ifndef __SDL_WINDOW_H__
-#define __SDL_WINDOW_H__
+#ifndef SDL_WINDOW_H
+#define SDL_WINDOW_H
 
 #include <string>
 #include <memory>

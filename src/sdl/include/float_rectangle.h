@@ -1,5 +1,5 @@
-#ifndef __SDL_RECTANGLE_H__
-#define __SDL_RECTANGLE_H__
+#ifndef SDL_RECTANGLE_H
+#define SDL_RECTANGLE_H
 
 #include <memory>
 

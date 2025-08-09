@@ -6,7 +6,7 @@
 
 class Base {
   public:
-    virtual ~Base() = default;
+    virtual ~Base() {};
     virtual void print() const { std::cout << "Base!" << std::endl; };
 };
 

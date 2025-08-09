@@ -8,8 +8,8 @@
  * event dispatcher system.
  */
 
-#ifndef __SDL_USER_EVENT_H__
-#define __SDL_USER_EVENT_H__
+#ifndef SDL_USER_EVENT_H
+#define SDL_USER_EVENT_H
 
 #include "event.h"
 
@@ -42,7 +42,7 @@ uint32_t registerEventType();
  * @code
  * class MyCustomEvent : public UserEvent {
  * public:
- *     MyCustomEvent(int myData) : UserEvent(), customData(myData) {}
+ *     MyCustomEvent(int myData) : UserEvent(), customData(myData) = default
  *     
  *     virtual void handle(BaseEventHandler &baseEventHandler) override {
  *         castHandler(*this, baseEventHandler);
@@ -120,7 +120,7 @@ class UserEvent: public Event {
  * @code
  * class MyCustomEvent : public CustomUserEvent<MyCustomEvent> {
  * public:
- *     MyCustomEvent(int myData) : CustomUserEvent(), customData(myData) {}
+ *     MyCustomEvent(int myData) : CustomUserEvent(), customData(myData) = default
  *     
  *     int customData;
  * };
