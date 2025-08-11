@@ -88,7 +88,10 @@ OLD_Event* EventConverter::convert(const CustomEventImpl& customEventImpl) const
 
 BaseEvent& getEvent() {
   OLD_Event* oldEvent = waitForOldEvent();
-  if (oldEvent == nullptr) throw NoEventsException("There are no more events!");
+  if (oldEvent == nullptr)
+  {
+    throw NoEventsException("There are no more events!");
+  }
   BaseEvent& event = createEvent(oldEvent);
   delete oldEvent;
   return event;

@@ -13,7 +13,7 @@ class FloatRectangleImpl;
 class FloatRectangle {
   friend Renderer;
   public:
-    FloatRectangle(float x, float y, float width, float height);
+    FloatRectangle(float topLeftX, float topLeftY, float width, float height);
 
     /**
      * FloatRectangleImpl is incomplete here, so the compiler cannot
@@ -25,22 +25,22 @@ class FloatRectangle {
     //! @brief copy constructor
     FloatRectangle(const FloatRectangle& other);
     //! @brief move constructor
-    FloatRectangle(FloatRectangle&& other);
+    FloatRectangle(FloatRectangle&& other) noexcept;
 
     ~FloatRectangle();
 
     //! @brief copy assignment operator
-    FloatRectangle& operator=(const FloatRectangle& other);
+    auto operator=(const FloatRectangle& other) -> FloatRectangle&;
     
     //! @brief move assignment operator
-    FloatRectangle& operator=(FloatRectangle&& other);
+    auto operator=(FloatRectangle&& other) noexcept -> FloatRectangle&;
 
-    float getX() const;
-    float getY() const;
-    float getHeight() const;
-    float getWidth() const;
+    [[nodiscard]] auto getX() const -> float;
+    [[nodiscard]] auto getY() const -> float;
+    [[nodiscard]] auto getHeight() const -> float;
+    [[nodiscard]] auto getWidth() const -> float;
 
-    bool contains(const float &x, const float &y) const;
+    [[nodiscard]] auto contains(const float &topLeftX, const float &topLeftY) const -> bool;
 
   private:
     std::unique_ptr<FloatRectangleImpl> _rectangleImpl;

@@ -75,6 +75,17 @@
         "ranges": "cpp",
         "stdfloat": "cpp",
         "text_encoding": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "future": "cpp",
+        "*.def": "cpp"
     },
+    "files.exclude": {
+        "**/build/**": true
+    },
+    "search.exclude": {
+        "**/build/**": true
+    },
+    "C_Cpp.files.exclude": {
+        "**/build/**": true
+    }
 }

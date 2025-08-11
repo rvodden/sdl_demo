@@ -11,9 +11,15 @@ class SDLImpl;
 class SDL {
   public:
     SDL();
+    SDL(const SDL& sdl) = delete;
+    SDL(SDL&& sdl) noexcept = delete;
+
+    auto operator=(const SDL&) -> SDL& = delete;
+    auto operator=(SDL&&) -> SDL& = delete;
+
     ~SDL() noexcept;
 
-    typedef uint8_t SubSystem; 
+    using SubSystem = uint8_t; 
     static constexpr SubSystem kTimer = 0;
     static constexpr SubSystem kAudio = 1;
     static constexpr SubSystem kVideo = 2;

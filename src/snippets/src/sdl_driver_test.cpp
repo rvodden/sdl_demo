@@ -3,7 +3,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-int main() {
+auto main() -> int {
     SDL_Init(SDL_INIT_VIDEO);
     
     int num_drivers = SDL_GetNumVideoDrivers();

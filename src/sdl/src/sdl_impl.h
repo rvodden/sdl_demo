@@ -20,7 +20,7 @@ static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap {{
 class SDLImpl {
   friend SDL;
   private:
-    std::unordered_set<SDL::SubSystem> subSystemInitializationStatus {  };
+    std::unordered_set<SDL::SubSystem> subSystemInitializationStatus;
 };
 
 }

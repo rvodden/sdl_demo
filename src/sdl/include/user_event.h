@@ -21,7 +21,7 @@ class UserEventImpl;
  * @return The registered SDL event type ID
  * @throws Exception if SDL_RegisterEvents fails
  */
-uint32_t registerEventType();
+auto registerEventType() -> uint32_t;
 
 /**
  * @brief User-defined event for custom application events
@@ -74,17 +74,17 @@ class UserEvent: public Event {
         void* d1
     );
     
-    UserEvent(const UserEvent &userEvent);
-    UserEvent(UserEvent &&userEvent);
-    UserEvent& operator=(const UserEvent &userEvent);
-    UserEvent& operator=(UserEvent &&userEvent);
-    virtual ~UserEvent();
-    
+    UserEvent(const UserEvent &other);
+    UserEvent(UserEvent &&other) noexcept;
+    auto operator=(const UserEvent &userEvent) -> UserEvent&;
+    auto operator=(UserEvent &&userEvent) noexcept -> UserEvent&;
+    ~UserEvent() override;
+
     /**
      * @brief Handle this user event using the provided handler
      * @param baseEventHandler The handler to process this event
      */
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
     };
 
@@ -95,7 +95,7 @@ class UserEvent: public Event {
     /** @brief Generic data pointer for passing custom data */
     void* data;
 
-    static uint32_t getEventType() {
+    auto static getEventType() -> uint32_t {
       static uint32_t eventCode = registerEventType();  // Once per type
       return eventCode;
     }
@@ -174,11 +174,11 @@ class CustomUserEvent : public UserEvent {
      * 
      * @param baseEventHandler The handler to process this event
      */
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
         castHandler(static_cast<const DerivedEvent&>(*this), baseEventHandler);
     }
 
-    static uint32_t getEventType() {
+    auto static getEventType() -> uint32_t {
       static uint32_t eventType = registerEventType();
       
       return eventType;

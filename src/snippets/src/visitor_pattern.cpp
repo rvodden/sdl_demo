@@ -8,8 +8,8 @@ class Event;
 
 class BaseEventHandler { 
   public:
-    BaseEventHandler() {};
-    virtual ~BaseEventHandler() {};
+    BaseEventHandler() = default;
+    virtual ~BaseEventHandler() = default;
     BaseEventHandler(BaseEventHandler&&) = delete;
     auto operator=(BaseEventHandler&&) -> BaseEventHandler& = delete;
     BaseEventHandler(const BaseEventHandler&) = delete;
@@ -19,8 +19,8 @@ class BaseEventHandler {
 template <class EventClass>
 class EventHandler {
   public:
-    EventHandler() {};
-    virtual ~EventHandler() {};
+    EventHandler() = default;
+    virtual ~EventHandler() = default;
     EventHandler(EventHandler&&) = delete;
     auto operator=(EventHandler&&) -> EventHandler& = delete;
     EventHandler(const EventHandler&) = delete;
@@ -39,12 +39,12 @@ void castHandler(const EventClass& eventClass, BaseEventHandler& abstractHandler
 
 class Event {
   public:
-    Event() {};
-    virtual ~Event() {};
-    Event(Event&&) = delete;
-    auto operator=(Event&&) -> Event& {};
-    Event(const Event&) = delete;
-    auto operator=(const Event&) -> Event& {};
+    Event() = default;
+    virtual ~Event() = default;
+    Event(Event&& other) = delete;
+    auto operator=(Event&& other) -> Event& = default;
+    Event(const Event& other) = delete;
+    auto operator=(const Event& other) -> Event& = default;
     
     virtual void handle(BaseEventHandler& abstractHandler) = 0;
     [[nodiscard]] virtual auto getName() const -> std::string { return "Event"; }
@@ -63,7 +63,7 @@ class MouseEventHandler: public BaseEventHandler, public EventHandler<MouseEvent
   public:
     void handle([[maybe_unused]] const MouseEvent& mouseEvent) override {
       std::cout << "I am handling a mouse event." << "\n";
-    }; //note no override
+    };
 };
 
 auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {

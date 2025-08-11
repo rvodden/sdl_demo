@@ -13,9 +13,9 @@ namespace sdl::tools {
 class ButtonImpl {
   friend Button;
   public:
-    ButtonImpl(EventDispatcher &eventProcessor, sdl::FloatRectangle& rectangle) : 
-      _rectangle { rectangle },
-      _eventProcessor { eventProcessor } { };
+    ButtonImpl(std::shared_ptr<EventDispatcher> eventProcessor, sdl::FloatRectangle rectangle) : 
+      _rectangle { std::move(rectangle) },
+      _eventProcessor { std::move(eventProcessor) } { };
 
     class MouseEventHandler : public sdl::EventHandler<sdl::MouseButtonEvent>, public sdl::BaseEventHandler {
       public:
@@ -23,18 +23,18 @@ class ButtonImpl {
           FloatRectangle& rectangle,
           std::forward_list<Button::Handler>& eventHandlers
         ) : _rectangle{ rectangle }, _eventHandlers { eventHandlers } { };
-        virtual void handle(const sdl::MouseButtonEvent& mouseEvent);
+        void handle(const sdl::MouseButtonEvent& mouseButtonEvent) override;
       private:
-        FloatRectangle& _rectangle;
-        std::forward_list<Button::Handler>& _eventHandlers;
+        FloatRectangle _rectangle;
+        std::forward_list<Button::Handler> _eventHandlers;
     };
 
   private:
     void eventHandler(const sdl::MouseButtonEvent &mouseButtonEvent);
 
     sdl::FloatRectangle _rectangle;
-    EventDispatcher& _eventProcessor;
-    std::forward_list<Button::Handler> _eventHandlers { };
+    std::shared_ptr<EventDispatcher> _eventProcessor;
+    std::forward_list<Button::Handler> _eventHandlers;
     MouseEventHandler _mouseEventHandler { _rectangle , _eventHandlers };
 };
 

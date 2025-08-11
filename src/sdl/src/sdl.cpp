@@ -20,7 +20,7 @@ SDL::~SDL() noexcept {
 
 void SDL::initSubSystem(const SubSystem &subSystem) {
 auto retVal = SDL_InitSubSystem(sdlSubSystemMap[subSystem]);
-  if(!retVal) throw Exception("SDL_InitSubSystem");
+  if(!retVal) { throw Exception("SDL_InitSubSystem"); }
   _sdlImpl->subSystemInitializationStatus.insert(subSystem);
 }
 

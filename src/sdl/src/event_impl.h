@@ -18,8 +18,8 @@ static constexpr vodden::Map<uint32_t, MouseButtonEvent::Button, 5> sdlMouseButt
   { SDL_BUTTON_X2, MouseButtonEvent::Button::kX2 },
 }};
 
-std::unique_ptr<QuitEvent> createQuitEvent(const SDL_QuitEvent* sdlQuitEvent);
-std::unique_ptr<MouseButtonEvent> createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent);
-std::unique_ptr<BaseEvent> createUserEvent(const SDL_UserEvent* sdlUserEvent);
+auto createQuitEvent(const SDL_QuitEvent* sdlQuitEvent) -> std::unique_ptr<QuitEvent>;
+auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent) -> std::unique_ptr<MouseButtonEvent>;
+auto createUserEvent(const SDL_UserEvent* sdlUserEvent) -> std::unique_ptr<BaseEvent>;
 
 }

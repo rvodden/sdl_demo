@@ -9,7 +9,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(cmake/standard_build.cmake)
 project(test_project LANGUAGES CXX)
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 add_subdirectory(external)
 add_subdirectory(src)

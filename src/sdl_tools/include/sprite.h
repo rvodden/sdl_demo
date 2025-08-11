@@ -15,8 +15,12 @@ class SpriteRenderer;
 class Sprite {
   friend SpriteRenderer;
   public:
-    Sprite(const Texture& texture, const FloatRectangle& rectangle);
-    Sprite(Sprite&& other);
+    Sprite(std::shared_ptr<const Texture> texture, const FloatRectangle& rectangle);
+    Sprite(const Sprite& other) = delete;
+    Sprite(Sprite&& other) noexcept;
+
+    auto operator=(const Sprite& other) -> Sprite& = delete;
+    auto operator=(Sprite&& other) noexcept -> Sprite&;
 
     ~Sprite();
 

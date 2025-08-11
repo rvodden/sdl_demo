@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+// NOLINTBEGIN
+
 std::deque<OLD_Event> oldEvents = {
   { .user   = { OLD_USEREVENT, 1 }},
   { .system = { OLD_SYSTEMEVENT, 2 }},
@@ -19,3 +21,5 @@ OLD_Event* waitForOldEvent() {
 void pushOldEvent(OLD_Event* event) {
   oldEvents.push_back(*event);
 }
+
+//NOLINTEND

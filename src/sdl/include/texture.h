@@ -14,10 +14,10 @@ class TextureImpl;
 class Texture {
   friend Renderer;
   public:
-    typedef uint8_t BlendMode;
+    using BlendMode = uint8_t;
     
     //! @brief creates a texture from a file on disk.
-    Texture(const Renderer& renderer, std::filesystem::path filePath);
+    Texture(const Renderer& renderer, const std::filesystem::path& filePath);
 
     //! @brief creates a file from data already held in cpu memory.
     Texture(const Renderer& renderer, const void* location, std::size_t size);
@@ -27,11 +27,11 @@ class Texture {
     Texture(Texture&& other) noexcept;
     ~Texture();
 
-    Texture& operator=(Texture& other) = delete;
-    Texture& operator=(Texture&& other) noexcept;
+    auto operator=(Texture& other) -> Texture& = delete;
+    auto operator=(Texture&& other) noexcept -> Texture&;
 
     void setTextureBlendMode(const BlendMode& blendMode);
-    BlendMode getTextureBlendMode();
+    auto getTextureBlendMode() -> BlendMode;
     
     static constexpr BlendMode kNone = 0;
     static constexpr BlendMode kBlend = 1;

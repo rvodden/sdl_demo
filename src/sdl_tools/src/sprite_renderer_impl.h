@@ -8,10 +8,10 @@ namespace sdl::tools {
 class SpriteRendererImpl {
   friend SpriteRenderer;
   public:
-    SpriteRendererImpl(const Renderer& renderer): _renderer { renderer } = default;
+    SpriteRendererImpl(std::shared_ptr<Renderer> renderer): _renderer ( std::move(renderer) ) {};
 
   private:
-    const Renderer& _renderer;  
+    std::shared_ptr<Renderer> _renderer;  
 };
 
 }

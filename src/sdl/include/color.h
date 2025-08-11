@@ -17,13 +17,13 @@ class Color {
     constexpr Color(
       const uint8_t& red, 
       const uint8_t& green, 
-      const uint8_t& blue, 
-      const uint8_t& alpha) : _color { std::make_tuple(red, green, blue) }, _alpha { alpha } = default;
+      const uint8_t& blue,  // NOLINT(bugprone-easily-swappable-parameters)
+      const uint8_t& alpha) : _color { std::make_tuple(red, green, blue) }, _alpha { alpha } {};
 
-    uint8_t getRed() const { return std::get<0>(_color); };
-    uint8_t getGreen() const { return std::get<1>(_color); };
-    uint8_t getBlue() const { return std::get<2>(_color); };
-    uint8_t getAlpha() const { return _alpha; };
+    [[nodiscard]] auto getRed() const -> uint8_t { return std::get<0>(_color); };
+    [[nodiscard]] auto getGreen() const -> uint8_t { return std::get<1>(_color); };
+    [[nodiscard]] auto getBlue() const -> uint8_t { return std::get<2>(_color); };
+    [[nodiscard]] auto getAlpha() const -> uint8_t { return _alpha; };
   
   private:
     std::tuple<uint8_t, uint8_t, uint8_t> _color { 0, 0, 0 };

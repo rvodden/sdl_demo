@@ -8,19 +8,24 @@ namespace sdl::tools {
 
 void ButtonImpl::MouseEventHandler::handle([[maybe_unused]] const sdl::MouseButtonEvent &mouseButtonEvent) {
   if(_rectangle.contains(mouseButtonEvent.x, mouseButtonEvent.y) ) {
-    for(auto& handler : _eventHandlers) handler(mouseButtonEvent);
+    for(auto& handler : _eventHandlers) { handler(mouseButtonEvent); }
   }
 }
 
-Button::Button(EventDispatcher &eventProcessor, sdl::FloatRectangle rectangle) : _buttonImpl { std::make_unique<ButtonImpl>(eventProcessor, rectangle) } {
-  _buttonImpl->_eventProcessor.registerEventHandler(_buttonImpl->_mouseEventHandler);
+Button::Button(std::shared_ptr<EventDispatcher> eventProcessor, FloatRectangle rectangle) : _buttonImpl { std::make_unique<ButtonImpl>(std::move(eventProcessor), std::move(rectangle)) } {
+  _buttonImpl->_eventProcessor->registerEventHandler(_buttonImpl->_mouseEventHandler);
 }
 
-Button::Button(Button &&other) : _buttonImpl { std::move(other._buttonImpl) } {};
+Button::Button(Button &&other) noexcept : _buttonImpl { std::move(other._buttonImpl) } {};
 
-Button::~Button() {}
+Button::~Button() = default;
 
-void Button::registerEventHandler(Handler handler) {
+auto Button::operator=(Button&& other) noexcept -> Button&{
+  std::swap(_buttonImpl, other._buttonImpl);
+  return *this;
+}
+
+void Button::registerEventHandler(const Handler& handler) {
   _buttonImpl->_eventHandlers.push_front(handler);
 };
 

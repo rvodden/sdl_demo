@@ -20,7 +20,7 @@ class RendererImpl;
 class Renderer {
   friend Texture;
   public:
-    typedef uint8_t RendererFlag;
+    using RendererFlag = uint8_t;
     
     /**
      * @brief Construct a renderer associated with the provided window
@@ -34,24 +34,24 @@ class Renderer {
     ~Renderer() noexcept;
 
     //! @brief move assignment operator
-    Renderer& operator=( Renderer&& other ) noexcept;
+    auto operator=( Renderer&& other ) noexcept -> Renderer&;
     //! @brief Renderer cannot be copied
-    Renderer& operator= ( const Renderer& other ) = delete;
+    auto operator= ( const Renderer& other ) -> Renderer& = delete;
 
     //! @brief Set the color used for drawing operations (Rect, Line and Clear).
     void setRenderDrawColour(const Color& color);
 
     //! @brief Copy a region of the texture to a region of the renderer.
-    const Renderer &copy(
+    void copy(
       const Texture& texture
-    ) const;
+    );
     
     //! @brief Copy a region of the texture to a region of the renderer.
-    const Renderer &copy(
+    void copy(
       const Texture& texture, 
       const FloatRectangle &source, 
       const FloatRectangle &destination
-    ) const;
+    );
 
     //! @brief Clear the renderer with the drawing color.
     void clear() const;

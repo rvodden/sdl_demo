@@ -37,6 +37,12 @@ class UnknownEventException : public std::runtime_error {
  */
 class BaseEventHandler {
   public:
+    BaseEventHandler() = default;
+    BaseEventHandler(const BaseEventHandler&) = default;
+    BaseEventHandler(BaseEventHandler&&) noexcept = default;
+
+    auto operator=(const BaseEventHandler&) -> BaseEventHandler& = default;
+    auto operator=(BaseEventHandler&&) -> BaseEventHandler& = default;
     virtual ~BaseEventHandler() = default;
 };
 
@@ -52,6 +58,12 @@ class BaseEventHandler {
 template <class EventClass>
 class EventHandler {
   public:
+    EventHandler() = default;
+    EventHandler(const EventHandler&) = default;
+    EventHandler(EventHandler&&) noexcept = default;
+
+    auto operator=(const EventHandler&) -> EventHandler& = default;
+    auto operator=(EventHandler&&) -> EventHandler& = default;
     virtual ~EventHandler() = default;
     /**
      * @brief Handle a specific event type
@@ -70,6 +82,15 @@ class EventHandler {
 class BaseEvent {
   public:
     virtual ~BaseEvent() = default;
+
+    BaseEvent() = default;
+    BaseEvent(const BaseEvent&) = default;
+    BaseEvent(BaseEvent&&) noexcept = default;
+
+    auto operator=(const BaseEvent&) -> BaseEvent& = default;
+    auto operator=(BaseEvent&&) -> BaseEvent& = default;
+
+
     /**
      * @brief Handle this event using the provided handler
      * @param baseEventHandler The handler to process this event
@@ -92,9 +113,9 @@ class BaseEvent {
 template <class EventClass>
 void castHandler(const EventClass& eventClass, BaseEventHandler& baseEventHandler) {
   try {
-    EventHandler<EventClass> &eventHandler = dynamic_cast<EventHandler<EventClass>&>(baseEventHandler);
+    auto &eventHandler = dynamic_cast<EventHandler<EventClass>&>(baseEventHandler);
     eventHandler.handle(eventClass);
-  } catch (std::bad_cast &e) { } // bad cast just means this handler can't handle this event
+  } catch (std::bad_cast &e) { } //NOLINT(bugprone-empty-catch) bad cast just means this handler can't handle this event 
 }
 
 /**
@@ -109,13 +130,13 @@ class Event : public BaseEvent {
      * @brief Construct an event with a timestamp
      * @param ts The timestamp when this event occurred
      */
-    Event(std::chrono::duration<uint64_t, std::milli> ts) : timestamp{ts} = default;
+    Event(std::chrono::duration<uint64_t, std::milli> ts) : timestamp{ts} {};
     
 
     /** @brief Timestamp indicating when this event occurred */
     std::chrono::duration<uint64_t, std::milli> timestamp;
 
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
     };
 };
@@ -130,7 +151,7 @@ class Event : public BaseEvent {
 class QuitEvent : public Event {
   public:
     using Event::Event;
-    virtual void handle(BaseEventHandler &baseEventHandler ) override {
+    void handle(BaseEventHandler &baseEventHandler ) override {
       castHandler(*this, baseEventHandler);
     };
 };
@@ -154,9 +175,9 @@ class MouseEvent : public Event {
       std::milli> ts,
       uint32_t winId,
       u_int32_t mouseId
-    ) : Event(ts), windowId { winId }, which { mouseId } = default;
+    ) : Event(ts), windowId { winId }, which { mouseId } {};
     
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
     };
     
@@ -189,9 +210,9 @@ class MousePositionEvent : public MouseEvent {
       uint32_t mouseId,
       float xPos,
       float yPos
-    ) : MouseEvent(ts, winId, mouseId), x { xPos }, y { yPos } = default;
+    ) : MouseEvent(ts, winId, mouseId), x { xPos }, y { yPos } {};
     
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
     };
     
@@ -213,7 +234,7 @@ class MouseButtonEvent : public MousePositionEvent {
     /**
      * @brief Enumeration of supported mouse buttons
      */
-    enum class Button {
+    enum class Button : uint8_t {
       kLeft,    /**< Left mouse button */
       kMiddle,  /**< Middle mouse button (scroll wheel) */
       kRight,   /**< Right mouse button */
@@ -243,7 +264,7 @@ class MouseButtonEvent : public MousePositionEvent {
       uint8_t clickCount
     ) : MousePositionEvent(ts, winId, mouseId, xPos, yPos) , button { btn }, down{ btnDown } , clicks { clickCount } { };
 
-    virtual void handle(BaseEventHandler &baseEventHandler) override {
+    void handle(BaseEventHandler &baseEventHandler) override {
       castHandler(*this, baseEventHandler);
     };
     
@@ -267,19 +288,26 @@ class MouseButtonEvent : public MousePositionEvent {
  */
 class BaseEventProducer {
   public:
+    BaseEventProducer() = default;
+    BaseEventProducer(const BaseEventProducer&) = default;
+    BaseEventProducer(BaseEventProducer&&) noexcept = default;
+
+    auto operator=(const BaseEventProducer&) -> BaseEventProducer& = default; 
+    auto operator=(BaseEventProducer&&) noexcept -> BaseEventProducer& = default; 
+
     virtual ~BaseEventProducer() = default;
     
     /**
      * @brief Wait for and return the next event
      * @return A unique pointer to the next available event
      */
-    virtual std::unique_ptr<BaseEvent> wait() = 0;
+    virtual auto wait() -> std::unique_ptr<BaseEvent> = 0;
     
     /**
      * @brief Inject a custom event into the event stream
      * @param event The event to inject
      */
-    virtual void produce(std::unique_ptr<UserEvent>) = default;
+    virtual void produce(std::unique_ptr<UserEvent>) = 0;
 };
 
 /**
@@ -290,19 +318,26 @@ class BaseEventProducer {
  */
 class EventProducer : public BaseEventProducer {
   public:
-    virtual ~EventProducer() = default;
+    EventProducer() = default;
+    EventProducer(const EventProducer&) = default;
+    EventProducer(EventProducer&&) noexcept = default;
+
+    auto operator=(const EventProducer&) -> EventProducer& = default; 
+    auto operator=(EventProducer&&) noexcept -> EventProducer& = default; 
+
+    ~EventProducer() override = default;
     
     /**
      * @brief Wait for and return the next SDL event
      * @return A unique pointer to the next available event from SDL
      */
-    virtual std::unique_ptr<BaseEvent> wait();
+    auto wait() -> std::unique_ptr<BaseEvent> override;
     
     /**
      * @brief Inject a custom event into the SDL event stream
      * @param event The event to inject
      */
-    virtual void produce(std::unique_ptr<UserEvent> event);
+    void produce(std::unique_ptr<UserEvent> event) override;
 };
 
 

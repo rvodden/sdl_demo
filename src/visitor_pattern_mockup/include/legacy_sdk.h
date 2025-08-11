@@ -5,6 +5,7 @@
 #include <deque>
 
 // LEGACY SDK
+// NOLINTBEGIN
 
 enum OLD_EventType {
   OLD_USEREVENT,
@@ -39,5 +40,7 @@ extern std::deque<OLD_Event> oldEvents;
 
 OLD_Event* waitForOldEvent();
 void pushOldEvent(OLD_Event* oldEvent);
+
+// NOLINTEND
 
 #endif

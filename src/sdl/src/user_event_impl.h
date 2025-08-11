@@ -14,8 +14,8 @@ class UserEvent;
 class UserEventImpl {
   friend UserEvent;
   public:
-    UserEventImpl();
-    std::unique_ptr<SDL_Event> _createSDLUserEvent();
+    UserEventImpl(UserEvent* userEvent);
+    auto _createSDLUserEvent() -> std::unique_ptr<SDL_Event>;
   
   private:
     UserEvent* _userEvent;

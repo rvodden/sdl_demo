@@ -20,14 +20,14 @@ class Window {
     Window(const Window& other) = delete;
     ~Window();
 
-    Window& operator=(const Window& other) = delete;
-    Window& operator=(Window&& other) noexcept;
+    auto operator=(const Window& other) -> Window& = delete;
+    auto operator=(Window&& other) noexcept -> Window&;
     
     //! @brief Get the title of the window.
-    std::string_view getTitle();
+    auto getTitle() -> std::string_view;
 
     //! @brief Set the title of the window.
-    void setTitle(std::string newTitle);
+    void setTitle(const std::string& newTitle);
 
   private:
     std::string _title;

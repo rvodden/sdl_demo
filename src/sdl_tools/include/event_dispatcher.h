@@ -49,8 +49,14 @@ class EventDispatcher {
      * 
      * @param eventProducer Reference to the event producer that will supply events
      */
-    EventDispatcher(sdl::EventProducer& eventProducer);
-    
+    EventDispatcher(std::shared_ptr<EventProducer> eventProducer);
+    EventDispatcher(const EventDispatcher& other) = default;
+    EventDispatcher(EventDispatcher&& other) noexcept = default;
+   
+    auto operator=(const EventDispatcher& other) -> EventDispatcher& = default;
+    auto operator=(EventDispatcher&& other) noexcept -> EventDispatcher& = default;
+
+
     /**
      * @brief Destructor
      * 

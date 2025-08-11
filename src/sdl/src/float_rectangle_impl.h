@@ -14,8 +14,8 @@ class FloatRectangleImpl{
   friend FloatRectangle;
   public:
     FloatRectangleImpl() = default;
-    FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect { sdlFRect } = default;
-    SDL_FRect* getSDLRect() { return &_sdlFRect; };
+    FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect { sdlFRect } {};
+    auto getSDLRect() -> SDL_FRect* { return &_sdlFRect; };
 
   private:
     SDL_FRect _sdlFRect;

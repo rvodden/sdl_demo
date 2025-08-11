@@ -67,7 +67,10 @@ class TicTacToe {
 
     void play(uint8_t x, uint8_t y) {
       const auto index = _index(x, y);
-      if (_cells.at(index)) return;
+      if (_cells.at(index))
+      {
+        return;
+      }
 
       _cells.at(index) = { _turn };
       _turn = _turn == Player::O ? Player::X : Player::O;
@@ -88,22 +91,37 @@ class TicTacToe {
     Player _turn { Player::O };
 
     static inline uint8_t _index(uint8_t x,  uint8_t y) {
-      if (x > 2 || y > 2) throw std::runtime_error(std::format("Cell coordinates are out of bounds: ({},{})", x, y));
+      if (x > 2 || y > 2)
+      {
+        throw std::runtime_error(std::format("Cell coordinates are out of bounds: ({},{})", x, y));
+      }
       return x + static_cast<uint8_t>(y * 3);
     }
 
     State _checkWinCondition() const {
       State state = _checkRows();
-      if(state != State::Playing) return state;
+      if (state != State::Playing)
+      {
+        return state;
+      }
 
       state = _checkColumns();
-      if(state != State::Playing) return state;
+      if (state != State::Playing)
+      {
+        return state;
+      }
 
       state = _checkDiagonals();
-      if(state != State::Playing) return state;
+      if (state != State::Playing)
+      {
+        return state;
+      }
 
       state = _checkForDraw();
-      if(state != State::Playing) return state;
+      if (state != State::Playing)
+      {
+        return state;
+      }
 
       return State::Playing;
       

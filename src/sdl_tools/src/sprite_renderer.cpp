@@ -8,10 +8,15 @@
 
 namespace sdl::tools {
 
-SpriteRenderer::SpriteRenderer(const Renderer& renderer) : _spriteRendererImpl { std::make_unique<SpriteRendererImpl>(renderer) } {}
-SpriteRenderer::SpriteRenderer(SpriteRenderer &&other) : _spriteRendererImpl { std::move(other._spriteRendererImpl ) } {}
+SpriteRenderer::SpriteRenderer(std::shared_ptr<Renderer> renderer) : _spriteRendererImpl { std::make_unique<SpriteRendererImpl>(std::move(renderer)) } {}
+SpriteRenderer::SpriteRenderer(SpriteRenderer &&other) noexcept : _spriteRendererImpl { std::move(other._spriteRendererImpl ) } {}
 
-SpriteRenderer::~SpriteRenderer() {};
+auto SpriteRenderer::operator=(SpriteRenderer&& other) noexcept -> SpriteRenderer& {
+  std::swap(_spriteRendererImpl, other._spriteRendererImpl);
+  return *this;
+}
+
+SpriteRenderer::~SpriteRenderer() = default;
 
 void SpriteRenderer::render(const Sprite &sprite, const float x, const float y) const
 {
@@ -21,7 +26,7 @@ void SpriteRenderer::render(const Sprite &sprite, const float x, const float y) 
       sprite._spriteImpl->_rectangle.getWidth(),
       sprite._spriteImpl->_rectangle.getHeight()};
 
-  _spriteRendererImpl->_renderer.copy(sprite._spriteImpl->_spriteSheet, sprite._spriteImpl->_rectangle, destination);
+  _spriteRendererImpl->_renderer->copy(*sprite._spriteImpl->_spriteSheet, sprite._spriteImpl->_rectangle, destination);
 }
 
 }

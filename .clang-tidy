@@ -8,12 +8,14 @@ HeaderFilterRegex: '^.*/(src|include)/.*\.(h|hpp)$'
 Checks: >
   -*,
   bugprone-*,
+  -bugprone-easily-swappable-parameters,
   clang-analyzer-*,
   cppcoreguidelines-*,
   modernize-*,
   performance-*,
   portability-*,
-  readability-*
+  readability-*,
+  -readability-identifier-length
 
 # Don't check headers from these paths
 WarningsAsErrors: ''

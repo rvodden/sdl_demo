@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <stdexcept>
 #include <tuple>
 
@@ -14,13 +15,13 @@ struct Map {
     constexpr Map(std::initializer_list<std::pair<Key, Value>> _initList) {
       auto it = _initList.begin();
       for (std::size_t i = 0; i < Size; ++i) {
-        _data[i] = *it++;
+        _data.at(i) = *std::next(it, static_cast<int32_t>(i));
       }
     };
-    constexpr Map(const std::array<std::pair<Key, Value>, Size>& data) : _data { data } = default;
-    constexpr Map(std::array<std::pair<Key, Value>, Size>&& data) : _data(std::move(data)) = default;
+    constexpr Map(const std::array<std::pair<Key, Value>, Size>& data) : _data(data) {}
+    constexpr Map(std::array<std::pair<Key, Value>, Size>&& data) : _data(std::move(data)) {}
 
-    constexpr Value operator[](const Key &key) const;
+    constexpr auto operator[](const Key &key) const -> Value;
 
     private:
       std::array<std::pair<Key, Value>, Size> _data;
@@ -28,15 +29,17 @@ struct Map {
 
 //! @brief Helper function to create a Map from initializer list with automatic size deduction
 template <class Key, class Value, class... Pairs>
-constexpr auto make_map(Pairs&&... pairs) {
+constexpr auto make_map(Pairs&&... pairs) -> Map<Key, Value, sizeof...(pairs)> {
     return Map<Key, Value, sizeof...(pairs)>(std::array<std::pair<Key, Value>, sizeof...(pairs)>{{std::forward<Pairs>(pairs)...}});
 }
 
 template <class Key, class Value, std::size_t Size>
-inline constexpr Value Map<Key, Value, Size>::operator[](const Key &key) const
+constexpr auto Map<Key, Value, Size>::operator[](const Key &key) const -> Value
 {
-  const auto& iterator = std::find_if(_data.cbegin(), _data.cend(), [&key](const auto& value){ return key == value.first; });
-  if (iterator == _data.cend()) throw std::range_error("Not Found.");
+  const auto& iterator = std::find_if(_data.cbegin(), _data.cend(), [&key](const auto& value) -> bool { return key == value.first; });
+  if (iterator == _data.cend()) {
+    throw std::range_error("Not Found.");
+  }
   return iterator->second;
 }
 
@@ -49,7 +52,7 @@ Map(std::array<std::pair<Key, Value>, N>&&) -> Map<Key, Value, N>;
 
 //! @brief Convenient alias for creating maps with automatic size deduction from arrays
 template <class Key, class Value, std::size_t N>
-constexpr auto make_constexpr_map(const std::array<std::pair<Key, Value>, N>& data) {
+constexpr auto make_constexpr_map(const std::array<std::pair<Key, Value>, N>& data) -> Map<Key, Value, N> {
     return Map<Key, Value, N>(data);
 }
 
