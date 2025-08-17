@@ -6,9 +6,9 @@
 
 class ConcreteCustomEvent: public CustomEvent {
   public:
-    ConcreteCustomEvent() : CustomEvent() {};
+    ConcreteCustomEvent() = default;
     ConcreteCustomEvent(CustomEventImpl* impl) : CustomEvent(impl) {};
-    ConcreteCustomEvent(uint16_t eventNumber, std::string msg): CustomEvent(),  message { msg } {
+    ConcreteCustomEvent(uint16_t eventNumber, std::string msg): CustomEvent(),  message { std::move(msg) } {
       (*this).customEventNumber = eventNumber;
     };
     

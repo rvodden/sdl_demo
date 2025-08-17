@@ -11,6 +11,7 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   clang-analyzer-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-c-copy-assignment-signature,
   modernize-*,
   performance-*,
   portability-*,

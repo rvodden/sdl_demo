@@ -3,6 +3,9 @@
 
 #include "visitor_pattern_legacy_sdk.h"
 #include "legacy_sdk.h"
+#include <stdexcept>
+
+// NOLINTBEGIN
 
 class BaseConverter {
   public:
@@ -26,15 +29,26 @@ OLD_Event* castConverter(const EventClass& event, const BaseConverter& baseConve
 
 class EventConverter;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 class BaseEventImpl {
   friend EventConverter;
   public:
-    BaseEventImpl(BaseEvent* baseEvent) : _baseEvent { baseEvent } = default;
+    BaseEventImpl(BaseEvent* baseEvent) : _baseEvent { _validateAndDeref(baseEvent) } {
+    }
     virtual ~BaseEventImpl() = default;
     virtual OLD_Event* acceptConverter(const BaseConverter& baseConverter) const = 0;
   protected:
-    BaseEvent* _baseEvent;
+    BaseEvent& _baseEvent;
+  private:
+    static BaseEvent& _validateAndDeref(BaseEvent* baseEvent) {
+        if (baseEvent == nullptr) {
+            throw std::invalid_argument("baseEvent cannot be null");
+        }
+        return *baseEvent;
+    }
 };
+#pragma GCC diagnostic pop
 
 
 class UserEventImpl : public BaseEventImpl {
@@ -79,5 +93,7 @@ class EventConverter : public BaseConverter,
    virtual OLD_Event* convert(const SystemEventImpl& event) const override;
    virtual OLD_Event* convert(const CustomEventImpl& event) const override;
 };
+
+// NOLINTEND
 
 #endif

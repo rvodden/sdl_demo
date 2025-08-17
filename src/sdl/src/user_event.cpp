@@ -37,6 +37,32 @@ UserEvent::UserEvent( UserEvent&& other ) noexcept :
     _userEventImpl->_userEvent = this;
   };
 
+auto UserEvent::operator=(const UserEvent &userEvent) -> UserEvent& {
+  if (this == &userEvent) { return *this; }
+
+  Event::operator=(userEvent);
+  windowId = userEvent.windowId;
+  code = userEvent.code;
+  data = userEvent.data;
+  _userEventImpl = std::make_unique<UserEventImpl>(*userEvent._userEventImpl);
+  _userEventImpl->_userEvent = this;
+
+  return *this;
+}
+
+auto UserEvent::operator=(UserEvent &&userEvent) noexcept -> UserEvent& {
+  if (this == &userEvent) { return *this; }
+  
+  windowId = userEvent.windowId;
+  code = userEvent.code;
+  data = userEvent.data;
+  _userEventImpl = std::move(userEvent._userEventImpl);
+  _userEventImpl->_userEvent = this;
+  Event::operator=(std::move(userEvent));
+  
+  return *this;
+}
+
 UserEvent::~UserEvent() = default;
 
 UserEventImpl::UserEventImpl(UserEvent* userEvent) : _userEvent(userEvent) {};
@@ -47,10 +73,10 @@ auto UserEventImpl::_createSDLUserEvent() -> std::unique_ptr<SDL_Event>
 
   retval->type = _userEvent->getEventType(); //NOLINT(readability-static-accessed-through-instance)
   retval->user.timestamp = static_cast<uint32_t>(_userEvent->timestamp.count());
-  retval->user.windowID = _userEvent->windowId;
-  retval->user.code = _userEvent->code;
+  retval->user.windowID = _userEvent->getWindowId();
+  retval->user.code = _userEvent->getCode();
   retval->user.data1 = _userEvent;
-  retval->user.data2 = _userEvent->data;
+  retval->user.data2 = _userEvent->getData();
   
   return retval;
 }

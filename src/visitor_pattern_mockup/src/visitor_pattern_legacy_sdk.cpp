@@ -7,6 +7,9 @@
 
 #include "visitor_pattern_legacy_sdk_impl.h"
 
+//NOLINTBEGIN This is a demo legacy API, it does all kinds of things with raw pointers deliberate
+// so thtat we can test if we can hide that behind a modern SDK
+
 BaseEvent::BaseEvent(BaseEventImpl* impl): _impl { impl,  [](BaseEventImpl* i ) { delete i; } } {};
 UserEvent::UserEvent(): BaseEvent(new UserEventImpl(this))  {};
 SystemEvent::SystemEvent(): BaseEvent(new SystemEventImpl(this)) {};
@@ -23,7 +26,7 @@ CustomEvent& CustomEvent::clone() const {
 }
 
 CustomEventImpl* CustomEvent::cloneImpl() const {
-  return static_cast<CustomEventImpl*>(this->_impl.get())->clone();
+  return dynamic_cast<CustomEventImpl*>(this->_impl.get())->clone();
 }
 
 CustomEventImpl* CustomEventImpl::clone() const {
@@ -63,7 +66,7 @@ BaseEvent& createEvent(OLD_Event* oldEvent) {
 OLD_Event* EventConverter::convert(const UserEventImpl& userEvent) const {
   OLD_Event* oldEvent = new OLD_Event{ .user={
     OLD_USEREVENT,
-    static_cast<UserEvent*>(userEvent._baseEvent)->userNumber
+    static_cast<const UserEvent&>(userEvent._baseEvent).userNumber
   }};
   return oldEvent;
 }
@@ -71,13 +74,13 @@ OLD_Event* EventConverter::convert(const UserEventImpl& userEvent) const {
 OLD_Event* EventConverter::convert(const SystemEventImpl& systemEvent) const {
   OLD_Event* oldEvent = new OLD_Event{ .system={
     OLD_SYSTEMEVENT,
-    static_cast<SystemEvent*>(systemEvent._baseEvent)->systemNumber
+    static_cast<const SystemEvent&>(systemEvent._baseEvent).systemNumber
   }};
   return oldEvent;
 }
 
 OLD_Event* EventConverter::convert(const CustomEventImpl& customEventImpl) const {
-  auto& customEvent = static_cast<CustomEvent&>(*customEventImpl._baseEvent);
+  auto& customEvent = static_cast<CustomEvent&>(customEventImpl._baseEvent);
   OLD_Event* oldEvent = new OLD_Event{ .custom={
     OLD_CUSTOMEVENT,
     customEvent.customEventNumber,
@@ -103,3 +106,5 @@ void pushEvent(const BaseEvent& event) {
   pushOldEvent(oldEvent);
   delete oldEvent;
 };
+
+//NOLINTEND
