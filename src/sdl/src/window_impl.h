@@ -12,10 +12,10 @@ class WindowImpl {
   friend Window;
   friend Renderer;
 
-  private:
-    SDL_Window *_sdlWindow { nullptr };
+ private:
+  SDL_Window* _sdlWindow{nullptr};
 };
 
-}
+}  // namespace sdl
 
 #endif

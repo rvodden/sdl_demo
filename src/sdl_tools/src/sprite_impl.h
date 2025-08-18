@@ -13,14 +13,16 @@ class SpriteRenderer;
 class SpriteImpl {
   friend Sprite;
   friend SpriteRenderer;
-  public:
-    SpriteImpl(std::shared_ptr<const Texture> texture, FloatRectangle rectangle ) : _spriteSheet { std::move(texture) }, _rectangle { std::move(rectangle) } {};
 
-  private:
-    std::shared_ptr<const Texture> _spriteSheet;
-    FloatRectangle _rectangle;
+ public:
+  SpriteImpl(std::shared_ptr<const Texture> texture, FloatRectangle rectangle)
+      : _spriteSheet{std::move(texture)}, _rectangle{std::move(rectangle)} {};
+
+ private:
+  std::shared_ptr<const Texture> _spriteSheet;
+  FloatRectangle _rectangle;
 };
 
-}
+}  // namespace sdl::tools
 
 #endif

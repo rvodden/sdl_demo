@@ -7,25 +7,26 @@
 namespace sdl {
 
 class Exception : public std::runtime_error {
-  public:
-    /**!
-     * @brief Construct an exception
-     * 
-     * @param[cause] The cause of the error, usually the SDL function name which returned < 0
-    */
-    explicit Exception(const std::string& cause);
+ public:
+  /**!
+   * @brief Construct an exception
+   *
+   * @param[cause] The cause of the error, usually the SDL function name
+   * which returned < 0
+   */
+  explicit Exception(const std::string& cause);
 
-    Exception(const Exception& other) = default;
-    auto operator=(const Exception& other) -> Exception& = default;
-    Exception(Exception&& other) = default;
-    auto operator=(Exception&& other) -> Exception& = default;
-    ~Exception() override = default;
+  Exception(const Exception& other) = default;
+  auto operator=(const Exception& other) -> Exception& = default;
+  Exception(Exception&& other) = default;
+  auto operator=(Exception&& other) -> Exception& = default;
+  ~Exception() override = default;
 
-  private:
-    std::string _cause;
-    std::string _error;
+ private:
+  std::string _cause;
+  std::string _error;
 };
 
-}
+}  // namespace sdl
 
-#endif // SDL_EXCEPTION_H
+#endif  // SDL_EXCEPTION_H

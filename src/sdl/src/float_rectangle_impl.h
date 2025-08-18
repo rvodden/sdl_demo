@@ -10,17 +10,18 @@
 
 namespace sdl {
 
-class FloatRectangleImpl{
+class FloatRectangleImpl {
   friend FloatRectangle;
-  public:
-    FloatRectangleImpl() = default;
-    FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect { sdlFRect } {};
-    auto getSDLRect() -> SDL_FRect* { return &_sdlFRect; };
 
-  private:
-    SDL_FRect _sdlFRect;
+ public:
+  FloatRectangleImpl() = default;
+  FloatRectangleImpl(SDL_FRect sdlFRect) : _sdlFRect{sdlFRect} {};
+  auto getSDLRect() -> SDL_FRect* { return &_sdlFRect; };
+
+ private:
+  SDL_FRect _sdlFRect;
 };
 
-}
+}  // namespace sdl
 
 #endif

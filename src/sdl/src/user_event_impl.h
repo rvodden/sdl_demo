@@ -13,14 +13,15 @@ class UserEvent;
 
 class UserEventImpl {
   friend UserEvent;
-  public:
-    UserEventImpl(UserEvent* userEvent);
-    auto _createSDLUserEvent() -> std::unique_ptr<SDL_Event>;
-  
-  private:
-    UserEvent* _userEvent;
+
+ public:
+  UserEventImpl(UserEvent* userEvent);
+  auto _createSDLUserEvent() -> std::unique_ptr<SDL_Event>;
+
+ private:
+  UserEvent* _userEvent;
 };
 
-}
+}  // namespace sdl
 
 #endif

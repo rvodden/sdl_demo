@@ -7,12 +7,13 @@
 
 namespace sdl {
 
-class SurfaceImpl{
+class SurfaceImpl {
   friend Surface;
-  private:
-    SDL_Surface* _sdlSurface;
+
+ private:
+  SDL_Surface* _sdlSurface;
 };
 
-}
+}  // namespace sdl
 
 #endif

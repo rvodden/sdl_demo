@@ -11,21 +11,21 @@ class SurfaceImpl;
 
 //! A class which holds a collection of pixels to be used in software blitting.
 class Surface {
-  public:
-    Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask, uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask );
-    Surface(const std::filesystem::path& filePath);
-    Surface(const Surface&) = delete;
-    Surface(Surface&& other) noexcept;
-    ~Surface();
+ public:
+  Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask,
+          uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask);
+  Surface(const std::filesystem::path& filePath);
+  Surface(const Surface&) = delete;
+  Surface(Surface&& other) noexcept;
+  ~Surface();
 
-    auto operator=(const Surface&) -> Surface& = delete;
-    auto operator=(Surface&& other) noexcept -> Surface&;
+  auto operator=(const Surface&) -> Surface& = delete;
+  auto operator=(Surface&& other) noexcept -> Surface&;
 
-
-  private:
-    std::unique_ptr<SurfaceImpl> _surfaceImpl;
+ private:
+  std::unique_ptr<SurfaceImpl> _surfaceImpl;
 };
 
-}
+}  // namespace sdl
 
 #endif

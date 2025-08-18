@@ -9,24 +9,23 @@
 
 namespace sdl {
 
-static constexpr auto sdlBlendModeMapData = std::array{
-    std::pair{Texture::kNone, SDL_BLENDMODE_NONE},
-    std::pair{Texture::kBlend, SDL_BLENDMODE_BLEND},
-    std::pair{Texture::kAdd, SDL_BLENDMODE_ADD},
-    std::pair{Texture::kMod, SDL_BLENDMODE_MOD},
-    std::pair{Texture::kMul, SDL_BLENDMODE_MUL}
-};
+static constexpr auto sdlBlendModeMapData =
+    std::array{std::pair{Texture::kNone, SDL_BLENDMODE_NONE},
+               std::pair{Texture::kBlend, SDL_BLENDMODE_BLEND},
+               std::pair{Texture::kAdd, SDL_BLENDMODE_ADD},
+               std::pair{Texture::kMod, SDL_BLENDMODE_MOD},
+               std::pair{Texture::kMul, SDL_BLENDMODE_MUL}};
 
 static constexpr auto sdlBlendModeMap = vodden::Map(sdlBlendModeMapData);
 
 class TextureImpl {
   friend Renderer;
   friend Texture;
-  private:
-    SDL_Texture* _sdlTexture;
+
+ private:
+  SDL_Texture* _sdlTexture;
 };
 
-}
+}  // namespace sdl
 
 #endif
-

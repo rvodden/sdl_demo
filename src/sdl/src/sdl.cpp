@@ -1,31 +1,30 @@
-#include <memory>
+#include "sdl.h"
+
 #include <SDL3/SDL.h>
 
-#include "exception.h"
+#include <memory>
 
-#include "sdl.h"
+#include "exception.h"
 #include "sdl_impl.h"
 
 namespace sdl {
 
-SDL::SDL() {
-  _sdlImpl = std::make_unique<SDLImpl>();
-}
+SDL::SDL() { _sdlImpl = std::make_unique<SDLImpl>(); }
 
 SDL::~SDL() noexcept {
   for (const auto& subSystem : _sdlImpl->subSystemInitializationStatus) {
-    SDL_QuitSubSystem( sdlSubSystemMap[subSystem] );
+    SDL_QuitSubSystem(sdlSubSystemMap[subSystem]);
   }
 }
 
-void SDL::initSubSystem(const SubSystem &subSystem) {
-auto retVal = SDL_InitSubSystem(sdlSubSystemMap[subSystem]);
-  if(!retVal) { throw Exception("SDL_InitSubSystem"); }
+void SDL::initSubSystem(const SubSystem& subSystem) {
+  auto retVal = SDL_InitSubSystem(sdlSubSystemMap[subSystem]);
+  if (!retVal) {
+    throw Exception("SDL_InitSubSystem");
+  }
   _sdlImpl->subSystemInitializationStatus.insert(subSystem);
 }
 
-void delay_ms(uint32_t duration) {
-  SDL_Delay(duration);
-}
+void delay_ms(uint32_t duration) { SDL_Delay(duration); }
 
-}
+}  // namespace sdl

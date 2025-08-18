@@ -1,28 +1,28 @@
 #ifndef SDL_SDL_IMPL_H
 #define SDL_SDL_IMPL_H
 
-#include "sdl.h"
-#include "constexpr_map.h"
-
 #include <unordered_set>
+
+#include "constexpr_map.h"
+#include "sdl.h"
 
 namespace sdl {
 
-static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap {{
-  { SDL::kAudio, SDL_INIT_AUDIO },
-  { SDL::kEvents, SDL_INIT_EVENTS },
-  { SDL::kGameController, SDL_INIT_GAMEPAD },
-  { SDL::kHaptic, SDL_INIT_HAPTIC },
-  { SDL::kJoystick, SDL_INIT_JOYSTICK },
-  { SDL::kVideo, SDL_INIT_VIDEO }
-}};
+static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap{
+    {{SDL::kAudio, SDL_INIT_AUDIO},
+     {SDL::kEvents, SDL_INIT_EVENTS},
+     {SDL::kGameController, SDL_INIT_GAMEPAD},
+     {SDL::kHaptic, SDL_INIT_HAPTIC},
+     {SDL::kJoystick, SDL_INIT_JOYSTICK},
+     {SDL::kVideo, SDL_INIT_VIDEO}}};
 
 class SDLImpl {
   friend SDL;
-  private:
-    std::unordered_set<SDL::SubSystem> subSystemInitializationStatus;
+
+ private:
+  std::unordered_set<SDL::SubSystem> subSystemInitializationStatus;
 };
 
-}
+}  // namespace sdl
 
 #endif

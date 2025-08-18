@@ -12,26 +12,33 @@ namespace sdl::tools {
 class EventDispatcher;
 class EventDispatcherImpl;
 
-class DefaultQuitEventHandler : public sdl::EventHandler<QuitEvent>, public sdl::BaseEventHandler {
-  public:
-    DefaultQuitEventHandler(EventDispatcherImpl& eventDispatcherImpl ) : _eventDispatcherImpl ( eventDispatcherImpl ) {};
-    void handle( [[maybe_unused]] const QuitEvent& quitEvent ) override;
-  private:
-    std::reference_wrapper<EventDispatcherImpl> _eventDispatcherImpl;
+class DefaultQuitEventHandler : public sdl::EventHandler<QuitEvent>,
+                                public sdl::BaseEventHandler {
+ public:
+  DefaultQuitEventHandler(EventDispatcherImpl& eventDispatcherImpl)
+      : _eventDispatcherImpl(eventDispatcherImpl) {};
+  void handle([[maybe_unused]] const QuitEvent& quitEvent) override;
+
+ private:
+  std::reference_wrapper<EventDispatcherImpl> _eventDispatcherImpl;
 };
 
 class EventDispatcherImpl {
   friend EventDispatcher;
-  public:
-    EventDispatcherImpl( std::shared_ptr<EventProducer> eventProducer ) : _eventProducer ( std::move(eventProducer) ) {};
-    void quit() { quitFlag = true; };
-  private:
-    std::shared_ptr<BaseEventProducer> _eventProducer;
-    std::forward_list<std::reference_wrapper<sdl::BaseEventHandler>> _eventHandlers;
-    std::atomic_bool quitFlag { false };
-    DefaultQuitEventHandler defaultQuitEventHandler { *this };
+
+ public:
+  EventDispatcherImpl(std::shared_ptr<EventProducer> eventProducer)
+      : _eventProducer(std::move(eventProducer)) {};
+  void quit() { quitFlag = true; };
+
+ private:
+  std::shared_ptr<BaseEventProducer> _eventProducer;
+  std::forward_list<std::reference_wrapper<sdl::BaseEventHandler>>
+      _eventHandlers;
+  std::atomic_bool quitFlag{false};
+  DefaultQuitEventHandler defaultQuitEventHandler{*this};
 };
 
-}
+}  // namespace sdl::tools
 
 #endif

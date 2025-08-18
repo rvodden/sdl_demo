@@ -1,33 +1,38 @@
 #include <functional>
-#include <memory>
-
 #include <iostream>
+#include <memory>
 #include <vector>
 
 class Base {
-  public:
-    virtual ~Base() {};
-    virtual void print() const { std::cout << "Base!" << std::endl; };
+ public:
+  Base() = default;
+  Base(const Base& other) = default;
+  Base(Base&& other) noexcept = default;
+
+  auto operator=(const Base& other) -> Base& = default;
+  auto operator=(Base&& other) noexcept -> Base& = default;
+
+  virtual ~Base() = default;
+  virtual void print() const { std::cout << "Base!\n"; };
 };
 
 class Sub : public Base {
-  public:
-    virtual void print() const { std::cout << "Sub!" << std::endl; };
+ public:
+  void print() const override { std::cout << "Sub!\n"; };
 };
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
-  std::vector<std::reference_wrapper<Base>> bases {};
+auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
+  std::vector<std::unique_ptr<Base>> bases{};
 
   {
-    Base& base = std::ref(*(new Base()));
-    Sub& sub = std::ref(*(new Sub()));
-    bases.push_back(base);
-    bases.push_back(sub);
+    auto base = std::make_unique<Base>();
+    auto sub = std::make_unique<Sub>();
+    bases.emplace_back(std::move(base));
+    bases.emplace_back(std::move(sub));
   }
 
-  for ( const Base& base : bases ) {
-    base.print();
-    delete &base;
+  for (const auto& base : bases) {
+    base->print();
   }
 
   return 0;

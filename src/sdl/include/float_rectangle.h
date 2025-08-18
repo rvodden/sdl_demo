@@ -12,40 +12,42 @@ class FloatRectangleImpl;
 
 class FloatRectangle {
   friend Renderer;
-  public:
-    FloatRectangle(float topLeftX, float topLeftY, float width, float height);
 
-    /**
-     * FloatRectangleImpl is incomplete here, so the compiler cannot
-     * construct default move & copy constructors & assignemnt
-     * operators. In rectangle.cpp FloatRectangleImpl is complete so
-     * we just have to type out these methods manually
-    */
+ public:
+  FloatRectangle(float topLeftX, float topLeftY, float width, float height);
 
-    //! @brief copy constructor
-    FloatRectangle(const FloatRectangle& other);
-    //! @brief move constructor
-    FloatRectangle(FloatRectangle&& other) noexcept;
+  /**
+   * FloatRectangleImpl is incomplete here, so the compiler cannot
+   * construct default move & copy constructors & assignemnt
+   * operators. In rectangle.cpp FloatRectangleImpl is complete so
+   * we just have to type out these methods manually
+   */
 
-    ~FloatRectangle();
+  //! @brief copy constructor
+  FloatRectangle(const FloatRectangle& other);
+  //! @brief move constructor
+  FloatRectangle(FloatRectangle&& other) noexcept;
 
-    //! @brief copy assignment operator
-    auto operator=(const FloatRectangle& other) -> FloatRectangle&;
-    
-    //! @brief move assignment operator
-    auto operator=(FloatRectangle&& other) noexcept -> FloatRectangle&;
+  ~FloatRectangle();
 
-    [[nodiscard]] auto getX() const -> float;
-    [[nodiscard]] auto getY() const -> float;
-    [[nodiscard]] auto getHeight() const -> float;
-    [[nodiscard]] auto getWidth() const -> float;
+  //! @brief copy assignment operator
+  auto operator=(const FloatRectangle& other) -> FloatRectangle&;
 
-    [[nodiscard]] auto contains(const float &topLeftX, const float &topLeftY) const -> bool;
+  //! @brief move assignment operator
+  auto operator=(FloatRectangle&& other) noexcept -> FloatRectangle&;
 
-  private:
-    std::unique_ptr<FloatRectangleImpl> _rectangleImpl;
+  [[nodiscard]] auto getX() const -> float;
+  [[nodiscard]] auto getY() const -> float;
+  [[nodiscard]] auto getHeight() const -> float;
+  [[nodiscard]] auto getWidth() const -> float;
+
+  [[nodiscard]] auto contains(const float& topLeftX,
+                              const float& topLeftY) const -> bool;
+
+ private:
+  std::unique_ptr<FloatRectangleImpl> _rectangleImpl;
 };
 
-}
+}  // namespace sdl
 
 #endif

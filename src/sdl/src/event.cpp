@@ -1,10 +1,10 @@
-#include <memory>
+#include "event.h"
 
 #include <SDL3/SDL.h>
-
 #include <constexpr_map.h>
 
-#include "event.h"
+#include <memory>
+
 #include "event_impl.h"
 #include "exception.h"
 #include "user_event.h"
@@ -22,7 +22,8 @@ auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
     case SDL_EventType::SDL_EVENT_QUIT:
       return createQuitEvent(&event.quit);
     default:
-      // Check if this is a user event (SDL_EVENT_USER or registered custom event)
+      // Check if this is a user event (SDL_EVENT_USER or registered custom
+      // event)
       if (event.type >= SDL_EVENT_USER && event.type < SDL_EVENT_LAST) {
         return createUserEvent(&event.user);
       }
@@ -32,52 +33,50 @@ auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
 
 void EventProducer::produce(std::unique_ptr<UserEvent> userEvent) {
   auto sdlEvent = userEvent->_userEventImpl->_createSDLUserEvent();
-  
+
   // Release ownership of the event - it will be reclaimed when SDL returns it
-  userEvent.release(); // NOLINT(bugprone-unused-return-value) 
-  
+  userEvent.release();  // NOLINT(bugprone-unused-return-value)
+
   auto result = SDL_PushEvent(sdlEvent.get());
-  if(!result) { throw Exception(SDL_GetError()); }
+  if (!result) {
+    throw Exception(SDL_GetError());
+  }
 }
 
-auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent) -> std::unique_ptr<QuitEvent> {
-  return std::make_unique<QuitEvent>( std::chrono::milliseconds( SDL_GetTicks() ) );
+auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
+    -> std::unique_ptr<QuitEvent> {
+  return std::make_unique<QuitEvent>(std::chrono::milliseconds(SDL_GetTicks()));
 }
 
-auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent) -> std::unique_ptr<MouseButtonEvent> {
+auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
+    -> std::unique_ptr<MouseButtonEvent> {
   return std::make_unique<MouseButtonEvent>(
-    std::chrono::milliseconds( SDL_GetTicks() ),
-    sdlMouseButtonEvent->windowID,
-    sdlMouseButtonEvent->which,
-    sdlMouseButtonEvent->x,
-    sdlMouseButtonEvent->y,
-    sdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
-    sdlMouseButtonEvent->down,
-    sdlMouseButtonEvent->clicks
-  );
+      std::chrono::milliseconds(SDL_GetTicks()), sdlMouseButtonEvent->windowID,
+      sdlMouseButtonEvent->which, sdlMouseButtonEvent->x,
+      sdlMouseButtonEvent->y,
+      sdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
+      sdlMouseButtonEvent->down, sdlMouseButtonEvent->clicks);
 }
 
-auto createUserEvent(const SDL_UserEvent* sdlUserEvent) -> std::unique_ptr<BaseEvent> {
+auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
+    -> std::unique_ptr<BaseEvent> {
   // If data1 contains the original UserEvent pointer, return it directly
   if (sdlUserEvent->data1 != nullptr) {
     auto* originalEvent = static_cast<UserEvent*>(sdlUserEvent->data1);
-    // The original event was managed by a unique_ptr that was released when 
+    // The original event was managed by a unique_ptr that was released when
     // we pushed it to SDL. We need to take ownership again.
     // This is safe because SDL doesn't delete the data1 pointer.
     auto userEvent = std::unique_ptr<UserEvent>(originalEvent);
     std::unique_ptr<BaseEvent> baseEvent = std::move(userEvent);
     return baseEvent;
   }
-  
+
   // Fallback: create a generic UserEvent for external SDL user events
   auto userEvent = std::make_unique<UserEvent>(
-    std::chrono::milliseconds( SDL_GetTicks() ),
-    sdlUserEvent->windowID,
-    sdlUserEvent->code,
-    sdlUserEvent->data2
-  );
+      std::chrono::milliseconds(SDL_GetTicks()), sdlUserEvent->windowID,
+      sdlUserEvent->code, sdlUserEvent->data2);
   std::unique_ptr<BaseEvent> baseEvent = std::move(userEvent);
-  return baseEvent; 
+  return baseEvent;
 }
 
-}
+}  // namespace sdl
