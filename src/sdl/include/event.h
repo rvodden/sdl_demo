@@ -119,6 +119,39 @@ void castHandler(const EventClass& eventClass, BaseEventHandler& baseEventHandle
 }
 
 /**
+ * @brief Wrapper class that adapts callable objects to the EventHandler interface
+ * 
+ * This template class allows lambdas, function objects, and other callable types
+ * to be used as event handlers by wrapping them in the EventHandler interface.
+ * This eliminates the need to create separate handler classes for simple event
+ * handling logic.
+ * 
+ * @tparam EventType The type of event this handler processes
+ * @tparam Callable The type of the callable object (lambda, function, etc.)
+ */
+template<typename EventType, typename Callable>
+class FunctionEventHandler : public EventHandler<EventType>, public BaseEventHandler {
+public:
+    /**
+     * @brief Construct a function event handler with the given callable
+     * @param callable The callable object that will handle the events
+     */
+    explicit FunctionEventHandler(Callable&& callable) 
+        : _callable(std::forward<Callable>(std::move(callable))) {}
+    
+    /**
+     * @brief Handle an event by calling the wrapped callable
+     * @param event The event to handle
+     */
+    void handle(const EventType& event) override {
+        _callable(event);
+    }
+    
+private:
+    std::decay_t<Callable> _callable;
+};
+
+/**
  * @brief Base class for all timed events
  * 
  * This class extends BaseEvent with timing information, providing a timestamp

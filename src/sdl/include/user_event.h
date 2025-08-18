@@ -175,7 +175,28 @@ class UserEvent: public Event {
  */
 template<typename DerivedEvent>
 class CustomUserEvent : public UserEvent {
+  friend DerivedEvent;
   public:
+    /**
+     * @brief Handle this custom event using the provided handler
+     * 
+     * This method ensures that the event dispatcher can correctly route
+     * this custom event to handlers that are designed for the specific
+     * derived event type.
+     * 
+     * @param baseEventHandler The handler to process this event
+     */
+    void handle(BaseEventHandler &baseEventHandler) override {
+        castHandler(static_cast<const DerivedEvent&>(*this), baseEventHandler);
+    }
+
+    auto static getEventType() -> uint32_t {
+      static uint32_t eventType = registerEventType();
+      
+      return eventType;
+    }
+
+  private:
     /**
      * @brief Construct a custom user event with default parameters
      * 
@@ -200,25 +221,6 @@ class CustomUserEvent : public UserEvent {
         int32_t cde = 0,
         void* d1 = nullptr
     ) : UserEvent(ts, winId, cde, d1) { }
-    
-    /**
-     * @brief Handle this custom event using the provided handler
-     * 
-     * This method ensures that the event dispatcher can correctly route
-     * this custom event to handlers that are designed for the specific
-     * derived event type.
-     * 
-     * @param baseEventHandler The handler to process this event
-     */
-    void handle(BaseEventHandler &baseEventHandler) override {
-        castHandler(static_cast<const DerivedEvent&>(*this), baseEventHandler);
-    }
-
-    auto static getEventType() -> uint32_t {
-      static uint32_t eventType = registerEventType();
-      
-      return eventType;
-    }
 };
 
 }

@@ -6,7 +6,7 @@
 extern "C" const uint8_t _binary_tic_tac_toe_png_start;
 extern "C" const uint8_t _binary_tic_tac_toe_png_end;
 
-uint32_t ticTacToeSize() {
+auto ticTacToeSize() -> uint32_t {
   return static_cast<uint32_t>(&_binary_tic_tac_toe_png_end - &_binary_tic_tac_toe_png_start);
 }
 

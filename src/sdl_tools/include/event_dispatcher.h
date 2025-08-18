@@ -11,6 +11,7 @@
 #define SDL_TOOLS_EVENT_DISPATCHER_H
 
 #include <memory>
+#include <vector>
 
 #include "event.h"
 
@@ -93,9 +94,42 @@ class EventDispatcher {
      */
     void registerEventHandler(sdl::BaseEventHandler& baseEventHandler);
 
+    /**
+     * @brief Register a callable object (lambda, function, etc.) as an event handler
+     * 
+     * This template method allows you to register lambdas, function objects, and
+     * other callable types as event handlers without needing to create separate
+     * handler classes. The callable will be wrapped in a FunctionEventHandler
+     * and stored internally by the dispatcher.
+     * 
+     * @tparam EventType The type of event the callable should handle
+     * @tparam Callable The type of the callable object (automatically deduced)
+     * @param callable The callable object that will handle events of EventType
+     * 
+     * Usage example:
+     * @code
+     * dispatcher.registerEventHandler<ClickEvent>([](const ClickEvent& e) {
+     *     std::cout << "Clicked at: " << e.x << ", " << e.y << std::endl;
+     * });
+     * @endcode
+     * 
+     * @note The dispatcher takes ownership of the created handler and manages its lifetime.
+     */
+    template<typename EventType, typename Callable>
+    void registerEventHandler(Callable&& callable) {
+        auto handler = std::make_unique<FunctionEventHandler<EventType, Callable>>(
+            std::forward<Callable>(callable)
+        );
+        _functionHandlers.push_back(std::move(handler));
+        registerEventHandler(*_functionHandlers.back());
+    }
+
   private:
     /** @brief Pointer to implementation (pimpl idiom) */
     std::unique_ptr<EventDispatcherImpl> _eventDispatcherImpl;
+    
+    /** @brief Storage for function-based event handlers to manage their lifetime */
+    std::vector<std::unique_ptr<sdl::BaseEventHandler>> _functionHandlers;
 };
 
 }

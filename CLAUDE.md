@@ -56,6 +56,9 @@ This is a C++20 SDL3 demonstration project with a layered architecture:
 - GoogleTest and Google Benchmark for testing and performance measurement
 - All external dependencies are managed in `external/CMakeLists.txt`
 
+### Code Style
+- Raw pointers should never be used.
+
 ## Key Features
 
 ### Constexpr Map with Automatic Size Deduction

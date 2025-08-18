@@ -7,8 +7,12 @@
 namespace sdl::tools {
 
 void ButtonImpl::MouseEventHandler::handle([[maybe_unused]] const sdl::MouseButtonEvent &mouseButtonEvent) {
+  std::cout << "MouseEventHandler::handle called with (" << mouseButtonEvent.x << "," << mouseButtonEvent.y << ") - checking rectangle (" << _rectangle.getX() << "," << _rectangle.getY() << "," << _rectangle.getWidth() << "," << _rectangle.getHeight() << ")\n";
   if(_rectangle.contains(mouseButtonEvent.x, mouseButtonEvent.y) ) {
-    for(auto& handler : _eventHandlers) { handler(mouseButtonEvent); }
+    std::cout << "Rectangle contains point - calling " << std::distance(_eventHandlers->begin(), _eventHandlers->end()) << " handlers\n";
+    for(auto& handler : *_eventHandlers) { handler(mouseButtonEvent); }
+  } else {
+    std::cout << "Rectangle does not contain point\n";
   }
 }
 
@@ -26,13 +30,13 @@ auto Button::operator=(Button&& other) noexcept -> Button&{
 }
 
 void Button::registerEventHandler(const Handler& handler) {
-  _buttonImpl->_eventHandlers.push_front(handler);
+  _buttonImpl->_eventHandlers->push_front(handler);
 };
 
 void ButtonImpl::eventHandler([[maybe_unused]] const sdl::MouseButtonEvent &mouseButtonEvent)
 {
   if(_rectangle.contains(mouseButtonEvent.x, mouseButtonEvent.y)) {
-    for(const auto& handler : _eventHandlers) {
+    for(const auto& handler : *_eventHandlers) {
       handler(mouseButtonEvent);
     }
   };

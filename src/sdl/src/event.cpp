@@ -21,9 +21,11 @@ auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
       return createMouseButtonEvent(&event.button);
     case SDL_EventType::SDL_EVENT_QUIT:
       return createQuitEvent(&event.quit);
-    case SDL_EventType::SDL_EVENT_USER:
-      return createUserEvent(&event.user);
     default:
+      // Check if this is a user event (SDL_EVENT_USER or registered custom event)
+      if (event.type >= SDL_EVENT_USER && event.type < SDL_EVENT_LAST) {
+        return createUserEvent(&event.user);
+      }
       throw UnknownEventException("I don't know what this event is!");
   }
 }

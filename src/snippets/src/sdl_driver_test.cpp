@@ -4,7 +4,11 @@
 #include <SDL3/SDL_main.h>
 
 auto main() -> int {
-    SDL_Init(SDL_INIT_VIDEO);
+    auto retval = SDL_Init(SDL_INIT_VIDEO);
+    if(!retval) {
+      std::cerr << SDL_GetError() << "\n";
+      return 1;
+    }
     
     int num_drivers = SDL_GetNumVideoDrivers();
     std::cout << "Available video drivers:\n";

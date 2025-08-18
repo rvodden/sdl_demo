@@ -14,10 +14,10 @@ class EventDispatcherImpl;
 
 class DefaultQuitEventHandler : public sdl::EventHandler<QuitEvent>, public sdl::BaseEventHandler {
   public:
-    DefaultQuitEventHandler(std::shared_ptr<EventDispatcherImpl> eventDispatcherImpl ) : _eventDispatcherImpl ( std::move(eventDispatcherImpl) ) {};
+    DefaultQuitEventHandler(EventDispatcherImpl& eventDispatcherImpl ) : _eventDispatcherImpl ( eventDispatcherImpl ) {};
     void handle( [[maybe_unused]] const QuitEvent& quitEvent ) override;
   private:
-    std::shared_ptr<EventDispatcherImpl> _eventDispatcherImpl;
+    std::reference_wrapper<EventDispatcherImpl> _eventDispatcherImpl;
 };
 
 class EventDispatcherImpl {
@@ -29,7 +29,7 @@ class EventDispatcherImpl {
     std::shared_ptr<BaseEventProducer> _eventProducer;
     std::forward_list<std::reference_wrapper<sdl::BaseEventHandler>> _eventHandlers;
     std::atomic_bool quitFlag { false };
-    DefaultQuitEventHandler defaultQuitEventHandler { std::shared_ptr<EventDispatcherImpl>(this) };
+    DefaultQuitEventHandler defaultQuitEventHandler { *this };
 };
 
 }

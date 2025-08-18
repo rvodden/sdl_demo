@@ -5,7 +5,7 @@
 namespace sdl::tools {
 
 void DefaultQuitEventHandler::handle( [[maybe_unused]] const QuitEvent& quitEvent ) {
-  _eventDispatcherImpl->quit();
+  _eventDispatcherImpl.get().quit();
 }
 
 EventDispatcher::EventDispatcher( std::shared_ptr<EventProducer> eventProducer ) : 
