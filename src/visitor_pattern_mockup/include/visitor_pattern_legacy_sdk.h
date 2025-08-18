@@ -46,7 +46,7 @@ class InternalEventHandler {
 template <class EventClass>
 void castHandler(const EventClass& eventClass, const BaseEventHandler& abstractHandler) {
   try {
-    auto eventHandler = dynamic_cast<const InternalEventHandler<EventClass>&>(abstractHandler);
+    auto& eventHandler = dynamic_cast<const InternalEventHandler<EventClass>&>(abstractHandler);
     eventHandler.handle(eventClass);
   } catch (std::bad_cast &e) { } //NOLINT(bugprone-empty-catch) bad cast just means this handler can't handle this event
 }
@@ -108,7 +108,7 @@ class CustomEvent : public BaseEvent {
       castHandler(*this, abstractHandler);
     };
 
-    [[nodiscard]] virtual auto clone() const -> CustomEvent&;
+    [[nodiscard]] virtual auto clone() const -> std::unique_ptr<CustomEvent>;
     [[nodiscard]] virtual auto cloneImpl() const -> CustomEventImpl*;
 
 };
@@ -116,7 +116,9 @@ class CustomEvent : public BaseEvent {
 template<class EventClass>
 class EventHandler: public BaseEventHandler, public InternalEventHandler<EventClass> {};
 
+[[deprecated("Use getEventPtr() instead for proper memory management")]]
 auto getEvent() -> BaseEvent&;
+auto getEventPtr() -> std::unique_ptr<BaseEvent>;
 
 //NOLINTEND
 

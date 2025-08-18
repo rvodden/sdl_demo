@@ -27,7 +27,6 @@ This is a C++20 SDL3 demonstration project with a layered architecture:
    - `Button` - UI button component
 
 3. **utils** - General-purpose C++ utilities
-   - `value_ptr` - Polymorphic value semantics wrapper
    - `constexpr_map` - Compile-time key-value mapping with automatic size deduction
    - `thread_safe_queue` - Thread-safe queue implementation
 
@@ -58,6 +57,7 @@ This is a C++20 SDL3 demonstration project with a layered architecture:
 
 ### Code Style
 - Raw pointers should never be used.
+- Prefer trailing return types.
 
 ## Key Features
 

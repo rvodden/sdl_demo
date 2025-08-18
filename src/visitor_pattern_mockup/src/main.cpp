@@ -8,21 +8,21 @@ class ConcreteCustomEvent: public CustomEvent {
   public:
     ConcreteCustomEvent() = default;
     ConcreteCustomEvent(CustomEventImpl* impl) : CustomEvent(impl) {};
-    ConcreteCustomEvent(uint16_t eventNumber, std::string msg): CustomEvent(),  message { std::move(msg) } {
+    ConcreteCustomEvent(uint16_t eventNumber, std::string msg): message { std::move(msg) } {
       (*this).customEventNumber = eventNumber;
     };
     
-    virtual void operator()(const BaseEventHandler& abstractHandler) const override {
+    void operator()(const BaseEventHandler& abstractHandler) const override {
       castHandler(*this, abstractHandler);
     };
 
-    virtual CustomEvent& clone() const override {
-      auto newCustomEvent = new ConcreteCustomEvent(
+    [[nodiscard]] auto clone() const -> std::unique_ptr<CustomEvent> override {
+      auto newCustomEvent = std::make_unique<ConcreteCustomEvent>(
         this->cloneImpl()
       );
       newCustomEvent->customEventNumber = this->customEventNumber;
       newCustomEvent->message = this->message;
-      return *newCustomEvent;
+      return newCustomEvent;
     };
 
     std::string message;
@@ -30,26 +30,26 @@ class ConcreteCustomEvent: public CustomEvent {
 
 class UserEventHandler: public EventHandler<UserEvent> {
   public:
-    virtual void handle(const UserEvent& userEvent) const {
-      std::cout << "I am a user event with event number: " << userEvent.userNumber << std::endl;
+    void handle(const UserEvent& userEvent) const override {
+      std::cout << "I am a user event with event number: " << userEvent.userNumber << "\n";
     };
 };
 
 class SystemEventHandler: public EventHandler<SystemEvent> {
   public:
-    virtual void handle(const SystemEvent& systemEvent) const {
-      std::cout << "I am handling a system event: " << systemEvent.systemNumber << std::endl;
+    void handle(const SystemEvent& systemEvent) const override {
+      std::cout << "I am handling a system event: " << systemEvent.systemNumber << "\n";
     };
 };
 
 class ConcreteCustomEventHandler: public EventHandler<ConcreteCustomEvent> {
   public:
-    virtual void handle(const ConcreteCustomEvent& customEvent) const {
-      std::cout << customEvent.message << ": " << customEvent.customEventNumber << std::endl;
+    void handle(const ConcreteCustomEvent& customEvent) const override {
+      std::cout << customEvent.message << ": " << customEvent.customEventNumber << "\n";
     };
 };
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
+auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
 
   UserEventHandler userEventHandler;
   SystemEventHandler systemEventHandler;
@@ -61,39 +61,38 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     std::ref<ConcreteCustomEventHandler>(customEventHandler)
   };
 
-  std::vector<std::reference_wrapper<BaseEvent>> newEvents;
+  std::vector<std::unique_ptr<BaseEvent>> newEvents;
   try {
     while(true) {
-      newEvents.emplace_back(getEvent());
+      newEvents.emplace_back(getEventPtr());
     }
-  } catch (NoEventsException& _) {};
+  } catch (NoEventsException& _) {}; //NOLINT(bugprone-empty-catch)
 
   while(std::size(newEvents) > 0) {
-    BaseEvent& newEvent = std::move(newEvents.back());
-    newEvents.pop_back();
+    auto& newEvent = *newEvents.back();
     for(const BaseEventHandler& handler : eventHandlers) {
       newEvent(handler);
     }
-    delete &newEvent;
+    newEvents.pop_back();
   }
 
-  ConcreteCustomEvent customEvent { 17, "your mum!" };
+  const uint8_t kUltimaeAnswer = 42;
+  ConcreteCustomEvent customEvent { kUltimaeAnswer, "your mum!" };
 
   pushEvent(customEvent);
 
   try {
     while(true) {
-      newEvents.push_back(getEvent());
+      newEvents.emplace_back(getEventPtr());
     }
-  } catch (NoEventsException& _) {};
+  } catch (NoEventsException& _) {}; //NOLINT(bugprone-empty-catch)
 
   while(std::size(newEvents) > 0) {
-    const BaseEvent& newEvent = newEvents.back();
+    const auto& newEvent = *newEvents.back();
     for(const BaseEventHandler& handler : eventHandlers) {
       newEvent(handler);
     }
     newEvents.pop_back();
-    delete &newEvent;
   }
 
 }
