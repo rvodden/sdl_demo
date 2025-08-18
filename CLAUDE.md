@@ -13,7 +13,7 @@ This project uses CMake with presets for configuration and building:
 
 ## Architecture Overview
 
-This is a C++20 SDL3 demonstration project with a layered architecture:
+This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 
 ### Core Layers
 1. **sdl** - Low-level C++ wrapper around SDL3 C API
@@ -38,11 +38,9 @@ This is a C++20 SDL3 demonstration project with a layered architecture:
 ## Development Conventions
 
 ### Build System Patterns
-- Each module has its own `CMakeLists.txt` using `standard_build()` macro
-- Shared libraries are built by default with `standard_libarary_build()`
-- Executables use `standard_executable_build()`
+- Each module has its own `CMakeLists.txt`
 - Tests are automatically discovered via GoogleTest integration
-- Headers go in `include/` directories, sources in `src/`
+- Public Headers go in `include/` directories, sources in `src/`, private headers in `src/include`
 
 ### Code Organization
 - Implementation details are hidden in `*_impl.h` files (pimpl pattern)
