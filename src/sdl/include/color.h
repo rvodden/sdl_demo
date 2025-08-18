@@ -6,7 +6,8 @@
 
 namespace sdl {
 
-enum class Alpha : uint8_t { kOpaque = 255, kTranparent = 0 };
+enum class Alpha : uint8_t { kOpaque = 255,
+                             kTranparent = 0 };
 
 class Color {
  public:

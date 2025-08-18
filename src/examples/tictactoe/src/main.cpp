@@ -46,9 +46,13 @@ class GameCompletedEvent : public CustomUserEvent<GameCompletedEvent> {
 
 class TicTacToe {
  public:
-  enum class Player : std::uint8_t { O, X };
+  enum class Player : std::uint8_t { O,
+                                     X };
 
-  enum class State : std::uint8_t { Playing, PlayerOWins, PlayerXWins, Draw };
+  enum class State : std::uint8_t { Playing,
+                                    PlayerOWins,
+                                    PlayerXWins,
+                                    Draw };
 
   [[nodiscard]] auto getCellState(const uint8_t& x, const uint8_t& y) const
       -> std::optional<Player> {

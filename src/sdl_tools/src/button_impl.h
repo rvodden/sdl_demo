@@ -27,7 +27,7 @@ class ButtonImpl {
     MouseEventHandler(
         FloatRectangle& rectangle,
         std::shared_ptr<std::forward_list<Button::Handler>> eventHandlers)
-        : _rectangle{rectangle}, _eventHandlers{eventHandlers} {};
+        : _rectangle{rectangle}, _eventHandlers{std::move(eventHandlers)} {};
     void handle(const sdl::MouseButtonEvent& mouseButtonEvent) override;
 
    private:

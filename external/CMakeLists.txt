@@ -1,6 +1,11 @@
 include(FetchContent)
 
-### Google Test ###
+# Hide all warnings for 3rdparty code
+if (MSVC)
+    add_compile_options(/W0)
+else()
+    add_compile_options(-w)
+endif()
 
 option(SDLXX_USE_VENDORED_GTEST "Download GTest from GitHub" ON)
 if(SDLXX_USE_VENDORED_GTEST)
@@ -13,7 +18,6 @@ if(SDLXX_USE_VENDORED_GTEST)
                 SYSTEM
         )
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-        FetchContent_MakeAvailable(googletest)
 endif()
 
 ### Google Benchmark ###
@@ -33,8 +37,8 @@ endif()
 
 
 option(SDLXX_USE_VENDORED_SDL3 "Download SDL3 from GitHub" ON)
-
 if(SDLXX_USE_VENDORED_SDL3)
+        set(SDL_VULKAN OFF)
         ###
         FetchContent_Declare(
                 SDL3
@@ -44,7 +48,6 @@ if(SDLXX_USE_VENDORED_SDL3)
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
         )
-        FetchContent_MakeAvailable(SDL3)
         
         FetchContent_Declare(
                 SDL3_image
@@ -55,5 +58,13 @@ if(SDLXX_USE_VENDORED_SDL3)
                 SYSTEM
         )
         set(SDL3IMAGE_INSTALL OFF)
+endif()
+
+if(SDLXX_USE_VENDORED_GTEST)
+        FetchContent_MakeAvailable(googletest)
+endif()
+
+if(SDLXX_USE_VENDORED_SDL3)
+        FetchContent_MakeAvailable(SDL3)
         FetchContent_MakeAvailable(SDL3_image)
 endif()

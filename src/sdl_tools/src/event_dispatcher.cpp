@@ -25,8 +25,8 @@ void EventDispatcher::run() {
       for (const auto& handler : _eventDispatcherImpl->_eventHandlers) {
         event->handle(handler);
       }
-    } catch ([[maybe_unused]] sdl::UnknownEventException& _) {
-    }  // NOLINT(bugprone-empty-catch)
+    } catch ([[maybe_unused]] sdl::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
+    }
     // TODO: unknown events are "fine" whilst we've not implemented
     // all the events. When we have coverage this catch should go.
   }

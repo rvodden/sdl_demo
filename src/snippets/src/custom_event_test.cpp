@@ -50,7 +50,7 @@ auto main() -> int {
         std::chrono::steady_clock::now().time_since_epoch());
 
     std::cout << "TestEvent type: " << TestEvent::getEventType() << "\n";
-    eventProducer->produce(std::make_unique<TestEvent>(now, 0, 42));
+    eventProducer->produce(std::make_unique<TestEvent>(now, 0, 42));  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
     std::cout << "Waiting for event...\n";
 

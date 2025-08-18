@@ -67,8 +67,8 @@ auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
     while (true) {
       newEvents.emplace_back(getEventPtr());
     }
-  } catch (NoEventsException& _) { // NOLINT(bugprone-empty-catch)
-  };  
+  } catch (NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
+  };
 
   while (std::size(newEvents) > 0) {
     auto& newEvent = *newEvents.back();
@@ -87,8 +87,8 @@ auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
     while (true) {
       newEvents.emplace_back(getEventPtr());
     }
-  } catch (NoEventsException& _) {// NOLINT(bugprone-empty-catch)
-  };  
+  } catch (NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
+  };
 
   while (std::size(newEvents) > 0) {
     const auto& newEvent = *newEvents.back();

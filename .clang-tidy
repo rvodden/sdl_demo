@@ -16,7 +16,8 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
-  -readability-identifier-length
+  -readability-identifier-length,
+  -readability-magic-numbers
 
 # Don't check headers from these paths
 WarningsAsErrors: ''

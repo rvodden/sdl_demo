@@ -80,8 +80,8 @@ auto UserEventImpl::_createSDLUserEvent() -> std::unique_ptr<SDL_Event> {
   auto retval = std::make_unique<SDL_Event>();
 
   retval->type =
-      _userEvent
-          ->getEventType();  // NOLINT(readability-static-accessed-through-instance)
+      _userEvent  // NOLINT(readability-static-accessed-through-instance)
+          ->getEventType();
   retval->user.timestamp = static_cast<uint32_t>(_userEvent->timestamp.count());
   retval->user.windowID = _userEvent->getWindowId();
   retval->user.code = _userEvent->getCode();

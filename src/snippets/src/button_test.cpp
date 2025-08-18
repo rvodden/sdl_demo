@@ -11,7 +11,7 @@
 using namespace sdl;
 using namespace sdl::tools;
 
-int main() {
+auto main() -> int {
   try {
     SDL sdl;
     sdl.initSubSystem(SDL::kVideo);
@@ -19,12 +19,12 @@ int main() {
     auto eventProducer = std::make_shared<EventProducer>();
     auto eventDispatcher = std::make_shared<EventDispatcher>(eventProducer);
 
-    Window window("Button Test", 400, 300, 0);
+    Window window("Button Test", 400, 300, 0);  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     auto renderer = std::make_shared<Renderer>(window);
 
     // Create a button at position (50, 50) with size 100x50
     auto button = std::make_unique<Button>(
-        eventDispatcher, FloatRectangle{50.0F, 50.0F, 100.0F, 50.0F});
+        eventDispatcher, FloatRectangle{50.0F, 50.0F, 100.0F, 50.0F});  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
     std::cout << "Created button at (50, 50) with size 100x50\n";
     std::cout << "Button should respond to clicks between x=50-150, y=50-100\n";

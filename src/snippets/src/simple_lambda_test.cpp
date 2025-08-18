@@ -21,19 +21,15 @@ class TestEvent : public CustomUserEvent<TestEvent> {
 auto main() -> int {
   std::cout << "Testing lambda-based event handler compilation...\n";
 
-  // Just test that the template instantiation works
-  // This verifies that our FunctionEventHandler template compiles correctly
-  using LambdaType = decltype([](const TestEvent& e) {
-    std::cout << "Event value: " << e.value << "\n";
-  });
-
   // Test that our FunctionEventHandler template can be instantiated
-  auto lambda = [](const TestEvent& e) {
+  auto lambda = [](const TestEvent& e) -> void {
     std::cout << "Event value: " << e.value << "\n";
   };
 
-  auto handler = std::make_unique<FunctionEventHandler<TestEvent, LambdaType>>(
-      std::move(lambda));
+  // Use the same lambda for both type deduction and instance creation
+  auto handler =
+      std::make_unique<FunctionEventHandler<TestEvent, decltype(lambda)>>(
+          std::move(lambda));
 
   std::cout << "Lambda event handler template compilation successful!\n";
   std::cout << "FunctionEventHandler can be instantiated with lambda types.\n";

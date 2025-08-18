@@ -66,7 +66,7 @@ class ScoreUpdateHandler : public EventHandler<ScoreUpdateEvent>,
  public:
   void handle(const ScoreUpdateEvent& event) override {
     std::cout << "Score Update - Player " << event.playerId << " scored "
-              << event.newScore << " points!" << std::endl;
+              << event.newScore << " points!" << "\n";
   }
 };
 
@@ -78,7 +78,7 @@ class LevelCompleteHandler : public EventHandler<LevelCompleteEvent>,
  public:
   void handle(const LevelCompleteEvent& event) override {
     std::cout << "Level Complete - Level " << event.level << " completed in "
-              << event.completionTime << " seconds!" << std::endl;
+              << event.completionTime << " seconds!" << "\n";
   }
 };
 
@@ -94,12 +94,12 @@ class GameEventLogger : public EventHandler<ScoreUpdateEvent>,
  public:
   void handle(const ScoreUpdateEvent& event) override {
     std::cout << "[LOG] Score event: Player " << event.playerId << " -> "
-              << event.newScore << std::endl;
+              << event.newScore << "\n";
   }
 
   void handle(const LevelCompleteEvent& event) override {
     std::cout << "[LOG] Level event: Level " << event.level << " -> "
-              << event.completionTime << "s" << std::endl;
+              << event.completionTime << "s" << "\n";
   }
 };
 
@@ -108,49 +108,52 @@ class GameEventLogger : public EventHandler<ScoreUpdateEvent>,
  */
 class MockEventProducer : public EventProducer {
  public:
-  MockEventProducer() : eventCount(0) {}
+  MockEventProducer() = default;
 
-  std::unique_ptr<BaseEvent> wait() override {
+  auto wait() -> std::unique_ptr<BaseEvent> override {
     auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch());
 
     // Simulate different events
     switch (eventCount++ % 4) {
       case 0:
-        return std::make_unique<ScoreUpdateEvent>(now, 1, 1, 100);
+        return std::make_unique<ScoreUpdateEvent>(
+            now, 1, 1, 100);  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       case 1:
-        return std::make_unique<ScoreUpdateEvent>(now, 1, 2, 250);
+        return std::make_unique<ScoreUpdateEvent>(
+            now, 1, 2, 250);  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       case 2:
-        return std::make_unique<LevelCompleteEvent>(now, 1, 1, 45.7f);
+        return std::make_unique<LevelCompleteEvent>(
+            now, 1, 1, 45.7F);  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       case 3:
-        return std::make_unique<QuitEvent>(now);
       default:
         return std::make_unique<QuitEvent>(now);
     }
   }
 
  private:
-  int eventCount;
+  int eventCount = 0;
 };
 
 /**
  * @brief Demonstrate custom event system usage
  */
-int main() {
-  std::cout << "Custom Events Example" << std::endl;
-  std::cout << "=====================" << std::endl;
+auto main() -> int {
+  std::cout << "Custom Events Example" << "\n";
+  std::cout << "=====================" << "\n";
 
   // Show the automatically registered event codes
-  std::cout << "Registered SDL event codes:" << std::endl;
+  std::cout << "Registered SDL event codes:" << "\n";
   std::cout << "  ScoreUpdateEvent: " << ScoreUpdateEvent::getEventType()
-            << std::endl;
+            << "\n";
   std::cout << "  LevelCompleteEvent: " << LevelCompleteEvent::getEventType()
-            << std::endl;
-  std::cout << std::endl;
+            << "\n";
+  std::cout << "\n";
 
   try {
     // Create mock event producer
-    MockEventProducer producer;
+    std::shared_ptr<MockEventProducer> producer =
+        std::make_shared<MockEventProducer>();
 
     // Create event dispatcher
     EventDispatcher dispatcher(producer);
@@ -164,15 +167,15 @@ int main() {
     dispatcher.registerEventHandler(levelHandler);
     dispatcher.registerEventHandler(logger);
 
-    std::cout << "Starting event loop (will process a few events then quit)..."
-              << std::endl;
+    std::cout
+        << "Starting event loop (will process a few events then quit)...\n";
 
     // Run the event loop
     dispatcher.run();
 
-    std::cout << "Event loop finished!" << std::endl;
+    std::cout << "Event loop finished!\n";
   } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    std::cerr << "Error: " << e.what() << "\n";
     return -1;
   }
 

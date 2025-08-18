@@ -7,7 +7,9 @@
 // LEGACY SDK
 // NOLINTBEGIN
 
-enum OLD_EventType { OLD_USEREVENT, OLD_SYSTEMEVENT, OLD_CUSTOMEVENT };
+enum OLD_EventType { OLD_USEREVENT,
+                     OLD_SYSTEMEVENT,
+                     OLD_CUSTOMEVENT };
 
 struct OLD_UserEvent {
   OLD_EventType eventType;

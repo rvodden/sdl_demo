@@ -35,8 +35,8 @@ void castHandler(const EventClass& eventClass,
     auto& eventHandler =
         dynamic_cast<EventHandler<EventClass>&>(abstractHandler);
     eventHandler.handle(eventClass);
-  } catch (std::bad_cast& e) {
-  }  // NOLINT(bugprone-empty-catch)
+  } catch (std::bad_cast& e) {  // NOLINT(bugprone-empty-catch)
+  }
 }
 
 class Event {
