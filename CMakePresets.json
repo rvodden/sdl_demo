@@ -52,5 +52,33 @@
             "configuration": "Debug",
             "inherits": ["targets"]
         }
+    ],
+    "testPresets": [
+        {
+            "name": "ninja-mc-debug-tests",
+            "displayName": "Debug Tests",
+            "configurePreset": "ninja-mc",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
+            }
+        },
+        {
+            "name": "ninja-mc-release-tests",
+            "displayName": "Release Tests", 
+            "configurePreset": "ninja-mc",
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
+            }
+        }
     ]
 }

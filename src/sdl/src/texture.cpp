@@ -42,6 +42,25 @@ Texture::Texture(const Renderer& renderer, void* location, std::size_t size)
   }
 }
 
+Texture::Texture(const Renderer& renderer, uint32_t width, uint32_t height, const uint32_t* pixels)
+    : _textureImpl{std::make_unique<TextureImpl>()} {
+  _textureImpl->_sdlTexture = SDL_CreateTexture(
+      renderer._rendererImpl->_sdlRenderer, SDL_PIXELFORMAT_RGBA8888, 
+      SDL_TEXTUREACCESS_STATIC, static_cast<int>(width), static_cast<int>(height));
+  
+  if (_textureImpl->_sdlTexture == nullptr) {
+    throw Exception("SDL_CreateTexture");
+  }
+
+  if (pixels != nullptr) {
+    const int pitch = static_cast<int>(width * sizeof(uint32_t));
+    if (!SDL_UpdateTexture(_textureImpl->_sdlTexture, nullptr, pixels, pitch)) {
+      SDL_DestroyTexture(_textureImpl->_sdlTexture);
+      throw Exception("SDL_UpdateTexture");
+    }
+  }
+}
+
 Texture::Texture(Texture&& other) noexcept
     : _textureImpl{std::move(other._textureImpl)} {}
 

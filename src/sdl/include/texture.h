@@ -25,6 +25,9 @@ class Texture {
   Texture(const Renderer& renderer, const void* location, std::size_t size);
   Texture(const Renderer& renderer, void* location, std::size_t size);
 
+  //! @brief creates a texture from raw RGBA pixel data
+  Texture(const Renderer& renderer, uint32_t width, uint32_t height, const uint32_t* pixels);
+
   Texture(Texture& other) = delete;
   Texture(Texture&& other) noexcept;
   ~Texture();

@@ -21,10 +21,10 @@ Window::Window(std::string title, uint16_t width, uint16_t height,
 }
 
 Window::Window(Window&& other) noexcept
-    : _windowImpl{std::move(other._windowImpl)} {}
+    : _title{std::move(other._title)}, _windowImpl{std::move(other._windowImpl)} {}
 
 Window::~Window() {
-  if (_windowImpl->_sdlWindow != nullptr) {
+  if (_windowImpl && _windowImpl->_sdlWindow != nullptr) {
     SDL_DestroyWindow(_windowImpl->_sdlWindow);
   }
 }
@@ -33,9 +33,10 @@ auto Window::operator=(Window&& other) noexcept -> Window& {
   if (&other == this) {
     return *this;
   }
-  if (_windowImpl->_sdlWindow != nullptr) {
+  if (_windowImpl && _windowImpl->_sdlWindow != nullptr) {
     SDL_DestroyWindow(_windowImpl->_sdlWindow);
   }
+  _title = std::move(other._title);
   _windowImpl = std::move(other._windowImpl);
   return *this;
 }

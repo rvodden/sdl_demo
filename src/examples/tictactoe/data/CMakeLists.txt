@@ -2,14 +2,12 @@ file(GLOB DataFiles *)
 
 set(SKIP_FILES "CMakeLists.txt" "include")
 
-message(CHECK_START "Proecessing data files...")
 foreach (DataFile IN LISTS DataFiles)
     get_filename_component(DataName ${DataFile} NAME)
     if(DataName IN_LIST SKIP_FILES)
         continue()
     endif()
     set(OutFile "${CMAKE_CURRENT_BINARY_DIR}/${DataName}.o")
-    message("   Creating ${OutFile} from ${DataName}")
     add_custom_command(
             OUTPUT ${OutFile}
             MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/${DataName}"
@@ -20,7 +18,6 @@ foreach (DataFile IN LISTS DataFiles)
             )
     list(APPEND DataObjectFiles ${OutFile})
 endforeach ()
-message(CHECK_PASS "done.")
 
 add_library(${PROJECT_NAME}_data STATIC)
 target_sources(${PROJECT_NAME}_data PUBLIC ${DataObjectFiles})

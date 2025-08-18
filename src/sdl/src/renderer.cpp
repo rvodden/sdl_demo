@@ -29,14 +29,16 @@ Renderer::Renderer(Renderer&& other) noexcept
     : _rendererImpl{std::move(other._rendererImpl)} {};
 
 Renderer::~Renderer() noexcept {
-  SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
+  if (_rendererImpl && _rendererImpl->_sdlRenderer != nullptr) {
+    SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
+  }
 }
 
 auto Renderer::operator=(Renderer&& other) noexcept -> Renderer& {
   if (this == &other) {
     return *this;
   }
-  if (_rendererImpl->_sdlRenderer != nullptr) {
+  if (_rendererImpl && _rendererImpl->_sdlRenderer != nullptr) {
     SDL_DestroyRenderer(_rendererImpl->_sdlRenderer);
   }
   _rendererImpl = std::move(other._rendererImpl);

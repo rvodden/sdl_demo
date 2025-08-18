@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(cmake:*)",
-      "Bash(./build/ninja-mc/src/visitor_pattern_mockup/Debug/visitor_pattern_mockup)"
+      "Bash(./build/ninja-mc/src/visitor_pattern_mockup/Debug/visitor_pattern_mockup)",
+      "Bash(ctest:*)"
     ],
     "deny": [],
     "ask": []

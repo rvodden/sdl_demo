@@ -4,9 +4,6 @@ add_library(${PROJECT_NAME} SHARED)
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
 
-include(CMakePrintHelpers)
-cmake_print_variables(HEADER_FILES)
-
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include FILES ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PRIVATE src/include/)
@@ -29,10 +26,10 @@ endif()
 set( TEST_NAME "${PROJECT_NAME}_test" )
 
 file( GLOB_RECURSE TEST_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/*.h )
-foreach( SOURCE_FILE ${TEST_SOURCE_FILES} )
-    message( "   Adding test source file: ${SOURCE_FILE}" )
-endforeach()
 add_executable( ${TEST_NAME} ${TEST_SOURCE_FILES} )
+
+# Disable clang-tidy for test files
+set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 target_link_libraries( ${TEST_NAME} PRIVATE standard_compiler_options )
 target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME} )

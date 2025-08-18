@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(cmake/standard_build.cmake)
 project(test_project LANGUAGES CXX)
 
+include(GoogleTest)
+enable_testing()
 
 add_subdirectory(external)
 add_subdirectory(src)

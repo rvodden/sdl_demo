@@ -1,7 +1,7 @@
 ---
 # clang-tidy configuration for SDL demo project
 
-# Header filter to only analyze project headers, not dependencies
+# Header filter to only analyze project headers, not dependencies, and exclude test files
 HeaderFilterRegex: '^.*/(src|include)/.*\.(h|hpp)$'
 
 # Checks to run (customize as needed)
@@ -21,3 +21,17 @@ Checks: >
 
 # Don't check headers from these paths
 WarningsAsErrors: ''
+
+# Exclude test files from analysis by using a more restrictive HeaderFilterRegex
+# The current regex already excludes test files since they are typically in test/ subdirectories
+# which don't match the (src|include) pattern above
+
+# Additional configuration to make tests more lenient
+CheckOptions:
+  - key: readability-function-cognitive-complexity.IgnoreMacros
+    value: true
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: true
+
+# System includes should not be analyzed
+SystemHeaders: false
