@@ -69,10 +69,10 @@ class BaseEvent {
 
  public:
   explicit BaseEvent(BaseEventImpl* impl);
-  BaseEvent(const BaseEvent& baseEvent) = default;
+  BaseEvent(const BaseEvent& baseEvent) = delete;
   BaseEvent(BaseEvent&& baseEvent) noexcept = default;
 
-  auto operator=(const BaseEvent& baseEvent) -> BaseEvent& = default;
+  auto operator=(const BaseEvent& baseEvent) -> BaseEvent& = delete;
   auto operator=(BaseEvent&& baseEvent) noexcept -> BaseEvent& = default;
   virtual ~BaseEvent() noexcept = default;
   virtual void operator()(const BaseEventHandler& abstractHandler) const = 0;
@@ -108,10 +108,10 @@ class CustomEvent : public BaseEvent {
  public:
   CustomEvent();
   CustomEvent(CustomEventImpl* impl);
-  CustomEvent(const CustomEvent& baseEvent) = default;
+  CustomEvent(const CustomEvent& baseEvent) = delete;
   CustomEvent(CustomEvent&& baseEvent) noexcept = default;
 
-  auto operator=(const CustomEvent& baseEvent) -> CustomEvent& = default;
+  auto operator=(const CustomEvent& baseEvent) -> CustomEvent& = delete;
   auto operator=(CustomEvent&& baseEvent) noexcept -> CustomEvent& = default;
   ~CustomEvent() override = default;
 

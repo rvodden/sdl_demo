@@ -39,6 +39,9 @@ endif()
 option(SDLXX_USE_VENDORED_SDL3 "Download SDL3 from GitHub" ON)
 if(SDLXX_USE_VENDORED_SDL3)
         set(SDL_VULKAN OFF)
+        if(CCACHE_PROGRAM)
+                set(SDL_CCACHE ON)
+        endif()
         ###
         FetchContent_Declare(
                 SDL3

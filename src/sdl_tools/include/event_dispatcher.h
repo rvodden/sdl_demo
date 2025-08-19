@@ -52,10 +52,10 @@ class EventDispatcher {
    * events
    */
   EventDispatcher(std::shared_ptr<EventProducer> eventProducer);
-  EventDispatcher(const EventDispatcher& other) = default;
+  EventDispatcher(const EventDispatcher& other) = delete;
   EventDispatcher(EventDispatcher&& other) noexcept = default;
 
-  auto operator=(const EventDispatcher& other) -> EventDispatcher& = default;
+  auto operator=(const EventDispatcher& other) -> EventDispatcher& = delete;
   auto operator=(EventDispatcher&& other) noexcept
       -> EventDispatcher& = default;
 

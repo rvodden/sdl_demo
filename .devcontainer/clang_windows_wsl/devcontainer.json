@@ -1,0 +1,25 @@
+{
+    "name": "Windows WSL2 - Clang",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".",
+        "args": {
+            "GCC_VERSION": "14"
+        }
+    },
+    "remoteUser": "ubuntu",
+    "runArgs": ["--gpus", "all", "--cap-add=CAP_PERFMON"],
+    "customizations": {
+        "vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {},
+			"extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "EditorConfig.EditorConfig",
+                "Anthropic.claude-code",
+                "SteveBushResearch.BuildOutputColorizer"
+            ]
+		}
+    }
+}
+

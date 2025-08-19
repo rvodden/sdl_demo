@@ -1,8 +1,8 @@
 {
-    "name": "GCC (Windows)",
+    "name": "Windows WSL2 - GCC",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": "..",
+        "context": ".",
         "args": {
             "GCC_VERSION": "14"
         }
@@ -21,3 +21,4 @@
 		}
     }
 }
+

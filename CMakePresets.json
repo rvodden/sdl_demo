@@ -8,18 +8,8 @@
     "configurePresets": [
         {
             "hidden": true,
-            "name": "generate_compile_commands",
-            "environment": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-            }
-        },
-        {
-            "hidden": true,
             "name": "base_configuration",
-            "inherits": [
-                "generate_compile_commands"
-            ],
-            "binaryDir": "${sourceDir}/build/${presetName}"
+            "binaryDir": "build/${presetName}"
         },
         {
             "displayName": "Ninja Multi-Config",
@@ -36,26 +26,21 @@
     ],
     "buildPresets": [
         {
-            "name": "targets",
-            "configurePreset": "ninja-mc",
-            "hidden": true
-        },
-        {
-            "name": "ninja-mc-release-all",
+            "name": "ninja-mc-release",
             "displayName": "Release",
             "configuration": "Release",
-            "inherits": ["targets"]
+            "configurePreset": "ninja-mc"
         },
         {
-            "name": "ninja-mc-debug-all",
+            "name": "ninja-mc-debug",
             "displayName": "Debug",
             "configuration": "Debug",
-            "inherits": ["targets"]
+            "configurePreset": "ninja-mc"
         }
     ],
     "testPresets": [
         {
-            "name": "ninja-mc-debug-tests",
+            "name": "ninja-mc-debug",
             "displayName": "Debug Tests",
             "configurePreset": "ninja-mc",
             "configuration": "Debug",
@@ -68,7 +53,7 @@
             }
         },
         {
-            "name": "ninja-mc-release-tests",
+            "name": "ninja-mc-release",
             "displayName": "Release Tests", 
             "configurePreset": "ninja-mc",
             "configuration": "Release",

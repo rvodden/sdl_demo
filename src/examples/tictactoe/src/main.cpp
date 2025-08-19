@@ -187,8 +187,7 @@ class TicTacToeUI {
             _eventDispatcher,
             FloatRectangle{buttonX, buttonY, kCellWidth, kCellHeight});
         button->registerEventHandler(
-            [this, x, y, buttonX,
-             buttonY](const MouseButtonEvent& mouseButtonEvent) -> void {
+            [this, x, y](const MouseButtonEvent& mouseButtonEvent) -> void {
               auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                   std::chrono::steady_clock::now().time_since_epoch());
               if (mouseButtonEvent.down) {

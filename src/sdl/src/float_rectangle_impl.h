@@ -4,7 +4,6 @@
 #include <SDL3/SDL.h>
 
 #include <cinttypes>
-#include <stdfloat>
 
 #include "float_rectangle.h"
 

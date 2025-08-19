@@ -19,6 +19,10 @@ if(NOT CMAKE_TESTING_ENABLED)
     enable_testing()
 endif()
     
+if(SDLCPP_USE_CLANG_TIDY)
+  set_target_properties(standard_compiler_options PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
+endif()
+
 set( TEST_NAME "${PROJECT_NAME}_test" )
 
 file( GLOB_RECURSE TEST_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/*.h )
