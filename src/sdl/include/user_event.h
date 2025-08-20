@@ -12,6 +12,7 @@
 #define SDL_USER_EVENT_H
 
 #include "event.h"
+#include "sdl_export.h"
 
 namespace sdl {
 
@@ -21,7 +22,7 @@ class UserEventImpl;
  * @return The registered SDL event type ID
  * @throws Exception if SDL_RegisterEvents fails
  */
-auto registerEventType() -> uint32_t;
+SDL_EXPORT auto registerEventType() -> uint32_t;
 
 /**
  * @brief User-defined event for custom application events
@@ -53,7 +54,7 @@ auto registerEventType() -> uint32_t;
  * };
  * @endcode
  */
-class UserEvent : public Event {
+class SDL_EXPORT UserEvent : public Event {
   friend EventProducer;
 
  public:

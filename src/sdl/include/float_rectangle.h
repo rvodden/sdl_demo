@@ -4,13 +4,14 @@
 #include <memory>
 
 #include "renderer.h"
+#include "sdl_export.h"
 
 namespace sdl {
 
 class Renderer;
 class FloatRectangleImpl;
 
-class FloatRectangle {
+class SDL_EXPORT FloatRectangle {
   friend Renderer;
 
  public:

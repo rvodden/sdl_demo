@@ -5,12 +5,14 @@
 #include <filesystem>
 #include <memory>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
 class SurfaceImpl;
 
 //! A class which holds a collection of pixels to be used in software blitting.
-class Surface {
+class SDL_EXPORT Surface {
  public:
   Surface(uint32_t width, uint32_t height, uint8_t depth, uint32_t redMask,
           uint32_t greenMask, uint32_t blueMask, uint32_t alphaMask);

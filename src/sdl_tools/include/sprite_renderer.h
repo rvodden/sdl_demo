@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "renderer.h"
+#include "sdl_tools_export.h"
 #include "sprite.h"
 
 namespace sdl::tools {
@@ -11,7 +12,7 @@ namespace sdl::tools {
 class Sprite;
 class SpriteRendererImpl;
 
-class SpriteRenderer {
+class SDL_TOOLS_EXPORT SpriteRenderer {
  public:
   SpriteRenderer(std::shared_ptr<Renderer> renderer);
   SpriteRenderer(const SpriteRenderer&) = delete;

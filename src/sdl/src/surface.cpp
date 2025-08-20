@@ -22,7 +22,7 @@ Surface::Surface(uint32_t width, uint32_t height, uint8_t depth,
 }
 
 Surface::Surface(const std::filesystem::path& filePath) {
-  _surfaceImpl->_sdlSurface = IMG_Load(filePath.c_str());
+  _surfaceImpl->_sdlSurface = IMG_Load(filePath.string().c_str());
 }
 
 Surface::Surface(Surface&& other) noexcept

@@ -4,9 +4,11 @@
 #include <stdexcept>
 #include <string>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
-class Exception : public std::runtime_error {
+class SDL_EXPORT Exception : public std::runtime_error {
  public:
   /**!
    * @brief Construct an exception

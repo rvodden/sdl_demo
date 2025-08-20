@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "renderer.h"
+#include "sdl_export.h"
 
 namespace sdl {
 
@@ -12,7 +13,7 @@ class TextureImpl;
 
 //! @brief Image stored in the graphics card memory that can be used for fast
 //! drawing
-class Texture {
+class SDL_EXPORT Texture {
   friend Renderer;
 
  public:

@@ -47,7 +47,7 @@ class InternalEventHandler {
   virtual ~InternalEventHandler() noexcept = default;
 
   virtual void handle(
-      __attribute_maybe_unused__ const EventClass& event) const {};
+    [[maybe_unused]] const EventClass& event) const {};
 };
 
 template <class EventClass>

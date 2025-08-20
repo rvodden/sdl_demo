@@ -22,6 +22,23 @@
             "inherits": [
                 "base_configuration"
             ]
+        },
+        {
+            "displayName": "Visual Studio 2022",
+            "name": "msvcc",
+            "description": "Use Visual Studio to generate a multiconfiguration output.",
+            "generator": "Visual Studio 17 2022",
+            "environment": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "inherits": [
+                "base_configuration"
+            ]
         }
     ],
     "buildPresets": [

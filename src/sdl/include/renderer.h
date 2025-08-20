@@ -7,6 +7,7 @@
 
 #include "color.h"
 #include "float_rectangle.h"
+#include "sdl_export.h"
 #include "texture.h"
 
 namespace sdl {
@@ -17,7 +18,7 @@ class Window;
 class RendererImpl;
 
 //! @brief A 2D Rendering Context
-class Renderer {
+class SDL_EXPORT Renderer {
   friend Texture;
 
  public:

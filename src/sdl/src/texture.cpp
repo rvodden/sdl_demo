@@ -13,7 +13,7 @@ Texture::Texture(const Renderer& renderer,
                  const std::filesystem::path& filePath)
     : _textureImpl{std::make_unique<TextureImpl>()} {
   _textureImpl->_sdlTexture =
-      IMG_LoadTexture(renderer._rendererImpl->_sdlRenderer, filePath.c_str());
+      IMG_LoadTexture(renderer._rendererImpl->_sdlRenderer, filePath.string().c_str());
   if (_textureImpl->_sdlTexture == nullptr) {
     throw Exception("IMG_LoadTexture");
   }

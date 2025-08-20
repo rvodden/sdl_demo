@@ -4,11 +4,13 @@
 #include <chrono>
 #include <memory>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
 class SDLImpl;
 
-class SDL {
+class SDL_EXPORT SDL {
  public:
   SDL();
   SDL(const SDL& sdl) = delete;

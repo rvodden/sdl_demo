@@ -17,6 +17,10 @@ EventDispatcher::EventDispatcher(std::shared_ptr<EventProducer> eventProducer)
 
 EventDispatcher::~EventDispatcher() = default;
 
+EventDispatcher::EventDispatcher(EventDispatcher&& other) noexcept = default;
+
+auto EventDispatcher::operator=(EventDispatcher&& other) noexcept -> EventDispatcher& = default;
+
 void EventDispatcher::run() {
   std::unique_ptr<BaseEvent> event;
   while (!_eventDispatcherImpl->quitFlag) {
@@ -35,5 +39,12 @@ void EventDispatcher::run() {
 void EventDispatcher::registerEventHandler(BaseEventHandler& baseEventHandler) {
   _eventDispatcherImpl->_eventHandlers.push_front(std::ref(baseEventHandler));
 }
+
+EventDispatcherImpl::~EventDispatcherImpl() = default;
+
+EventDispatcherImpl::EventDispatcherImpl(std::shared_ptr<EventProducer> eventProducer)
+  : _eventProducer(std::move(eventProducer)) {};
+
+void EventDispatcherImpl::quit() { quitFlag = true; };
 
 }  // namespace sdl::tools

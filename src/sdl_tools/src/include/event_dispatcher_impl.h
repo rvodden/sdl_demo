@@ -27,9 +27,9 @@ class EventDispatcherImpl {
   friend EventDispatcher;
 
  public:
-  EventDispatcherImpl(std::shared_ptr<EventProducer> eventProducer)
-      : _eventProducer(std::move(eventProducer)) {};
-  void quit() { quitFlag = true; };
+  EventDispatcherImpl(std::shared_ptr<EventProducer> eventProducer);
+  ~EventDispatcherImpl();
+  void quit();
 
  private:
   std::shared_ptr<BaseEventProducer> _eventProducer;

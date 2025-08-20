@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "event.h"
+#include "sdl_tools_export.h"
 
 namespace sdl::tools {
 
@@ -40,7 +41,7 @@ class EventDispatcherImpl;
  * dispatcher.run(); // Starts the event loop
  * @endcode
  */
-class EventDispatcher {
+class SDL_TOOLS_EXPORT EventDispatcher {
  public:
   /**
    * @brief Construct an EventDispatcher with the given event producer
@@ -53,11 +54,11 @@ class EventDispatcher {
    */
   EventDispatcher(std::shared_ptr<EventProducer> eventProducer);
   EventDispatcher(const EventDispatcher& other) = delete;
-  EventDispatcher(EventDispatcher&& other) noexcept = default;
+  EventDispatcher(EventDispatcher&& other) noexcept;
 
   auto operator=(const EventDispatcher& other) -> EventDispatcher& = delete;
   auto operator=(EventDispatcher&& other) noexcept
-      -> EventDispatcher& = default;
+      -> EventDispatcher&;
 
   /**
    * @brief Destructor
@@ -121,7 +122,7 @@ class EventDispatcher {
    */
   template <typename EventType, typename Callable>
   void registerEventHandler(Callable&& callable) {
-    auto handler = std::make_unique<FunctionEventHandler<EventType, Callable>>(
+    auto handler = std::make_unique<sdl::FunctionEventHandler<EventType, Callable>>(
         std::forward<Callable>(callable));
     _functionHandlers.push_back(std::move(handler));
     registerEventHandler(*_functionHandlers.back());

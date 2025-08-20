@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-auto main() -> int {
+int main(int argc, char **argv) {
   auto retval = SDL_Init(SDL_INIT_VIDEO);
   if (!retval) {
     std::cerr << SDL_GetError() << "\n";

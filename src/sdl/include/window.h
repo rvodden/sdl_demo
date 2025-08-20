@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
 class Renderer;
@@ -12,7 +14,7 @@ class WindowImpl;
 /**!
  * @brief A window with
  */
-class Window {
+class SDL_EXPORT Window {
   friend Renderer;
 
  public:

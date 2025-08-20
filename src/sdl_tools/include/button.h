@@ -7,11 +7,13 @@
 
 #include <memory>
 
+#include "sdl_tools_export.h"
+
 namespace sdl::tools {
 
 class ButtonImpl;
 
-class Button {
+class SDL_TOOLS_EXPORT Button {
  public:
   using Handler = std::function<void(const MouseButtonEvent&)>;
 

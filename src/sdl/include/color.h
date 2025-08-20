@@ -4,12 +4,14 @@
 #include <cstdint>
 #include <tuple>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
 enum class Alpha : uint8_t { kOpaque = 255,
                              kTranparent = 0 };
 
-class Color {
+class SDL_EXPORT Color {
  public:
   Color() = default;
   constexpr Color(
@@ -30,14 +32,14 @@ class Color {
   uint8_t _alpha{static_cast<uint8_t>(Alpha::kOpaque)};
 };
 
-class NamedColor {
+class SDL_EXPORT NamedColor {
  public:
   static constexpr Color kBlack =
-      Color{0, 0, 0, static_cast<uint8_t>(Alpha::kTranparent)};
+      Color{0, 0, 0, static_cast<uint8_t>(Alpha::kOpaque)};
   static constexpr Color kWhite =
-      Color{255, 255, 255, static_cast<uint8_t>(Alpha::kTranparent)};
+      Color{255, 255, 255, static_cast<uint8_t>(Alpha::kOpaque)};
   static constexpr Color kMagenta =
-      Color{0xc2, 0x00, 0x78, static_cast<uint8_t>(Alpha::kTranparent)};
+      Color{0xc2, 0x00, 0x78, static_cast<uint8_t>(Alpha::kOpaque)};
 };
 
 }  // namespace sdl

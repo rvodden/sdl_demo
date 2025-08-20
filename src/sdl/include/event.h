@@ -16,6 +16,8 @@
 #include <iostream>
 #include <memory>
 
+#include "sdl_export.h"
+
 namespace sdl {
 
 class UserEvent;
@@ -27,7 +29,7 @@ class UserEvent;
  * This exception is thrown when the event system encounters an event type
  * that it doesn't know how to handle or process.
  */
-class UnknownEventException : public std::runtime_error {
+class SDL_EXPORT UnknownEventException : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
@@ -37,7 +39,7 @@ class UnknownEventException : public std::runtime_error {
  * This is the abstract base class that all event handlers must inherit from.
  * It provides the common interface for the polymorphic event handling system.
  */
-class BaseEventHandler {
+class SDL_EXPORT BaseEventHandler {
  public:
   BaseEventHandler() = default;
   BaseEventHandler(const BaseEventHandler&) = default;
@@ -81,7 +83,7 @@ class EventHandler {
  * polymorphic interface that allows events to be handled through the
  * visitor pattern implementation.
  */
-class BaseEvent {
+class SDL_EXPORT BaseEvent {
  public:
   virtual ~BaseEvent() = default;
 
@@ -164,7 +166,7 @@ class FunctionEventHandler : public EventHandler<EventType>,
  * timestamp for when the event occurred. Most concrete event types inherit
  * from this class.
  */
-class Event : public BaseEvent {
+class SDL_EXPORT Event : public BaseEvent {
  public:
   /**
    * @brief Construct an event with a timestamp
@@ -187,7 +189,7 @@ class Event : public BaseEvent {
  * or uses a system-level quit command. Handlers should respond by initiating
  * a clean shutdown of the application.
  */
-class QuitEvent : public Event {
+class SDL_EXPORT QuitEvent : public Event {
  public:
   using Event::Event;
   void handle(BaseEventHandler& baseEventHandler) override {
@@ -201,7 +203,7 @@ class QuitEvent : public Event {
  * This class provides common data for all mouse events, including which
  * window has mouse focus and which mouse device generated the event.
  */
-class MouseEvent : public Event {
+class SDL_EXPORT MouseEvent : public Event {
  public:
   /**
    * @brief Construct a mouse event
@@ -210,7 +212,7 @@ class MouseEvent : public Event {
    * @param mouseId ID of the mouse device that generated the event
    */
   MouseEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
-             u_int32_t mouseId)
+             uint32_t mouseId)
       : Event(ts), windowId{winId}, which{mouseId} {};
 
   void handle(BaseEventHandler& baseEventHandler) override {
@@ -230,7 +232,7 @@ class MouseEvent : public Event {
  * This class extends MouseEvent with x,y coordinate information for events
  * that occur at a specific position within a window.
  */
-class MousePositionEvent : public MouseEvent {
+class SDL_EXPORT MousePositionEvent : public MouseEvent {
  public:
   /**
    * @brief Construct a mouse position event
@@ -261,7 +263,7 @@ class MousePositionEvent : public MouseEvent {
  * including which button was affected, whether it was pressed or released,
  * and the click count for detecting multi-clicks.
  */
-class MouseButtonEvent : public MousePositionEvent {
+class SDL_EXPORT MouseButtonEvent : public MousePositionEvent {
  public:
   /**
    * @brief Enumeration of supported mouse buttons
@@ -314,7 +316,7 @@ class MouseButtonEvent : public MousePositionEvent {
  * (like SDL, user input, timers, etc.) and providing them to the event
  * system.
  */
-class BaseEventProducer {
+class SDL_EXPORT BaseEventProducer {
  public:
   BaseEventProducer() = default;
   BaseEventProducer(const BaseEventProducer&) = default;
@@ -344,7 +346,7 @@ class BaseEventProducer {
  * This is the main event producer that interfaces with SDL to convert
  * SDL events into the type-safe event objects used by this system.
  */
-class EventProducer : public BaseEventProducer {
+class SDL_EXPORT EventProducer : public BaseEventProducer {
  public:
   EventProducer() = default;
   EventProducer(const EventProducer&) = default;

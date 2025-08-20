@@ -1,11 +1,23 @@
 project(sdl LANGUAGES CXX)
 add_library(${PROJECT_NAME} SHARED)
 
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
-target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include FILES ${HEADER_FILES})
+target_sources(${PROJECT_NAME} 
+    PUBLIC 
+        FILE_SET HEADERS 
+            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include 
+            FILES ${HEADER_FILES}
+        FILE_SET generated_headers
+            TYPE HEADERS
+            BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME},BINARY_DIR>
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/$<LOWER_CASE:${PROJECT_NAME}>_export.h
+    )
 target_include_directories(${PROJECT_NAME} PRIVATE src/include/)
 
 # target_precompile_headers(${PROJECT_NAME} REUSE_FROM precompiled_headers)
@@ -14,7 +26,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3_image::SDL3_image)
 target_link_libraries(${PROJECT_NAME} PRIVATE utils)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC m)
+if(NOT MSVC)
+    target_link_libraries(${PROJECT_NAME} PUBLIC m)
+endif()
 
 if(NOT PROJECT_IS_TOP_LEVEL)
     target_link_libraries(${PROJECT_NAME} PRIVATE standard_compiler_options)

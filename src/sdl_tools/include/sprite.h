@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "sdl_tools_export.h"
 #include "sprite_renderer.h"
 #include "texture.h"
 
@@ -11,7 +12,7 @@ namespace sdl::tools {
 class SpriteImpl;
 class SpriteRenderer;
 
-class Sprite {
+class SDL_TOOLS_EXPORT Sprite {
   friend SpriteRenderer;
 
  public:
