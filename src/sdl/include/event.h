@@ -120,10 +120,9 @@ void castHandler(const EventClass& eventClass,
     auto& eventHandler =
         dynamic_cast<EventHandler<EventClass>&>(baseEventHandler);
     eventHandler.handle(eventClass);
-  } catch (std::bad_cast& e) {  // NOLINT(bugprone-empty-catch) bad cast just
-                                // means this handler can't
+  } catch ([[maybe_unused]] std::bad_cast& e) {  // NOLINT(bugprone-empty-catch) bad cast just
+                                // means this handler can't handle this event
   }
-  // handle this event
 }
 
 /**

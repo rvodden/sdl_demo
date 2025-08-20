@@ -1,1 +1,1 @@
-#define TICTACTOE_PNG 1
+const uint16_t kTicTacToe_Png = 1;

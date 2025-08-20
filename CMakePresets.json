@@ -59,6 +59,7 @@
             "displayName": "Release",
             "configuration": "Release",
             "configurePreset": "msvcc",
+            "jobs": 20,
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -70,6 +71,7 @@
             "displayName": "Debug",
             "configuration": "Debug",
             "configurePreset": "msvcc",
+            "jobs": 20,
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",

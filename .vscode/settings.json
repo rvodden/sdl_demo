@@ -87,5 +87,6 @@
     },
     "C_Cpp.files.exclude": {
         "**/build/**": true
-    }
+    },
+    "cmake.parallelJobs": 20
 }

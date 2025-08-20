@@ -15,6 +15,7 @@ Checks: >
   modernize-*,
   performance-*,
   portability-*,
+  -portability-template-virtual-member-function,
   readability-*,
   -readability-identifier-length,
   -readability-magic-numbers

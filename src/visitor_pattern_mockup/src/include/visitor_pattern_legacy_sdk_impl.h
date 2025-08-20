@@ -27,7 +27,7 @@ OLD_Event* castConverter(const EventClass& event,
     const Converter<EventClass>& eventConverter =
         dynamic_cast<const Converter<EventClass>&>(baseConverter);
     return eventConverter.convert(event);
-  } catch (std::bad_cast& e) {
+  } catch ( [[maybe_unused]] std::bad_cast& e) {
     return nullptr;
   }  // bad cast just means this handler can't handle this event
 }

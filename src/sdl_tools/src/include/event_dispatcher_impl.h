@@ -28,7 +28,13 @@ class EventDispatcherImpl {
 
  public:
   EventDispatcherImpl(std::shared_ptr<EventProducer> eventProducer);
+  EventDispatcherImpl(const EventDispatcherImpl& impl) = delete;
+  EventDispatcherImpl(EventDispatcherImpl&& impl) noexcept = default;
+
   ~EventDispatcherImpl();
+
+  auto operator=(const EventDispatcherImpl& impl) -> EventDispatcherImpl& = delete;
+  auto operator=(EventDispatcherImpl&& impl) noexcept -> EventDispatcherImpl& = default;
   void quit();
 
  private:

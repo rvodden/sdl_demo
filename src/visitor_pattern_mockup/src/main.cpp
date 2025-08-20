@@ -53,48 +53,58 @@ class ConcreteCustomEventHandler : public EventHandler<ConcreteCustomEvent> {
 };
 
 auto main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) -> int {
-  UserEventHandler userEventHandler;
-  SystemEventHandler systemEventHandler;
-  ConcreteCustomEventHandler customEventHandler;
-
-  std::vector<std::reference_wrapper<BaseEventHandler>> eventHandlers{
-      std::ref<UserEventHandler>(userEventHandler),
-      std::ref<SystemEventHandler>(systemEventHandler),
-      std::ref<ConcreteCustomEventHandler>(customEventHandler)};
-
-  std::vector<std::unique_ptr<BaseEvent>> newEvents;
   try {
-    while (true) {
-      newEvents.emplace_back(getEventPtr());
-    }
-  } catch (NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
-  };
+    UserEventHandler userEventHandler;
+    SystemEventHandler systemEventHandler;
+    ConcreteCustomEventHandler customEventHandler;
 
-  while (std::size(newEvents) > 0) {
-    auto& newEvent = *newEvents.back();
-    for (const BaseEventHandler& handler : eventHandlers) {
-      newEvent(handler);
+    std::vector<std::reference_wrapper<BaseEventHandler>> eventHandlers{
+        std::ref<UserEventHandler>(userEventHandler),
+        std::ref<SystemEventHandler>(systemEventHandler),
+        std::ref<ConcreteCustomEventHandler>(customEventHandler)};
+
+    std::vector<std::unique_ptr<BaseEvent>> newEvents;
+    try {
+      while (true) {
+        newEvents.emplace_back(getEventPtr());
+      }
+    } catch ([[maybe_unused]] NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
+    };
+
+    while (std::size(newEvents) > 0) {
+      auto& newEvent = *newEvents.back();
+      for (const BaseEventHandler& handler : eventHandlers) {
+        newEvent(handler);
+      }
+      newEvents.pop_back();
     }
-    newEvents.pop_back();
+
+    const uint8_t kUltimaeAnswer = 42;
+    ConcreteCustomEvent customEvent{kUltimaeAnswer, "your mum!"};
+
+    pushEvent(customEvent);
+
+    try {
+      while (true) {
+        newEvents.emplace_back(getEventPtr());
+      }
+    } catch ([[maybe_unused]] NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
+    };
+
+    while (std::size(newEvents) > 0) {
+      const auto& newEvent = *newEvents.back();
+      for (const BaseEventHandler& handler : eventHandlers) {
+        newEvent(handler);
+      }
+      newEvents.pop_back();
+    }
+  } catch (const std::exception& e) {
+    std::cout << e.what() << "\n";
+    return 1;
+  } catch (...) {
+    std::cout << "Unknown error occured\n";
+    return 2;
   }
 
-  const uint8_t kUltimaeAnswer = 42;
-  ConcreteCustomEvent customEvent{kUltimaeAnswer, "your mum!"};
-
-  pushEvent(customEvent);
-
-  try {
-    while (true) {
-      newEvents.emplace_back(getEventPtr());
-    }
-  } catch (NoEventsException& _) {  // NOLINT(bugprone-empty-catch)
-  };
-
-  while (std::size(newEvents) > 0) {
-    const auto& newEvent = *newEvents.back();
-    for (const BaseEventHandler& handler : eventHandlers) {
-      newEvent(handler);
-    }
-    newEvents.pop_back();
-  }
+  return 0;
 }

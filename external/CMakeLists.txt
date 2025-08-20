@@ -54,6 +54,8 @@ if(SDLXX_USE_VENDORED_SDL3)
        
         set(SDLIMAGE_AVIF OFF)
         set(SDLIMAGE_DAV1D OFF)
+        set(SDLIMAGE_TIF OFF)
+        set(SDLIMAGE_WEBP OFF)
         FetchContent_Declare(
                 SDL3_image
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
