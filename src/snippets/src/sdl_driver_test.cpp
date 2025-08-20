@@ -1,9 +1,8 @@
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 
 #include <iostream>
 
-int main(int argc, char **argv) {
+auto main() -> int {
   auto retval = SDL_Init(SDL_INIT_VIDEO);
   if (!retval) {
     std::cerr << SDL_GetError() << "\n";
