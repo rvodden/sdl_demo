@@ -53,6 +53,28 @@
             "displayName": "Debug",
             "configuration": "Debug",
             "configurePreset": "ninja-mc"
+        },
+        {
+            "name": "msvcc-release",
+            "displayName": "Release",
+            "configuration": "Release",
+            "configurePreset": "msvcc",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "msvcc-debug",
+            "displayName": "Debug",
+            "configuration": "Debug",
+            "configurePreset": "msvcc",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
         }
     ],
     "testPresets": [
@@ -80,6 +102,42 @@
             "execution": {
                 "noTestsAction": "error",
                 "stopOnFailure": false
+            }
+        },
+        {
+            "name": "msvcc-debug",
+            "displayName": "Debug Tests (VS)",
+            "configurePreset": "msvcc",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "msvcc-release",
+            "displayName": "Release Tests (VS)",
+            "configurePreset": "msvcc",
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
             }
         }
     ]
