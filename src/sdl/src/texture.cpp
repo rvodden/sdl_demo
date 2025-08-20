@@ -22,7 +22,14 @@ Texture::Texture(const Renderer& renderer,
 Texture::Texture(const Renderer& renderer, const void* location,
                  std::size_t size)
     : _textureImpl{std::make_unique<TextureImpl>()} {
+  if (location == nullptr || size == 0) {
+    throw Exception("Invalid texture data: null pointer or zero size");
+  }
+  
   SDL_IOStream* ioStream = SDL_IOFromConstMem(location, size);
+  if (ioStream == nullptr) {
+    throw Exception("SDL_IOFromConstMem failed");
+  }
 
   _textureImpl->_sdlTexture =
       IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, true);
@@ -33,7 +40,14 @@ Texture::Texture(const Renderer& renderer, const void* location,
 
 Texture::Texture(const Renderer& renderer, void* location, std::size_t size)
     : _textureImpl{std::make_unique<TextureImpl>()} {
+  if (location == nullptr || size == 0) {
+    throw Exception("Invalid texture data: null pointer or zero size");
+  }
+  
   SDL_IOStream* ioStream = SDL_IOFromMem(location, size);
+  if (ioStream == nullptr) {
+    throw Exception("SDL_IOFromMem failed");
+  }
 
   _textureImpl->_sdlTexture =
       IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, true);

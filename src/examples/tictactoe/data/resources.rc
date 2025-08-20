@@ -1,3 +1,4 @@
 #include <windows.h>
+#include "resource.h"
 
 TICTACTOE_PNG RCDATA "tic_tac_toe.png"

@@ -1,1 +1,1 @@
-#define TICTACTOE_PNG 101
+#define TICTACTOE_PNG 1

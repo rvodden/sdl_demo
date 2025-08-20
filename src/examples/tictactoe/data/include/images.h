@@ -10,12 +10,15 @@
 
   inline auto getTicTacToeData() -> const uint8_t* {
       HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(TICTACTOE_PNG), RT_RCDATA);
+      if (!hResource) return nullptr;
       HGLOBAL hMemory = LoadResource(nullptr, hResource);
+      if (!hMemory) return nullptr;
       return static_cast<const uint8_t*>(LockResource(hMemory));
   }
 
   inline auto ticTacToeSize() -> uint32_t {
       HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(TICTACTOE_PNG), RT_RCDATA);
+      if (!hResource) return 0;
       return SizeofResource(nullptr, hResource);
   }
 

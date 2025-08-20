@@ -1,8 +1,10 @@
 if(WIN32)
     enable_language(RC)
-      set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
-      add_library(${PROJECT_NAME}_data STATIC)
-      target_sources(${PROJECT_NAME}_data PRIVATE ${RESOURCE_FILE})
+    set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
+    add_library(${PROJECT_NAME}_data OBJECT ${RESOURCE_FILE})
+    set_target_properties(${PROJECT_NAME}_data PROPERTIES 
+        LINKER_LANGUAGE RC
+        RC_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 else()
     file(GLOB DataFiles *)
 
