@@ -49,6 +49,16 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
       -Wdouble-promotion # warn if float is implicit promoted to double
       -Wformat=2 # warn on security issues around functions that format output (ie printf)
       -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
+      -gdwarf-4 # Use DWARF-4 debug format for better libunwind compatibility
+      -fno-unwind-tables # Disable unwind tables to avoid libunwind issues
+      -fno-asynchronous-unwind-tables # Disable async unwind tables
+    )
+  target_link_options(standard_compiler_options INTERFACE
+      -gdwarf-4 # Use DWARF-4 debug format for better libunwind compatibility
+      -fno-unwind-tables # Disable unwind tables to avoid libunwind issues
+      -fno-asynchronous-unwind-tables # Disable async unwind tables
+      -Wl,--as-needed # Only link necessary libraries
+      -Wl,--exclude-libs,libunwind # Try to exclude libunwind
     )
 elseif(MSVC)
   target_compile_options(standard_compiler_options INTERFACE

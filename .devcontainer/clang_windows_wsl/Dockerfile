@@ -44,7 +44,7 @@ RUN apt update && \
 RUN  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key 2>/dev/null | gpg --dearmor - >/usr/share/keyrings/llvm-snapshot.gpg && \
     echo 'deb [signed-by=/usr/share/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main' > /etc/apt/sources.list.d/llvm.list && \
     apt update && \
-    apt install -y clang-format-20 clang-tidy-20 clang-20 libc++-20-dev libc++abi-20-dev && \
+    apt install -y clang-format-19 clang-tidy-19 clang-19 libc++-19-dev libc++abi-19-dev && \
     rm -rf /var/lib/apt/lists/*
 
 ADD --chmod=0644 CMakeToolchain.txt /CMakeToolchain.txt
