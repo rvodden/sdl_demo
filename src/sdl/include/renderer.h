@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <unordered_set>
+#include <vector>
 
 #include "color.h"
 #include "float_rectangle.h"
@@ -56,6 +57,14 @@ class SDL_EXPORT Renderer {
   //! @brief Update the screen with any rendering performed since the
   //! previous call.
   void present() const;
+
+  //! @brief Read pixels from the current render target.
+  //! @param x X coordinate of the rectangle to read
+  //! @param y Y coordinate of the rectangle to read  
+  //! @param width Width of the rectangle to read
+  //! @param height Height of the rectangle to read
+  //! @return Vector of pixel data in RGBA format
+  [[nodiscard]] auto readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const -> std::vector<uint8_t>;
 
   static constexpr RendererFlag kSoftware = 0;
   static constexpr RendererFlag kAccelerated = 1;

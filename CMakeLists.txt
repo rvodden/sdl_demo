@@ -16,6 +16,9 @@ include(cmake/project_options.cmake)
 include(cmake/standard_build.cmake)
 include(cmake/ccache.cmake)
 
+include(GoogleTest)
+enable_testing()
+
 add_subdirectory(external)
 add_subdirectory(src)
 

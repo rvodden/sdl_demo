@@ -42,19 +42,19 @@ TEST(ColorTest, testNamedColors) {
   ASSERT_EQ(sdl::NamedColor::kBlack.getRed(), 0);
   ASSERT_EQ(sdl::NamedColor::kBlack.getGreen(), 0);
   ASSERT_EQ(sdl::NamedColor::kBlack.getBlue(), 0);
-  ASSERT_EQ(sdl::NamedColor::kBlack.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kTranparent));
+  ASSERT_EQ(sdl::NamedColor::kBlack.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kOpaque));
   
   // Test white color
   ASSERT_EQ(sdl::NamedColor::kWhite.getRed(), kMaxColorValue);
   ASSERT_EQ(sdl::NamedColor::kWhite.getGreen(), kMaxColorValue);
   ASSERT_EQ(sdl::NamedColor::kWhite.getBlue(), kMaxColorValue);
-  ASSERT_EQ(sdl::NamedColor::kWhite.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kTranparent));
+  ASSERT_EQ(sdl::NamedColor::kWhite.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kOpaque));
   
   // Test magenta color
   ASSERT_EQ(sdl::NamedColor::kMagenta.getRed(), kMagentaRed);
   ASSERT_EQ(sdl::NamedColor::kMagenta.getGreen(), kMagentaGreen);
   ASSERT_EQ(sdl::NamedColor::kMagenta.getBlue(), kMagentaBlue);
-  ASSERT_EQ(sdl::NamedColor::kMagenta.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kTranparent));
+  ASSERT_EQ(sdl::NamedColor::kMagenta.getAlpha(), static_cast<uint8_t>(sdl::Alpha::kOpaque));
 }
 
 TEST(ColorTest, testAlphaValues) {

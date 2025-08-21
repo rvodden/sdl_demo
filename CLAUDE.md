@@ -47,6 +47,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 - Public headers expose clean interfaces without SDL dependencies
 - Namespaces follow directory structure (`sdl::`, `sdl::tools::`)
 - **Test/Debug code should be placed in the `snippets` project** - use this for temporary diagnostic tools, debugging utilities, and experimental code
+- **Tests must NEVER include `*_impl.h` headers** - tests should only interact with public interfaces
 
 ### Dependencies
 - SDL3 and SDL3_image are fetched automatically via CMake FetchContent

@@ -87,4 +87,5 @@ void Renderer::present() const {
   SDL_RenderPresent(_rendererImpl->_sdlRenderer);
 }
 
+
 }  // namespace sdl

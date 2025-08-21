@@ -49,6 +49,11 @@ target_link_libraries( ${TEST_NAME} PUBLIC gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC gmock )
 target_link_libraries( ${TEST_NAME} PUBLIC gtest_main )
 
-gtest_discover_tests( ${TEST_NAME} XML_OUTPUT_DIR report EXTRA_ARGS --gtest_catch_exceptions=0 )
+gtest_discover_tests( ${TEST_NAME} 
+    DISCOVERY_MODE POST_BUILD
+    XML_OUTPUT_DIR report 
+    EXTRA_ARGS --gtest_catch_exceptions=0 
+    PROPERTIES ENVIRONMENT SDL_VIDEODRIVER=dummy
+)
 
 set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
