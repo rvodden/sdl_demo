@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cmake:*)",
       "Bash(./build/ninja-mc/src/visitor_pattern_mockup/Debug/visitor_pattern_mockup)",
-      "Bash(ctest:*)"
+      "Bash(ctest:*)",
+      "Bash(./build/ninja-mc/bin/Debug/sdlpp_tools_test:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,258 @@
+{
+  "tests": 16,
+  "failures": 6,
+  "disabled": 0,
+  "errors": 0,
+  "timestamp": "2025-08-22T08:56:43Z",
+  "time": "0.001s",
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "ButtonTest",
+      "tests": 16,
+      "failures": 6,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2025-08-22T08:56:43Z",
+      "time": "0.001s",
+      "testsuite": [
+        {
+          "name": "ConstructorWithValidParameters",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 125,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "ConstructorRegistersWithEventRouter",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 133,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "MoveConstructor",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 148,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "MoveAssignment",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 160,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "RegisterSingleHandler",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 177,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "RegisterMultipleHandlers",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 186,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "ClickInsideButtonTriggersHandler",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 202,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "ClickOutsideButtonDoesNotTriggerHandler",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 219,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "BoundaryTesting",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 234,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:265\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\nFailed for bottom-right inside\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:265\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\nFailed for center\n",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "DifferentMouseButtonTypes",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 272,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:295\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:296\nExpected equality of these values:\n  handler.lastEvent.button\n    Which is: 1-byte object <00>\n  buttonType\n    Which is: 1-byte object <02>\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:295\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:296\nExpected equality of these values:\n  handler.lastEvent.button\n    Which is: 1-byte object <00>\n  buttonType\n    Which is: 1-byte object <01>\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:295\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:296\nExpected equality of these values:\n  handler.lastEvent.button\n    Which is: 1-byte object <00>\n  buttonType\n    Which is: 1-byte object <03>\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:295\nExpected equality of these values:\n  handler.callCount\n    Which is: 0\n  1\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:296\nExpected equality of these values:\n  handler.lastEvent.button\n    Which is: 1-byte object <00>\n  buttonType\n    Which is: 1-byte object <04>\n",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "MultipleHandlersAllReceiveEvent",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 300,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "ZeroSizeRectangle",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 319,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:333\nExpected equality of these values:\n  handler.callCount\n    Which is: 1\n  0\n",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "NegativeCoordinateRectangle",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 336,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest"
+        },
+        {
+          "name": "MultipleRapidClicks",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 353,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:369\nExpected equality of these values:\n  handler.callCount\n    Which is: 1\n  clickCount\n    Which is: 10\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:370\nExpected equality of these values:\n  handler.receivedEvents.size()\n    Which is: 1\n  static_cast<size_t>(clickCount)\n    Which is: 10\n",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "HandlerExceptionDoesNotCrashButton",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 373,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:392\nExpected: testEventRouter->injectAndProcess(std::move(clickEvent)) doesn't throw an exception.\n  Actual: it throws std::runtime_error with description \"Test exception\".\n",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "HandlesManyEventsEfficiently",
+          "file": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp",
+          "line": 399,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2025-08-22T08:56:43Z",
+          "time": "0s",
+          "classname": "ButtonTest",
+          "failures": [
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:415\nExpected equality of these values:\n  handler.callCount\n    Which is: 1\n  eventCount\n    Which is: 100\n",
+              "type": ""
+            },
+            {
+              "failure": "\/workspaces\/sdl_demo\/src\/sdlpp_tools\/test\/button_test.cpp:416\nExpected equality of these values:\n  handler.receivedEvents.size()\n    Which is: 1\n  static_cast<size_t>(eventCount)\n    Which is: 100\n",
+              "type": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
