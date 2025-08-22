@@ -2,22 +2,22 @@
 #define SDL_TOOLS_BUTTON_H
 
 #include <event.h>
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <float_rectangle.h>
 
 #include <memory>
 
-#include "sdl_tools_export.h"
+#include "sdlpp_tools_export.h"
 
 namespace sdlpp::tools {
 
 class ButtonImpl;
 
-class SDL_TOOLS_EXPORT Button {
+class SDLPP_TOOLS_EXPORT Button {
  public:
   using Handler = std::function<void(const MouseButtonEvent&)>;
 
-  Button(std::shared_ptr<EventDispatcher> eventDispatcher,
+  Button(std::shared_ptr<EventRouter> eventRouter,
          sdlpp::FloatRectangle rectangle);
   Button(const Button& other) = delete;
   Button(Button&& other) noexcept;

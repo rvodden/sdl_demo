@@ -1,6 +1,6 @@
 #include "tictactoe.h"
 #include "tictactoe_ui.h"
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <sdl.h>
 
 #include <exception>
@@ -15,21 +15,21 @@ auto main() -> int {
     SDL sdl;
     sdl.initSubSystem(SDL::kVideo);
 
-    auto eventProducer = std::make_shared<EventProducer>();
-    auto eventDispatcher = std::make_shared<EventDispatcher>(eventProducer);
+    auto eventBus = std::make_shared<EventBus>();
+    auto eventRouter = std::make_shared<EventRouter>(std::static_pointer_cast<BaseEventBus>(eventBus));
 
-    auto ticTacToe = std::make_shared<TicTacToe>(eventProducer);
+    auto ticTacToe = std::make_shared<TicTacToe>(eventBus);
     auto ticTacToeUI =
-        std::make_shared<TicTacToeUI>(eventProducer, eventDispatcher);
+        std::make_shared<TicTacToeUI>(eventBus, eventRouter);
 
     ticTacToeUI->render(ticTacToe);
 
-    eventDispatcher->registerEventHandler<ClickEvent>(
+    eventRouter->registerEventHandler<ClickEvent>(
       [=]([[maybe_unused]] const ClickEvent& clickEvent) -> void {
         ticTacToeUI->render(ticTacToe);
       });
 
-    eventDispatcher->registerEventHandler<GameCompletedEvent>(
+    eventRouter->registerEventHandler<GameCompletedEvent>(
       [=](const GameCompletedEvent& gCE) -> void {
         using enum GameState;
         switch(gCE.getState()) {
@@ -48,13 +48,13 @@ auto main() -> int {
         }
       });
     
-    eventDispatcher->registerEventHandler<ClickEvent>(
+    eventRouter->registerEventHandler<ClickEvent>(
       [=](const ClickEvent& clickEvent) -> void {
         ticTacToe->play(clickEvent.x, clickEvent.y);
       });
 
 
-    eventDispatcher->run();
+    eventRouter->run();
   } catch (std::exception& e) {
     std::cout << "Some kind of error happened!\n";
     std::cout << e.what() << "\n";

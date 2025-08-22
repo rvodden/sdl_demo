@@ -6,7 +6,7 @@
 #include "tictactoe.h"
 #include <button.h>
 #include <color.h>
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <float_rectangle.h>
 #include <images.h>
 #include <renderer.h>
@@ -20,15 +20,15 @@
 
 class TicTacToeUI {
  public:
-  TicTacToeUI(std::shared_ptr<sdlpp::EventProducer> producer,
-              std::shared_ptr<sdlpp::tools::EventDispatcher> dispatcher);
+  TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
+              std::shared_ptr<sdlpp::tools::EventRouter> router);
 
   void render(const std::shared_ptr<TicTacToe>& ticTacToe);
 
  private:
   sdlpp::Window _window{"Tic Tac Toe", kInitialWindowWidth, kInitialWindowHeight, 0};
-  std::shared_ptr<sdlpp::EventProducer> _eventProducer;
-  std::shared_ptr<sdlpp::tools::EventDispatcher> _eventDispatcher;
+  std::shared_ptr<sdlpp::EventBus> _eventBus;
+  std::shared_ptr<sdlpp::tools::EventRouter> _eventRouter;
 
   std::shared_ptr<sdlpp::Renderer> _renderer = std::make_shared<sdlpp::Renderer>(_window);
   std::shared_ptr<sdlpp::tools::SpriteRenderer> _spriteRenderer =

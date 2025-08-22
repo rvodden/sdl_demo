@@ -3,8 +3,8 @@
 #include <exception>
 #include <format>
 
-TicTacToe::TicTacToe(std::shared_ptr<sdlpp::EventProducer> eventProducer)
-    : _eventProducer(std::move(eventProducer)) {}
+TicTacToe::TicTacToe(std::shared_ptr<sdlpp::EventBus> eventBus)
+    : _eventBus(std::move(eventBus)) {}
 
 [[nodiscard]] auto TicTacToe::getCellState(const uint8_t& x, const uint8_t& y) const
     -> std::optional<Player> {
@@ -21,7 +21,7 @@ void TicTacToe::play(uint8_t x, uint8_t y) {
   
   const auto state = _checkWinCondition();
   if(state != GameState::Playing) {
-    _eventProducer->produce(std::make_unique<GameCompletedEvent>(state));
+    _eventBus->publish(std::make_unique<GameCompletedEvent>(state));
   }
   
   _turn = _turn == Player::O ? Player::X : Player::O;

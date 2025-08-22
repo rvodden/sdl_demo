@@ -1,5 +1,5 @@
 #include <event.h>
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <user_event.h>
 
 #include <chrono>
@@ -21,14 +21,14 @@ class TestEvent : public CustomUserEvent<TestEvent> {
 auto main() -> int {
   std::cout << "Testing lambda-based event handlers...\n";
 
-  auto eventProducer = std::make_shared<EventProducer>();
-  auto eventDispatcher = std::make_shared<EventDispatcher>(eventProducer);
+  auto eventBus = std::make_shared<EventBus>();
+  auto eventRouter = std::make_shared<EventRouter>(eventBus);
 
   int counter = 0;
   std::string message = "This is a message";
 
   // Test 1: Simple lambda with capture
-  eventDispatcher->registerEventHandler<TestEvent>(
+  eventRouter->registerEventHandler<TestEvent>(
       [&counter](const TestEvent& e) -> void {
         counter += e.value;
         std::cout << "Lambda handler 1: Received value " << e.value
@@ -36,7 +36,7 @@ auto main() -> int {
       });
 
   // Test 2: Lambda with different capture
-  eventDispatcher->registerEventHandler<TestEvent>(
+  eventRouter->registerEventHandler<TestEvent>(
       [&message](const TestEvent& e) -> void {
         message = "Processed event with value: " + std::to_string(e.value);
         std::cout << "Lambda handler 2: " << message << "\n";
@@ -51,7 +51,7 @@ auto main() -> int {
 
   // Manually trigger event handling (simplified test)
   // In real usage, this would happen in the event loop
-  eventDispatcher->registerEventHandler<TestEvent>(
+  eventRouter->registerEventHandler<TestEvent>(
       [](const TestEvent& e) -> void {
         std::cout << "Lambda handler 3: Event received with value " << e.value
                   << "\n";

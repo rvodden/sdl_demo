@@ -22,8 +22,8 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
    - Event system with type-safe event handling
    - Exception-based error handling via `sdlpp::Exception`
 
-2. **sdl_tools** - Higher-level game development utilities built on sdl layer
-   - `EventDispatcher` - Event routing and handling system
+2. **sdlpp_tools** - Higher-level game development utilities built on sdl layer
+   - `EventRouter` - Event routing and handling system
    - `Sprite` and `SpriteRenderer` - 2D sprite management
    - `Button` - UI button component
 

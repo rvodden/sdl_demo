@@ -7,7 +7,7 @@
  */
 
 #include <event.h>
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <user_event.h>
 
 #include <chrono>
@@ -106,9 +106,9 @@ class GameEventLogger : public EventHandler<ScoreUpdateEvent>,
 /**
  * @brief Mock event producer for testing custom events
  */
-class MockEventProducer : public EventProducer {
+class MockEventBus : public EventBus {
  public:
-  MockEventProducer() = default;
+  MockEventBus() = default;
 
   auto wait() -> std::unique_ptr<BaseEvent> override {
     auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -152,11 +152,11 @@ auto main() -> int {
 
   try {
     // Create mock event producer
-    std::shared_ptr<MockEventProducer> producer =
-        std::make_shared<MockEventProducer>();
+    std::shared_ptr<MockEventBus> producer =
+        std::make_shared<MockEventBus>();
 
     // Create event dispatcher
-    EventDispatcher dispatcher(producer);
+    EventRouter dispatcher(producer);
 
     // Create and register event handlers
     ScoreUpdateHandler scoreHandler;

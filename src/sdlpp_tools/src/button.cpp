@@ -16,11 +16,11 @@ void ButtonImpl::MouseEventHandler::handle(
   }
 }
 
-Button::Button(std::shared_ptr<EventDispatcher> eventProcessor,
+Button::Button(std::shared_ptr<EventRouter> eventProcessor,
                FloatRectangle rectangle)
     : _buttonImpl{std::make_unique<ButtonImpl>(std::move(eventProcessor),
                                                std::move(rectangle))} {
-  _buttonImpl->_eventDispatcher->registerEventHandler(
+  _buttonImpl->_eventRouter->registerEventHandler(
       _buttonImpl->_mouseEventHandler);
 }
 

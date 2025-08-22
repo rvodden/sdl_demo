@@ -1,5 +1,5 @@
 #include <event.h>
-#include <event_dispatcher.h>
+#include <event_router.h>
 #include <sdl.h>
 #include <user_event.h>
 
@@ -35,28 +35,28 @@ auto main() -> int {
     SDL sdl;
     sdl.initSubSystem(SDL::kVideo);
 
-    auto eventProducer = std::make_shared<EventProducer>();
-    auto eventDispatcher = std::make_shared<EventDispatcher>(eventProducer);
+    auto eventBus = std::make_shared<EventBus>();
+    auto eventRouter = std::make_shared<EventRouter>(eventBus);
 
     std::cout << "Creating TestEvent handler...\n";
     auto testHandler = std::make_unique<TestEventHandler>();
     auto* handlerPtr = testHandler.get();
 
     std::cout << "Registering event handler for TestEvent...\n";
-    eventDispatcher->registerEventHandler(*testHandler);
+    eventRouter->registerEventHandler(*testHandler);
 
-    std::cout << "Producing TestEvent...\n";
+    std::cout << "Publishing TestEvent...\n";
     auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch());
 
     std::cout << "TestEvent type: " << TestEvent::getEventType() << "\n";
-    eventProducer->produce(std::make_unique<TestEvent>(now, 0, 42));  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+    eventBus->publish(std::make_unique<TestEvent>(now, 0, 42));  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
     std::cout << "Waiting for event...\n";
 
     // Simple test: just try to get one event
     try {
-      auto event = eventProducer->wait();
+      auto event = eventBus->wait();
       std::cout << "Got event from producer, now checking if handler was "
                    "called...\n";
 

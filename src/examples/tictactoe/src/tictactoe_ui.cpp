@@ -5,10 +5,10 @@
 #include <chrono>
 #include <ranges>
 
-TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventProducer> producer,
-                         std::shared_ptr<sdlpp::tools::EventDispatcher> dispatcher)
-    : _eventProducer(std::move(producer)),
-      _eventDispatcher(std::move(dispatcher)) {
+TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
+                         std::shared_ptr<sdlpp::tools::EventRouter> router)
+    : _eventBus(std::move(bus)),
+      _eventRouter(std::move(router)) {
   _spriteSheet->setTextureBlendMode(sdlpp::Texture::kBlend);
   buttons.reserve(static_cast<std::size_t>(kCellColumns * kCellRows));
   for (uint8_t x :
@@ -17,14 +17,14 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventProducer> producer,
       float buttonX = (static_cast<float>(x) * kCellWidth) + 1;
       float buttonY = (static_cast<float>(y) * kCellHeight) + 1;
       auto button = std::make_unique<sdlpp::tools::Button>(
-          _eventDispatcher,
+          _eventRouter,
           sdlpp::FloatRectangle{buttonX, buttonY, kCellWidth, kCellHeight});
       button->registerEventHandler(
           [this, x, y](const sdlpp::MouseButtonEvent& mouseButtonEvent) -> void {
             auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now().time_since_epoch());
             if (mouseButtonEvent.down) {
-              _eventProducer->produce(
+              _eventBus->publish(
                   std::make_unique<ClickEvent>(now, 0, x, y));
             }
           });

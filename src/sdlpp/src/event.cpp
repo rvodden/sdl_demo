@@ -12,7 +12,7 @@
 
 namespace sdlpp {
 
-auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
+auto EventBus::wait() -> std::unique_ptr<BaseEvent> {
   SDL_Event event;
   SDL_WaitEvent(&event);
   switch (event.type) {
@@ -31,7 +31,7 @@ auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
   }
 }
 
-void EventProducer::produce(std::unique_ptr<UserEvent> userEvent) {
+void EventBus::publish(std::unique_ptr<UserEvent> userEvent) {
   auto sdlEvent = userEvent->_userEventImpl->_createSDLUserEvent();
 
   // Release ownership of the event - it will be reclaimed when SDL returns it

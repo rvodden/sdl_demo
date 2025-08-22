@@ -14,10 +14,10 @@ class ButtonImpl {
   friend Button;
 
  public:
-  ButtonImpl(std::shared_ptr<EventDispatcher> eventDispatcher,
+  ButtonImpl(std::shared_ptr<EventRouter> eventRouter,
              sdlpp::FloatRectangle rectangle)
       : _rectangle{std::move(rectangle)},
-        _eventDispatcher{std::move(eventDispatcher)},
+        _eventRouter{std::move(eventRouter)},
         _eventHandlers{std::make_shared<std::forward_list<Button::Handler>>()},
         _mouseEventHandler{_rectangle, _eventHandlers} {};
 
@@ -39,7 +39,7 @@ class ButtonImpl {
   void eventHandler(const sdlpp::MouseButtonEvent& mouseButtonEvent);
 
   sdlpp::FloatRectangle _rectangle;
-  std::shared_ptr<EventDispatcher> _eventDispatcher;
+  std::shared_ptr<EventRouter> _eventRouter;
   std::shared_ptr<std::forward_list<Button::Handler>> _eventHandlers;
   MouseEventHandler _mouseEventHandler;
 };
