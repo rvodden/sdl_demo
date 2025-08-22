@@ -6,7 +6,7 @@
 #include "float_rectangle.h"
 #include "sprite.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class SpriteRenderer;
 
@@ -23,6 +23,6 @@ class SpriteImpl {
   FloatRectangle _rectangle;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

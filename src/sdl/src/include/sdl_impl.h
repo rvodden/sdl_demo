@@ -6,7 +6,7 @@
 #include "constexpr_map.h"
 #include "sdl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap{
     {{SDL::kAudio, SDL_INIT_AUDIO},
@@ -23,6 +23,6 @@ class SDLImpl {
   std::unordered_set<SDL::SubSystem> subSystemInitializationStatus;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

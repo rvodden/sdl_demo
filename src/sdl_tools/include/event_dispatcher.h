@@ -16,7 +16,7 @@
 #include "event.h"
 #include "sdl_tools_export.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 /**
  * @brief Forward declaration of the implementation class (pimpl idiom)
@@ -95,7 +95,7 @@ class SDL_TOOLS_EXPORT EventDispatcher {
    *       dispatched to all compatible handlers.
    * @note The dispatcher does not take ownership of the handler.
    */
-  void registerEventHandler(sdl::BaseEventHandler& baseEventHandler);
+  void registerEventHandler(sdlpp::BaseEventHandler& baseEventHandler);
 
   /**
    * @brief Register a callable object (lambda, function, etc.) as an event
@@ -122,7 +122,7 @@ class SDL_TOOLS_EXPORT EventDispatcher {
    */
   template <typename EventType, typename Callable>
   void registerEventHandler(Callable&& callable) {
-    auto handler = std::make_unique<sdl::FunctionEventHandler<EventType, Callable>>(
+    auto handler = std::make_unique<sdlpp::FunctionEventHandler<EventType, Callable>>(
         std::forward<Callable>(callable));
     _functionHandlers.push_back(std::move(handler));
     registerEventHandler(*_functionHandlers.back());
@@ -134,9 +134,9 @@ class SDL_TOOLS_EXPORT EventDispatcher {
 
   /** @brief Storage for function-based event handlers to manage their
    * lifetime */
-  std::vector<std::unique_ptr<sdl::BaseEventHandler>> _functionHandlers;
+  std::vector<std::unique_ptr<sdlpp::BaseEventHandler>> _functionHandlers;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

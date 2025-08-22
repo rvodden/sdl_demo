@@ -3,7 +3,7 @@
 #include "exception.h"
 #include "user_event_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 UserEvent::UserEvent()
     : Event(std::chrono::duration<int64_t, std::milli>(SDL_GetTicks())),
@@ -100,4 +100,4 @@ auto registerEventType() -> uint32_t {
   return eventType;
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-namespace sdl {
+namespace sdlpp {
 
 class SurfaceImpl {
   friend class Surface;
@@ -13,6 +13,6 @@ class SurfaceImpl {
   SDL_Surface* _sdlSurface = nullptr;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

@@ -7,7 +7,7 @@
 #include "renderer_impl.h"
 #include "texture_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 Texture::Texture(const Renderer& renderer,
                  const std::filesystem::path& filePath)
@@ -103,4 +103,4 @@ void Texture::setTextureBlendMode(const BlendMode& blendMode) {
   }
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

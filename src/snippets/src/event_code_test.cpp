@@ -14,7 +14,7 @@
 #include "event.h"
 #include "user_event.h"
 
-using namespace sdl;
+using namespace sdlpp;
 
 class TestEvent1 : public CustomUserEvent<TestEvent1> {
  public:

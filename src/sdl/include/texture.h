@@ -6,7 +6,7 @@
 #include "renderer.h"
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class Renderer;
 class TextureImpl;
@@ -49,6 +49,6 @@ class SDL_EXPORT Texture {
   std::unique_ptr<TextureImpl> _textureImpl;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

@@ -7,9 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This project uses CMake with presets for configuration and building:
 
 - **Configure**: `cmake --preset ninja-mc` (uses Ninja Multi-Config generator)
-- **Build Debug**: `cmake --build --preset ninja-mc-debug-all`
-- **Build Release**: `cmake --build --preset ninja-mc-release-all`
-- **Run Tests**: `ctest --preset ninja-mc-debug-all` (after building debug)
+- **Build Debug**: `cmake --build --preset ninja-mc-debug`
+- **Build Release**: `cmake --build --preset ninja-mc-release`
+- **Run Tests (in Debug mode)**: `ctest --preset ninja-mc-debug` (after Build Debug)
+- **Run Tests (in Release mode)**: `ctest --preset ninja-mc-debug` (after Build Release)
 
 ## Architecture Overview
 
@@ -19,7 +20,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 1. **sdl** - Low-level C++ wrapper around SDL3 C API
    - Provides RAII wrappers for SDL resources (Window, Renderer, Surface, Texture)
    - Event system with type-safe event handling
-   - Exception-based error handling via `sdl::Exception`
+   - Exception-based error handling via `sdlpp::Exception`
 
 2. **sdl_tools** - Higher-level game development utilities built on sdl layer
    - `EventDispatcher` - Event routing and handling system
@@ -45,7 +46,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 ### Code Organization
 - Implementation details are hidden in `*_impl.h` files (pimpl pattern)
 - Public headers expose clean interfaces without SDL dependencies
-- Namespaces follow directory structure (`sdl::`, `sdl::tools::`)
+- Namespaces follow directory structure (`sdlpp::`, `sdlpp::tools::`)
 - **Test/Debug code should be placed in the `snippets` project** - use this for temporary diagnostic tools, debugging utilities, and experimental code
 - **Tests must NEVER include `*_impl.h` headers** - tests should only interact with public interfaces
 
@@ -57,6 +58,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 ### Code Style
 - Raw pointers should never be used.
 - Prefer trailing return types.
+- **Header guards**: Use traditional `#ifndef`/`#define`/`#endif` include guards instead of `#pragma once`. Follow the pattern `#ifndef PROJECT_MODULE_FILENAME_H` / `#define PROJECT_MODULE_FILENAME_H` / `#endif // PROJECT_MODULE_FILENAME_H`
 
 ## Key Features
 

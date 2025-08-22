@@ -7,7 +7,7 @@
 #include "event.h"
 #include "user_event.h"
 
-namespace sdl {
+namespace sdlpp {
 
 static constexpr vodden::Map<uint32_t, MouseButtonEvent::Button, 5>
     sdlMouseButtonEventButtonMap{{
@@ -25,4 +25,4 @@ auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
 auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
     -> std::unique_ptr<BaseEvent>;
 
-}  // namespace sdl
+}  // namespace sdlpp

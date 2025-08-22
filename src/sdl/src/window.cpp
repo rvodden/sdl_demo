@@ -8,7 +8,7 @@
 #include "renderer.h"
 #include "window_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 Window::Window(std::string title, uint16_t width, uint16_t height,
                uint32_t flags)
@@ -49,4 +49,4 @@ void Window::setTitle(const std::string& newTitle) {
   SDL_SetWindowTitle(_windowImpl->_sdlWindow, newTitle.c_str());
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

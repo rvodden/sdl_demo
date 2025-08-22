@@ -7,8 +7,8 @@
 #include <iostream>
 #include <memory>
 
-using namespace sdl;
-using namespace sdl::tools;
+using namespace sdlpp;
+using namespace sdlpp::tools;
 
 class TestEvent : public CustomUserEvent<TestEvent> {
  public:
@@ -67,7 +67,7 @@ auto main() -> int {
 
       std::cout << "Handler called: "
                 << (handlerPtr->handlerCalled ? "YES" : "NO") << "\n";
-    } catch (sdl::UnknownEventException& e) {
+    } catch (sdlpp::UnknownEventException& e) {
       std::cout << "Unknown event exception: " << e.what() << "\n";
     }
   } catch (std::exception& e) {

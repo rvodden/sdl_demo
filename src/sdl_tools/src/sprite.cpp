@@ -1,6 +1,6 @@
 #include "sprite_impl.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 Sprite::Sprite(std::shared_ptr<const Texture> texture,
                const FloatRectangle& rectangle)
@@ -17,4 +17,4 @@ auto Sprite::operator=(Sprite&& other) noexcept -> Sprite& {
 
 Sprite::~Sprite() = default;
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools

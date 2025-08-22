@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 
-using namespace sdl;
+using namespace sdlpp;
 
 class TestEvent : public CustomUserEvent<TestEvent> {
  public:

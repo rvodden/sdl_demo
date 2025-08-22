@@ -7,7 +7,7 @@
 
 #include "user_event.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class UserEvent;
 
@@ -22,6 +22,6 @@ class UserEventImpl {
   UserEvent* _userEvent;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

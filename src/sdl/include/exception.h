@@ -6,7 +6,7 @@
 
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class SDL_EXPORT Exception : public std::runtime_error {
  public:
@@ -29,6 +29,6 @@ class SDL_EXPORT Exception : public std::runtime_error {
   std::string _error;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif  // SDL_EXCEPTION_H

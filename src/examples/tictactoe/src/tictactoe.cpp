@@ -1,0 +1,120 @@
+#include "tictactoe.h"
+
+#include <exception>
+#include <format>
+
+TicTacToe::TicTacToe(std::shared_ptr<sdlpp::EventProducer> eventProducer)
+    : _eventProducer(std::move(eventProducer)) {}
+
+[[nodiscard]] auto TicTacToe::getCellState(const uint8_t& x, const uint8_t& y) const
+    -> std::optional<Player> {
+  return _cells.at(_index(x, y));
+}
+
+void TicTacToe::play(uint8_t x, uint8_t y) {
+  const auto index = _index(x, y);
+  if (_cells.at(index)) {
+    return;
+  }
+
+  _cells.at(index) = {_turn};
+  
+  const auto state = _checkWinCondition();
+  if(state != GameState::Playing) {
+    _eventProducer->produce(std::make_unique<GameCompletedEvent>(state));
+  }
+  
+  _turn = _turn == Player::O ? Player::X : Player::O;
+}
+
+auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
+  if (x > 2 || y > 2) {
+    throw std::runtime_error(
+        std::format("Cell coordinates are out of bounds: ({},{})", x, y));
+  }
+  return x + static_cast<uint8_t>(y * 3);
+}
+
+[[nodiscard]] auto TicTacToe::_checkWinCondition() const -> GameState {
+  using enum GameState;
+  auto state = _checkRows();
+  if (state != Playing) {
+    return state;
+  }
+
+  state = _checkColumns();
+  if (state != Playing) {
+    return state;
+  }
+
+  state = _checkDiagonals();
+  if (state != Playing) {
+    return state;
+  }
+
+  state = _checkForDraw();
+  if (state != Playing) {
+    return state;
+  }
+
+  return Playing;
+}
+
+[[nodiscard]] auto TicTacToe::_checkRows() const -> GameState {
+  using enum GameState;
+  for (uint8_t row = 0; row < 3; ++row) {
+    if (_cells.at(_index(0, row)) &&
+        _cells.at(_index(0, row)) == _cells.at(_index(1, row)) &&
+        _cells.at(_index(1, row)) == _cells.at(_index(2, row))) {
+      return _cells.at(_index(0, row)) == Player::O ? PlayerOWins
+                                                    : PlayerXWins;
+    }
+  }
+  return Playing;
+}
+
+[[nodiscard]] auto TicTacToe::_checkColumns() const -> GameState {
+  using enum GameState;
+  for (uint8_t col = 0; col < 3; ++col) {
+    if (_cells.at(_index(col, 0)) &&
+        _cells.at(_index(col, 0)) == _cells.at(_index(col, 1)) &&
+        _cells.at(_index(col, 1)) == _cells.at(_index(col, 2))) {
+      return _cells.at(_index(col, 0)) == Player::O ? PlayerOWins
+                                                    : PlayerXWins;
+    }
+  }
+  return Playing;
+}
+
+[[nodiscard]] auto TicTacToe::_checkDiagonals() const -> GameState {
+  using enum GameState;
+  // Check diagonals
+  if (_cells.at(_index(0, 0)) &&
+      _cells.at(_index(0, 0)) == _cells.at(_index(1, 1)) &&
+      _cells.at(_index(1, 1)) == _cells.at(_index(2, 2))) {
+    return _cells.at(_index(0, 0)) == Player::O ? PlayerOWins
+                                                : PlayerXWins;
+  }
+
+  if (_cells.at(_index(2, 0)) &&
+      _cells.at(_index(2, 0)) == _cells.at(_index(1, 1)) &&
+      _cells.at(_index(1, 1)) == _cells.at(_index(0, 2))) {
+    return _cells.at(_index(2, 0)) == Player::O ? PlayerOWins
+                                                : PlayerXWins;
+  }
+
+  return Playing;
+}
+
+[[nodiscard]] auto TicTacToe::_checkForDraw() const -> GameState {
+  // Check for draw (all cells filled)
+  bool allFilled = true;
+  for (const auto& cell : _cells) {
+    if (!cell) {
+      allFilled = false;
+      break;
+    }
+  }
+
+  return allFilled ? GameState::Draw : GameState::Playing;
+}

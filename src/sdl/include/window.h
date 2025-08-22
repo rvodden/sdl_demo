@@ -6,7 +6,7 @@
 
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class Renderer;
 class WindowImpl;
@@ -37,6 +37,6 @@ class SDL_EXPORT Window {
   std::unique_ptr<WindowImpl> _windowImpl;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

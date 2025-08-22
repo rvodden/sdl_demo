@@ -13,12 +13,12 @@ constexpr uint16_t kTestHeight = 600;
 class SpriteTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    window = std::make_unique<sdl::Window>("Test Window", kTestWidth, kTestHeight, 0);
-    renderer = std::make_unique<sdl::Renderer>(*window);
+    window = std::make_unique<sdlpp::Window>("Test Window", kTestWidth, kTestHeight, 0);
+    renderer = std::make_unique<sdlpp::Renderer>(*window);
     
     // Create a simple 1x1 red pixel texture
     constexpr uint32_t redPixel = 0xFF0000FF;  // RGBA format: red with full alpha
-    texture = std::make_shared<sdl::Texture>(*renderer, 1, 1, &redPixel);
+    texture = std::make_shared<sdlpp::Texture>(*renderer, 1, 1, &redPixel);
   }
 
   void TearDown() override {
@@ -27,19 +27,19 @@ protected:
     window.reset();
   }
 
-  sdl::SDL sdl;
-  std::unique_ptr<sdl::Window> window;
-  std::unique_ptr<sdl::Renderer> renderer;
-  std::shared_ptr<sdl::Texture> texture;
+  sdlpp::SDL sdl;
+  std::unique_ptr<sdlpp::Window> window;
+  std::unique_ptr<sdlpp::Renderer> renderer;
+  std::shared_ptr<sdlpp::Texture> texture;
 };
 
 TEST_F(SpriteTest, testSpriteCreation) {
   constexpr float kRectSize = 100.0F;
   constexpr float kZero = 0.0F;
-  sdl::FloatRectangle rect(kZero, kZero, kRectSize, kRectSize);
+  sdlpp::FloatRectangle rect(kZero, kZero, kRectSize, kRectSize);
   
   // Should not throw when creating sprite
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite(texture, rect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));
 }
 
 TEST_F(SpriteTest, testSpriteMoveConstructor) {
@@ -47,11 +47,11 @@ TEST_F(SpriteTest, testSpriteMoveConstructor) {
   constexpr float kY = 20.0F;
   constexpr float kWidth = 50.0F;
   constexpr float kHeight = 60.0F;
-  sdl::FloatRectangle rect(kX, kY, kWidth, kHeight);
-  sdl::tools::Sprite sprite1(texture, rect);
+  sdlpp::FloatRectangle rect(kX, kY, kWidth, kHeight);
+  sdlpp::tools::Sprite sprite1(texture, rect);
   
   // Move constructor should work
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite2(std::move(sprite1)));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite2(std::move(sprite1)));
 }
 
 TEST_F(SpriteTest, testSpriteMoveAssignment) {
@@ -64,11 +64,11 @@ TEST_F(SpriteTest, testSpriteMoveAssignment) {
   constexpr float kWidth2 = 70.0F;
   constexpr float kHeight2 = 80.0F;
   
-  sdl::FloatRectangle rect1(kX1, kY1, kWidth1, kHeight1);
-  sdl::FloatRectangle rect2(kX2, kY2, kWidth2, kHeight2);
+  sdlpp::FloatRectangle rect1(kX1, kY1, kWidth1, kHeight1);
+  sdlpp::FloatRectangle rect2(kX2, kY2, kWidth2, kHeight2);
   
-  sdl::tools::Sprite sprite1(texture, rect1);
-  sdl::tools::Sprite sprite2(texture, rect2);
+  sdlpp::tools::Sprite sprite1(texture, rect1);
+  sdlpp::tools::Sprite sprite2(texture, rect2);
   
   // Move assignment should work
   ASSERT_NO_THROW(sprite2 = std::move(sprite1));
@@ -82,13 +82,13 @@ TEST_F(SpriteTest, testSpriteWithDifferentRectangles) {
   constexpr float kOffset = 100.0F;
   
   // Test with various rectangle configurations
-  sdl::FloatRectangle smallRect(kZero, kZero, kSmallSize, kSmallSize);
-  sdl::FloatRectangle largeRect(kZero, kZero, kLargeSize, kLargeSize);
-  sdl::FloatRectangle offsetRect(kOffset, kOffset, kMidSize, kMidSize);
+  sdlpp::FloatRectangle smallRect(kZero, kZero, kSmallSize, kSmallSize);
+  sdlpp::FloatRectangle largeRect(kZero, kZero, kLargeSize, kLargeSize);
+  sdlpp::FloatRectangle offsetRect(kOffset, kOffset, kMidSize, kMidSize);
   
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite1(texture, smallRect));
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite2(texture, largeRect));
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite3(texture, offsetRect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite1(texture, smallRect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite2(texture, largeRect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite3(texture, offsetRect));
 }
 
 TEST_F(SpriteTest, testSpriteWithNegativeCoordinates) {
@@ -96,16 +96,16 @@ TEST_F(SpriteTest, testSpriteWithNegativeCoordinates) {
   constexpr float kNegY = -20.0F;
   constexpr float kWidth = 50.0F;
   constexpr float kHeight = 60.0F;
-  sdl::FloatRectangle rect(kNegX, kNegY, kWidth, kHeight);
+  sdlpp::FloatRectangle rect(kNegX, kNegY, kWidth, kHeight);
   
   // Should handle negative coordinates
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite(texture, rect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));
 }
 
 TEST_F(SpriteTest, testSpriteWithZeroDimensions) {
   constexpr float kZero = 0.0F;
-  sdl::FloatRectangle rect(kZero, kZero, kZero, kZero);
+  sdlpp::FloatRectangle rect(kZero, kZero, kZero, kZero);
   
   // Should handle zero dimensions
-  ASSERT_NO_THROW(sdl::tools::Sprite sprite(texture, rect));
+  ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));
 }

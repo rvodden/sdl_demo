@@ -7,7 +7,7 @@
 #include "renderer.h"
 #include "texture.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class RendererImpl {
   friend Renderer;
@@ -21,6 +21,6 @@ class RendererImpl {
   SDL_Renderer* _sdlRenderer;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

@@ -10,7 +10,7 @@
 #include "user_event.h"
 #include "user_event_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 auto EventProducer::wait() -> std::unique_ptr<BaseEvent> {
   SDL_Event event;
@@ -79,4 +79,4 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
   return baseEvent;
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

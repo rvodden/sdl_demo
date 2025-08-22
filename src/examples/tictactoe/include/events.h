@@ -1,0 +1,31 @@
+#ifndef TICTACTOE_EVENTS_H
+#define TICTACTOE_EVENTS_H
+
+#include "game_constants.h"
+#include <user_event.h>
+
+#include <chrono>
+#include <cstdint>
+
+class ClickEvent : public sdlpp::CustomUserEvent<ClickEvent> {
+ public:
+  ClickEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
+             uint8_t xParam, uint8_t yParam)
+      : CustomUserEvent(ts, winId), x(xParam), y(yParam) {};
+
+  uint8_t x;
+  uint8_t y;
+};
+
+class GameCompletedEvent : public sdlpp::CustomUserEvent<GameCompletedEvent> {
+ public:
+  GameCompletedEvent(const GameState& state)
+      : CustomUserEvent(std::chrono::duration_cast<std::chrono::milliseconds>(
+                  std::chrono::steady_clock::now().time_since_epoch()), 0), _state(state) {}
+  auto getState() const noexcept -> GameState { return _state; }
+ 
+ private:
+  GameState _state;
+};
+
+#endif // TICTACTOE_EVENTS_H

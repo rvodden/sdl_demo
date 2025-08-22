@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-namespace sdl {
+namespace sdlpp {
 
 class Window;
 class Renderer;
@@ -16,6 +16,6 @@ class WindowImpl {
   SDL_Window* _sdlWindow{nullptr};
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

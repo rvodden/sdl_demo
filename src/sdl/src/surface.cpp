@@ -10,7 +10,7 @@
 #include "exception.h"
 #include "surface_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 Surface::Surface(const std::filesystem::path& filePath)
     : _surfaceImpl{std::make_unique<SurfaceImpl>()} {
@@ -247,4 +247,4 @@ void Surface::save(const std::filesystem::path& filePath) const {
   }
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

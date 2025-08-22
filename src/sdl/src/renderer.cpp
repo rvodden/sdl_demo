@@ -12,7 +12,7 @@
 #include "window.h"
 #include "window_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 Renderer::Renderer(Window& window, const char* name)
     : _rendererImpl{std::make_unique<RendererImpl>()} {
@@ -88,4 +88,4 @@ void Renderer::present() const {
 }
 
 
-}  // namespace sdl
+}  // namespace sdlpp

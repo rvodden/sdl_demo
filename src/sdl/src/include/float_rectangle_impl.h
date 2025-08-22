@@ -7,7 +7,7 @@
 
 #include "float_rectangle.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class FloatRectangleImpl {
   friend FloatRectangle;
@@ -21,6 +21,6 @@ class FloatRectangleImpl {
   SDL_FRect _sdlFRect;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

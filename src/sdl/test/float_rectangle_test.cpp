@@ -34,7 +34,7 @@ constexpr float kNegHeight = 10.0F;
 constexpr float kZero = 0.0F;
 
 TEST(FloatRectangleTest, testConstructorAndGetters) {
-  sdl::FloatRectangle rect(kTestX, kTestY, kTestWidth, kTestHeight);
+  sdlpp::FloatRectangle rect(kTestX, kTestY, kTestWidth, kTestHeight);
   
   ASSERT_FLOAT_EQ(rect.getX(), kTestX);
   ASSERT_FLOAT_EQ(rect.getY(), kTestY);
@@ -43,8 +43,8 @@ TEST(FloatRectangleTest, testConstructorAndGetters) {
 }
 
 TEST(FloatRectangleTest, testCopyConstructor) {
-  sdl::FloatRectangle rect1(kCopyX, kCopyY, kCopyWidth, kCopyHeight);
-  sdl::FloatRectangle rect2(rect1);
+  sdlpp::FloatRectangle rect1(kCopyX, kCopyY, kCopyWidth, kCopyHeight);
+  sdlpp::FloatRectangle rect2(rect1);
   
   ASSERT_FLOAT_EQ(rect2.getX(), kCopyX);
   ASSERT_FLOAT_EQ(rect2.getY(), kCopyY);
@@ -53,8 +53,8 @@ TEST(FloatRectangleTest, testCopyConstructor) {
 }
 
 TEST(FloatRectangleTest, testMoveConstructor) {
-  sdl::FloatRectangle rect1(kMoveX, kMoveY, kMoveWidth, kMoveHeight);
-  sdl::FloatRectangle rect2(std::move(rect1));
+  sdlpp::FloatRectangle rect1(kMoveX, kMoveY, kMoveWidth, kMoveHeight);
+  sdlpp::FloatRectangle rect2(std::move(rect1));
   
   ASSERT_FLOAT_EQ(rect2.getX(), kMoveX);
   ASSERT_FLOAT_EQ(rect2.getY(), kMoveY);
@@ -63,8 +63,8 @@ TEST(FloatRectangleTest, testMoveConstructor) {
 }
 
 TEST(FloatRectangleTest, testCopyAssignment) {
-  sdl::FloatRectangle rect1(kCopyX, kCopyY, kCopyWidth, kCopyHeight);
-  sdl::FloatRectangle rect2(kZero, kZero, kZero, kZero);
+  sdlpp::FloatRectangle rect1(kCopyX, kCopyY, kCopyWidth, kCopyHeight);
+  sdlpp::FloatRectangle rect2(kZero, kZero, kZero, kZero);
   
   rect2 = rect1;
   
@@ -75,8 +75,8 @@ TEST(FloatRectangleTest, testCopyAssignment) {
 }
 
 TEST(FloatRectangleTest, testMoveAssignment) {
-  sdl::FloatRectangle rect1(kAssignX, kAssignY, kAssignWidth, kAssignHeight);
-  sdl::FloatRectangle rect2(kZero, kZero, kZero, kZero);
+  sdlpp::FloatRectangle rect1(kAssignX, kAssignY, kAssignWidth, kAssignHeight);
+  sdlpp::FloatRectangle rect2(kZero, kZero, kZero, kZero);
   
   rect2 = std::move(rect1);
   
@@ -87,7 +87,7 @@ TEST(FloatRectangleTest, testMoveAssignment) {
 }
 
 TEST(FloatRectangleTest, testContains) {
-  sdl::FloatRectangle rect(kRectX, kRectY, kRectWidth, kRectHeight);
+  sdlpp::FloatRectangle rect(kRectX, kRectY, kRectWidth, kRectHeight);
   
   constexpr float kInsideX = 30.0F;
   constexpr float kInsideY = 35.0F;
@@ -112,7 +112,7 @@ TEST(FloatRectangleTest, testContains) {
 }
 
 TEST(FloatRectangleTest, testZeroDimensions) {
-  sdl::FloatRectangle rect(kZero, kZero, kZero, kZero);
+  sdlpp::FloatRectangle rect(kZero, kZero, kZero, kZero);
   
   ASSERT_FLOAT_EQ(rect.getX(), kZero);
   ASSERT_FLOAT_EQ(rect.getY(), kZero);
@@ -126,7 +126,7 @@ TEST(FloatRectangleTest, testZeroDimensions) {
 }
 
 TEST(FloatRectangleTest, testNegativeCoordinates) {
-  sdl::FloatRectangle rect(kNegX, kNegY, kNegWidth, kNegHeight);
+  sdlpp::FloatRectangle rect(kNegX, kNegY, kNegWidth, kNegHeight);
   
   ASSERT_FLOAT_EQ(rect.getX(), kNegX);
   ASSERT_FLOAT_EQ(rect.getY(), kNegY);

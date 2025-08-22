@@ -9,7 +9,7 @@
 
 #include "sdl_tools_export.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class ButtonImpl;
 
@@ -17,8 +17,8 @@ class SDL_TOOLS_EXPORT Button {
  public:
   using Handler = std::function<void(const MouseButtonEvent&)>;
 
-  Button(std::shared_ptr<EventDispatcher> eventProcessor,
-         sdl::FloatRectangle rectangle);
+  Button(std::shared_ptr<EventDispatcher> eventDispatcher,
+         sdlpp::FloatRectangle rectangle);
   Button(const Button& other) = delete;
   Button(Button&& other) noexcept;
 
@@ -33,6 +33,6 @@ class SDL_TOOLS_EXPORT Button {
   std::unique_ptr<ButtonImpl> _buttonImpl;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

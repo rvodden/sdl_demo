@@ -27,7 +27,7 @@ TEST_F(SurfaceTest, testCreateSurfaceWithDimensions) {
   constexpr uint32_t width = 100;
   constexpr uint32_t height = 50;
   
-  sdl::Surface surface(width, height);
+  sdlpp::Surface surface(width, height);
   
   ASSERT_EQ(surface.getWidth(), width);
   ASSERT_EQ(surface.getHeight(), height);
@@ -45,7 +45,7 @@ TEST_F(SurfaceTest, testCreateSurfaceFromPixelData) {
     255, 255, 255, 255 // White pixel
   };
   
-  sdl::Surface surface(width, height, pixels);
+  sdlpp::Surface surface(width, height, pixels);
   
   ASSERT_EQ(surface.getWidth(), width);
   ASSERT_EQ(surface.getHeight(), height);
@@ -63,15 +63,15 @@ TEST_F(SurfaceTest, testCreateSurfaceFromInvalidPixelData) {
   // Create invalid pixel data (wrong size)
   std::vector<uint8_t> pixels = {255, 0, 0, 255}; // Only 1 pixel instead of 4
   
-  ASSERT_THROW(sdl::Surface surface(width, height, pixels), sdl::Exception);
+  ASSERT_THROW(sdlpp::Surface surface(width, height, pixels), sdlpp::Exception);
 }
 
 TEST_F(SurfaceTest, testFillSurface) {
   constexpr uint32_t width = 10;
   constexpr uint32_t height = 10;
   
-  sdl::Surface surface(width, height);
-  sdl::Color fillColor(255, 128, 64, 255);
+  sdlpp::Surface surface(width, height);
+  sdlpp::Color fillColor(255, 128, 64, 255);
   
   surface.fill(fillColor);
   
@@ -93,8 +93,8 @@ TEST_F(SurfaceTest, testSetAndGetPixel) {
   constexpr uint32_t width = 10;
   constexpr uint32_t height = 10;
   
-  sdl::Surface surface(width, height);
-  sdl::Color testColor(200, 100, 50, 128);
+  sdlpp::Surface surface(width, height);
+  sdlpp::Color testColor(200, 100, 50, 128);
   
   surface.setPixel(5, 3, testColor);
   auto retrievedColor = surface.getPixel(5, 3);
@@ -109,31 +109,31 @@ TEST_F(SurfaceTest, testPixelOutOfBounds) {
   constexpr uint32_t width = 10;
   constexpr uint32_t height = 10;
   
-  sdl::Surface surface(width, height);
-  sdl::Color testColor(255, 255, 255, 255);
+  sdlpp::Surface surface(width, height);
+  sdlpp::Color testColor(255, 255, 255, 255);
   
   // Test setting pixel out of bounds
-  ASSERT_THROW(surface.setPixel(width, height, testColor), sdl::Exception);
-  ASSERT_THROW(surface.setPixel(width + 1, 0, testColor), sdl::Exception);
-  ASSERT_THROW(surface.setPixel(0, height + 1, testColor), sdl::Exception);
+  ASSERT_THROW(surface.setPixel(width, height, testColor), sdlpp::Exception);
+  ASSERT_THROW(surface.setPixel(width + 1, 0, testColor), sdlpp::Exception);
+  ASSERT_THROW(surface.setPixel(0, height + 1, testColor), sdlpp::Exception);
   
   // Test getting pixel out of bounds
-  ASSERT_THROW((void)surface.getPixel(width, height), sdl::Exception);
-  ASSERT_THROW((void)surface.getPixel(width + 1, 0), sdl::Exception);
-  ASSERT_THROW((void)surface.getPixel(0, height + 1), sdl::Exception);
+  ASSERT_THROW((void)surface.getPixel(width, height), sdlpp::Exception);
+  ASSERT_THROW((void)surface.getPixel(width + 1, 0), sdlpp::Exception);
+  ASSERT_THROW((void)surface.getPixel(0, height + 1), sdlpp::Exception);
 }
 
 TEST_F(SurfaceTest, testFillRect) {
   constexpr uint32_t width = 20;
   constexpr uint32_t height = 20;
   
-  sdl::Surface surface(width, height);
+  sdlpp::Surface surface(width, height);
   
   // Fill entire surface with black first
-  surface.fill(sdl::NamedColor::kBlack);
+  surface.fill(sdlpp::NamedColor::kBlack);
   
   // Fill a rectangle with white
-  sdl::Color fillColor = sdl::NamedColor::kWhite;
+  sdlpp::Color fillColor = sdlpp::NamedColor::kWhite;
   surface.fillRect(5, 5, 10, 10, fillColor);
   
   // Check pixels inside the rectangle
@@ -154,12 +154,12 @@ TEST_F(SurfaceTest, testBlit) {
   constexpr uint32_t height = 10;
   
   // Create source surface and fill with red
-  sdl::Surface source(width, height);
-  source.fill(sdl::Color(255, 0, 0, 255));
+  sdlpp::Surface source(width, height);
+  source.fill(sdlpp::Color(255, 0, 0, 255));
   
   // Create destination surface and fill with blue
-  sdl::Surface dest(width * 2, height * 2);
-  dest.fill(sdl::Color(0, 0, 255, 255));
+  sdlpp::Surface dest(width * 2, height * 2);
+  dest.fill(sdlpp::Color(0, 0, 255, 255));
   
   // Blit source to destination at position (5, 5)
   dest.blit(source, 5, 5);
@@ -182,15 +182,15 @@ TEST_F(SurfaceTest, testBlitRegion) {
   constexpr uint32_t height = 10;
   
   // Create source surface with different colored quadrants
-  sdl::Surface source(width, height);
-  source.fillRect(0, 0, 5, 5, sdl::Color(255, 0, 0, 255));   // Red top-left
-  source.fillRect(5, 0, 5, 5, sdl::Color(0, 255, 0, 255));   // Green top-right
-  source.fillRect(0, 5, 5, 5, sdl::Color(0, 0, 255, 255));   // Blue bottom-left
-  source.fillRect(5, 5, 5, 5, sdl::Color(255, 255, 0, 255)); // Yellow bottom-right
+  sdlpp::Surface source(width, height);
+  source.fillRect(0, 0, 5, 5, sdlpp::Color(255, 0, 0, 255));   // Red top-left
+  source.fillRect(5, 0, 5, 5, sdlpp::Color(0, 255, 0, 255));   // Green top-right
+  source.fillRect(0, 5, 5, 5, sdlpp::Color(0, 0, 255, 255));   // Blue bottom-left
+  source.fillRect(5, 5, 5, 5, sdlpp::Color(255, 255, 0, 255)); // Yellow bottom-right
   
   // Create destination surface
-  sdl::Surface dest(width, height);
-  dest.fill(sdl::NamedColor::kBlack);
+  sdlpp::Surface dest(width, height);
+  dest.fill(sdlpp::NamedColor::kBlack);
   
   // Blit only the top-left red quadrant to center of destination
   dest.blit(source, 0, 0, 5, 5, 2, 2);
@@ -212,8 +212,8 @@ TEST_F(SurfaceTest, testSaveBMP) {
   constexpr uint32_t width = 4;
   constexpr uint32_t height = 4;
   
-  sdl::Surface surface(width, height);
-  surface.fill(sdl::Color(255, 128, 64, 255));
+  sdlpp::Surface surface(width, height);
+  surface.fill(sdlpp::Color(255, 128, 64, 255));
   
   auto bmpPath = std::filesystem::temp_directory_path() / "test_save.bmp";
   
@@ -231,11 +231,11 @@ TEST_F(SurfaceTest, testMoveConstructor) {
   constexpr uint32_t width = 10;
   constexpr uint32_t height = 15;
   
-  sdl::Surface original(width, height);
-  original.fill(sdl::Color(100, 150, 200, 255));
+  sdlpp::Surface original(width, height);
+  original.fill(sdlpp::Color(100, 150, 200, 255));
   
   // Move construct
-  sdl::Surface moved(std::move(original));
+  sdlpp::Surface moved(std::move(original));
   
   // Moved surface should have the original properties
   ASSERT_EQ(moved.getWidth(), width);
@@ -252,10 +252,10 @@ TEST_F(SurfaceTest, testMoveAssignment) {
   constexpr uint32_t width = 8;
   constexpr uint32_t height = 12;
   
-  sdl::Surface original(width, height);
-  original.fill(sdl::Color(75, 125, 175, 255));
+  sdlpp::Surface original(width, height);
+  original.fill(sdlpp::Color(75, 125, 175, 255));
   
-  sdl::Surface target(1, 1); // Create a different surface
+  sdlpp::Surface target(1, 1); // Create a different surface
   
   // Move assign
   target = std::move(original);

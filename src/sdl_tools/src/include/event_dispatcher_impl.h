@@ -7,13 +7,13 @@
 
 #include "event_dispatcher.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class EventDispatcher;
 class EventDispatcherImpl;
 
-class DefaultQuitEventHandler : public sdl::EventHandler<QuitEvent>,
-                                public sdl::BaseEventHandler {
+class DefaultQuitEventHandler : public sdlpp::EventHandler<QuitEvent>,
+                                public sdlpp::BaseEventHandler {
  public:
   DefaultQuitEventHandler(EventDispatcherImpl& eventDispatcherImpl)
       : _eventDispatcherImpl(eventDispatcherImpl) {};
@@ -39,12 +39,12 @@ class EventDispatcherImpl {
 
  private:
   std::shared_ptr<BaseEventProducer> _eventProducer;
-  std::forward_list<std::reference_wrapper<sdl::BaseEventHandler>>
+  std::forward_list<std::reference_wrapper<sdlpp::BaseEventHandler>>
       _eventHandlers;
   std::atomic_bool quitFlag{false};
   DefaultQuitEventHandler defaultQuitEventHandler{*this};
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

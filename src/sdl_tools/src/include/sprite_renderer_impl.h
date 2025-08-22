@@ -3,7 +3,7 @@
 
 #include "sprite_renderer.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class SpriteRendererImpl {
   friend SpriteRenderer;
@@ -16,6 +16,6 @@ class SpriteRendererImpl {
   std::shared_ptr<Renderer> _renderer;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

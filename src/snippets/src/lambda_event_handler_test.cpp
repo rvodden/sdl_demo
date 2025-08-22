@@ -6,8 +6,8 @@
 #include <iostream>
 #include <memory>
 
-using namespace sdl;
-using namespace sdl::tools;
+using namespace sdlpp;
+using namespace sdlpp::tools;
 
 class TestEvent : public CustomUserEvent<TestEvent> {
  public:

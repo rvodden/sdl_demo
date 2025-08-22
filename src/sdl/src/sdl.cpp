@@ -7,7 +7,7 @@
 #include "exception.h"
 #include "sdl_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 SDL::SDL() { _sdlImpl = std::make_unique<SDLImpl>(); }
 
@@ -27,4 +27,4 @@ void SDL::initSubSystem(const SubSystem& subSystem) {
 
 void delay_ms(uint32_t duration) { SDL_Delay(duration); }
 
-}  // namespace sdl
+}  // namespace sdlpp

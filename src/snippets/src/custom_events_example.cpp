@@ -14,8 +14,8 @@
 #include <iostream>
 #include <memory>
 
-using namespace sdl;
-using namespace sdl::tools;
+using namespace sdlpp;
+using namespace sdlpp::tools;
 
 /**
  * @brief Example custom event for game score updates

@@ -2,7 +2,7 @@
 
 #include "event_dispatcher_impl.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 void DefaultQuitEventHandler::handle(
     [[maybe_unused]] const QuitEvent& quitEvent) {
@@ -29,7 +29,7 @@ void EventDispatcher::run() {
       for (const auto& handler : _eventDispatcherImpl->_eventHandlers) {
         event->handle(handler);
       }
-    } catch ([[maybe_unused]] sdl::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
+    } catch ([[maybe_unused]] sdlpp::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
     }
     // TODO: unknown events are "fine" whilst we've not implemented
     // all the events. When we have coverage this catch should go.
@@ -47,4 +47,4 @@ EventDispatcherImpl::EventDispatcherImpl(std::shared_ptr<EventProducer> eventPro
 
 void EventDispatcherImpl::quit() { quitFlag = true; };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools

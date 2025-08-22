@@ -8,8 +8,8 @@
 #include <iostream>
 #include <memory>
 
-using namespace sdl;
-using namespace sdl::tools;
+using namespace sdlpp;
+using namespace sdlpp::tools;
 
 auto main() -> int {
   try {

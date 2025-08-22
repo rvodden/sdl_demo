@@ -11,7 +11,7 @@
 #include "sdl_export.h"
 #include "texture.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class FloatRectangle;
 class Texture;
@@ -75,6 +75,6 @@ class SDL_EXPORT Renderer {
   std::unique_ptr<RendererImpl> _rendererImpl;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

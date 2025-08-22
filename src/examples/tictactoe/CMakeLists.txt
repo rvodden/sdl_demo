@@ -15,13 +15,13 @@ if(SOURCE_FILES)
 endif()
 
 if(HEADER_FILES)
-    foreach( HEADER_FILE ${SOURCE_FILES} )
+    foreach( HEADER_FILE ${HEADER_FILES} )
         message(DEBUG "   Found: ${HEADER_FILE}" )
     endforeach()
 endif()
 
 add_executable(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS FILES ${HEADER_FILES})
+target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/ FILES ${HEADER_FILES})
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 if(NOT PROJECT_IS_TOP_LEVEL)

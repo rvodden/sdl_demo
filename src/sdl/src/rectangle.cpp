@@ -1,7 +1,7 @@
 #include "float_rectangle.h"
 #include "float_rectangle_impl.h"
 
-namespace sdl {
+namespace sdlpp {
 
 FloatRectangle::FloatRectangle(float x, float y, float width, float height)
     : _rectangleImpl{std::make_unique<FloatRectangleImpl>()} {
@@ -74,4 +74,4 @@ auto FloatRectangle::contains(const float& x, const float& y) const -> bool {
   return true;
 }
 
-}  // namespace sdl
+}  // namespace sdlpp

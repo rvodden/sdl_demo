@@ -7,7 +7,7 @@
 #include "sdl_tools_export.h"
 #include "sprite.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class Sprite;
 class SpriteRendererImpl;
@@ -30,6 +30,6 @@ class SDL_TOOLS_EXPORT SpriteRenderer {
   std::unique_ptr<SpriteRendererImpl> _spriteRendererImpl;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

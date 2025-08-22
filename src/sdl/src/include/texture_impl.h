@@ -7,7 +7,7 @@
 #include "renderer.h"
 #include "texture.h"
 
-namespace sdl {
+namespace sdlpp {
 
 static constexpr auto sdlBlendModeMapData =
     std::array{std::pair{Texture::kNone, SDL_BLENDMODE_NONE},
@@ -26,6 +26,6 @@ class TextureImpl {
   SDL_Texture* _sdlTexture;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

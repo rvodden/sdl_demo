@@ -6,7 +6,7 @@
 #include "renderer.h"
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class Renderer;
 class FloatRectangleImpl;
@@ -49,6 +49,6 @@ class SDL_EXPORT FloatRectangle {
   std::unique_ptr<FloatRectangleImpl> _rectangleImpl;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

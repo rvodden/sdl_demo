@@ -6,7 +6,7 @@
 #include "sprite_impl.h"
 #include "sprite_renderer_impl.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 SpriteRenderer::SpriteRenderer(std::shared_ptr<Renderer> renderer)
     : _spriteRendererImpl{
@@ -33,4 +33,4 @@ void SpriteRenderer::render(const Sprite& sprite, const float x,
                                        destination);
 }
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools

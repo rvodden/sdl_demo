@@ -14,7 +14,7 @@
 #include "event.h"
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class UserEventImpl;
 /**
@@ -222,6 +222,6 @@ class CustomUserEvent : public UserEvent {
       : UserEvent(ts, winId, cde, d1) {}
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

@@ -6,7 +6,7 @@
 
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class SDLImpl;
 
@@ -48,5 +48,5 @@ void delay(std::chrono::duration<T> duration) {
                .count());
 }
 
-}  // namespace sdl
+}  // namespace sdlpp
 #endif

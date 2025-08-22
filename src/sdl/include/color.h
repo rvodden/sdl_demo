@@ -6,7 +6,7 @@
 
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 enum class Alpha : uint8_t { kOpaque = 255,
                              kTranparent = 0 };
@@ -42,6 +42,6 @@ class SDL_EXPORT NamedColor {
       Color{0xc2, 0x00, 0x78, static_cast<uint8_t>(Alpha::kOpaque)};
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

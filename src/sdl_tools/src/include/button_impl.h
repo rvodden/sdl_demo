@@ -8,27 +8,27 @@
 
 #include "button.h"
 
-namespace sdl::tools {
+namespace sdlpp::tools {
 
 class ButtonImpl {
   friend Button;
 
  public:
-  ButtonImpl(std::shared_ptr<EventDispatcher> eventProcessor,
-             sdl::FloatRectangle rectangle)
+  ButtonImpl(std::shared_ptr<EventDispatcher> eventDispatcher,
+             sdlpp::FloatRectangle rectangle)
       : _rectangle{std::move(rectangle)},
-        _eventProcessor{std::move(eventProcessor)},
+        _eventDispatcher{std::move(eventDispatcher)},
         _eventHandlers{std::make_shared<std::forward_list<Button::Handler>>()},
         _mouseEventHandler{_rectangle, _eventHandlers} {};
 
-  class MouseEventHandler : public sdl::EventHandler<sdl::MouseButtonEvent>,
-                            public sdl::BaseEventHandler {
+  class MouseEventHandler : public sdlpp::EventHandler<sdlpp::MouseButtonEvent>,
+                            public sdlpp::BaseEventHandler {
    public:
     MouseEventHandler(
         FloatRectangle& rectangle,
         std::shared_ptr<std::forward_list<Button::Handler>> eventHandlers)
         : _rectangle{rectangle}, _eventHandlers{std::move(eventHandlers)} {};
-    void handle(const sdl::MouseButtonEvent& mouseButtonEvent) override;
+    void handle(const sdlpp::MouseButtonEvent& mouseButtonEvent) override;
 
    private:
     FloatRectangle _rectangle;
@@ -36,14 +36,14 @@ class ButtonImpl {
   };
 
  private:
-  void eventHandler(const sdl::MouseButtonEvent& mouseButtonEvent);
+  void eventHandler(const sdlpp::MouseButtonEvent& mouseButtonEvent);
 
-  sdl::FloatRectangle _rectangle;
-  std::shared_ptr<EventDispatcher> _eventProcessor;
+  sdlpp::FloatRectangle _rectangle;
+  std::shared_ptr<EventDispatcher> _eventDispatcher;
   std::shared_ptr<std::forward_list<Button::Handler>> _eventHandlers;
   MouseEventHandler _mouseEventHandler;
 };
 
-}  // namespace sdl::tools
+}  // namespace sdlpp::tools
 
 #endif

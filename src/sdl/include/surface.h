@@ -9,7 +9,7 @@
 #include "color.h"
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class SurfaceImpl;
 
@@ -76,6 +76,6 @@ class SDL_EXPORT Surface {
   std::unique_ptr<SurfaceImpl> _surfaceImpl;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

@@ -18,7 +18,7 @@
 
 #include "sdl_export.h"
 
-namespace sdl {
+namespace sdlpp {
 
 class UserEvent;
 
@@ -369,6 +369,6 @@ class SDL_EXPORT EventProducer : public BaseEventProducer {
   void produce(std::unique_ptr<UserEvent> event) override;
 };
 
-}  // namespace sdl
+}  // namespace sdlpp
 
 #endif

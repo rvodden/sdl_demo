@@ -5,7 +5,7 @@
 #include <variant>
 #include <optional>
 
-namespace sdl {
+namespace sdlpp {
 
 enum class PixelType : uint8_t {
   kUnknown,
@@ -188,6 +188,6 @@ class PixelFormat {
 
 
  
-} // namespace sdl
+} // namespace sdlpp
 
 #endif
