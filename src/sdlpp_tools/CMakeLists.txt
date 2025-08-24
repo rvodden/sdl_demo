@@ -1,4 +1,10 @@
 project(sdlpp_tools LANGUAGES CXX)
+
+add_library(${PROJECT_NAME}_private INTERFACE)
+target_include_directories(${PROJECT_NAME}_private INTERFACE 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+)
+
 add_library(${PROJECT_NAME} SHARED)
 
 include(GenerateExportHeader)
@@ -18,8 +24,8 @@ target_sources(${PROJECT_NAME}
             BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME},BINARY_DIR>
             FILES ${CMAKE_CURRENT_BINARY_DIR}/$<LOWER_CASE:${PROJECT_NAME}>_export.h
     )
-target_include_directories(${PROJECT_NAME} PRIVATE src/include/)
 
+target_link_libraries(${PROJECT_NAME} PRIVATE sdlpp_tools_private)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdlpp)
 
 if(NOT PROJECT_IS_TOP_LEVEL)

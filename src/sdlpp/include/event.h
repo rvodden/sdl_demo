@@ -15,6 +15,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <optional>
 
 #include "sdlpp_export.h"
 
@@ -309,11 +310,30 @@ class SDLPP_EXPORT MouseButtonEvent : public MousePositionEvent {
 };
 
 /**
- * @brief Abstract base class for event buses
+ * @brief Template-based event adaptor for converting platform events to sdlpp events
  *
- * Event buses are responsible for generating events from various sources
- * (like SDL, user input, timers, etc.) and providing them to the event
- * system.
+ * EventAdaptors use template specialization to provide zero-cost conversion
+ * from platform-specific event types to sdlpp event objects. Each platform
+ * (SDL, etc.) provides a specialized implementation.
+ *
+ * @tparam PlatformEventType The platform-specific event type (e.g., SDL_Event)
+ */
+template<typename PlatformEventType>
+class EventAdaptor {
+ public:
+  /**
+   * @brief Convert platform event to sdlpp event
+   * @param event The platform-specific event to convert
+   * @return Converted sdlpp event, or nullptr if conversion not possible
+   */
+  auto convertEvent(const PlatformEventType& event) -> std::unique_ptr<BaseEvent>;
+};
+
+/**
+ * @brief Abstract base class for event buses (traditional polymorphic interface)
+ *
+ * This provides a common interface for event buses when runtime polymorphism
+ * is needed. For zero-cost abstraction, use TemplatedEventBus directly.
  */
 class SDLPP_EXPORT BaseEventBus {
  public:
@@ -333,10 +353,95 @@ class SDLPP_EXPORT BaseEventBus {
   virtual auto wait() -> std::unique_ptr<BaseEvent> = 0;
 
   /**
+   * @brief Poll for the next event without blocking
+   * @return A unique pointer to the next available event, or std::nullopt if no events available
+   */
+  virtual auto poll() -> std::optional<std::unique_ptr<BaseEvent>> = 0;
+
+  /**
    * @brief Publish a custom event to the event bus
    * @param event The event to publish
    */
   virtual void publish(std::unique_ptr<UserEvent>) = 0;
+
+  /**
+   * @brief Set the callback for routing converted events
+   * @param callback Function to call when events are available for routing
+   */
+  virtual void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) = 0;
+};
+
+// Forward declaration for pimpl
+class EventBusImpl;
+
+/**
+ * @brief CRTP template-based event bus for zero-cost platform-specific event handling
+ *
+ * This template class uses CRTP to provide a zero-cost abstraction for handling events
+ * from different platforms. It uses an EventAdaptor to convert platform
+ * events and routes them via a callback mechanism suitable for non-blocking
+ * event systems.
+ *
+ * @tparam Derived The concrete event bus implementation (CRTP pattern)
+ * @tparam PlatformEventType The platform-specific event type
+ * @tparam AdaptorType The adaptor type for converting events (auto-deduced)
+ */
+template<typename Derived, typename PlatformEventType, typename AdaptorType = EventAdaptor<PlatformEventType>>
+class TemplatedEventBus {
+ public:
+  TemplatedEventBus() = default;
+
+  /**
+   * @brief Set the callback for routing converted events
+   * @param callback Function to call when events are converted and ready for routing
+   */
+  void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) {
+    _routeCallback = std::move(callback);
+  }
+
+  /**
+   * @brief Handle a platform-specific event
+   *
+   * This method is typically called by platform event callbacks (e.g., SDL_AppEvent).
+   * It converts the platform event using the adaptor and routes it via the callback.
+   *
+   * @param platformEvent The platform-specific event to handle
+   */
+  void handlePlatformEvent(const PlatformEventType& platformEvent) {
+    if (auto event = _adaptor.convertEvent(platformEvent)) {
+      if (_routeCallback) {
+        _routeCallback(std::move(event));
+      }
+    }
+  }
+
+  /**
+   * @brief Wait for and return the next event (delegates to derived implementation)
+   * @return A unique pointer to the next available event
+   */
+  auto wait() -> std::unique_ptr<BaseEvent> {
+    return static_cast<Derived*>(this)->waitImpl();
+  }
+
+  /**
+   * @brief Poll for the next event without blocking (delegates to derived implementation)
+   * @return A unique pointer to the next available event, or std::nullopt if no events available
+   */
+  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> {
+    return static_cast<Derived*>(this)->pollImpl();
+  }
+
+  /**
+   * @brief Publish a custom event to the event bus (delegates to derived implementation)
+   * @param event The event to publish
+   */
+  void publish(std::unique_ptr<UserEvent> event) {
+    static_cast<Derived*>(this)->publishImpl(std::move(event));
+  }
+
+ private:
+  AdaptorType _adaptor;
+  std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
 };
 
 /**
@@ -347,14 +452,14 @@ class SDLPP_EXPORT BaseEventBus {
  */
 class SDLPP_EXPORT EventBus : public BaseEventBus {
  public:
-  EventBus() = default;
-  EventBus(const EventBus&) = default;
-  EventBus(EventBus&&) noexcept = default;
+  EventBus();
+  EventBus(const EventBus&) = delete;
+  EventBus(EventBus&&) noexcept;
 
-  auto operator=(const EventBus&) -> EventBus& = default;
-  auto operator=(EventBus&&) noexcept -> EventBus& = default;
+  auto operator=(const EventBus&) -> EventBus& = delete;
+  auto operator=(EventBus&&) noexcept -> EventBus&;
 
-  ~EventBus() override = default;
+  ~EventBus() override;
 
   /**
    * @brief Wait for and return the next SDL event
@@ -363,11 +468,37 @@ class SDLPP_EXPORT EventBus : public BaseEventBus {
   auto wait() -> std::unique_ptr<BaseEvent> override;
 
   /**
+   * @brief Poll for the next SDL event without blocking
+   * @return A unique pointer to the next available event, or std::nullopt if no events available
+   */
+  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override;
+
+  /**
    * @brief Publish a custom event to the SDL event stream
    * @param event The event to publish
    */
   void publish(std::unique_ptr<UserEvent> event) override;
+
+  /**
+   * @brief Set the callback for routing converted events
+   * @param callback Function to call when events are available for routing
+   */
+  void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override;
+
+ private:
+  std::unique_ptr<EventBusImpl> _impl;
 };
+
+/**
+ * @brief Factory function to create an SDL event bus
+ * 
+ * This function creates a TemplatedEventBus specialized for SDL events
+ * without exposing SDL types in the public API. The returned bus uses CRTP
+ * internally for zero-cost abstraction while providing the standard BaseEventBus interface.
+ * 
+ * @return A unique pointer to an SDL event bus
+ */
+SDLPP_EXPORT auto createSDLEventBus() -> std::unique_ptr<BaseEventBus>;
 
 }  // namespace sdlpp
 

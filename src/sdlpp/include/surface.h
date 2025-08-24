@@ -7,14 +7,18 @@
 #include <vector>
 
 #include "color.h"
+
 #include "sdlpp_export.h"
 
 namespace sdlpp {
 
 class SurfaceImpl;
+class Texture;
 
 //! @brief A pixel buffer for software rendering and image manipulation
 class SDLPP_EXPORT Surface {
+  friend SurfaceImpl;
+  friend Texture;
  public:
   //! @brief Create a surface from an image file
   explicit Surface(const std::filesystem::path& filePath);
@@ -73,6 +77,7 @@ class SDLPP_EXPORT Surface {
   void save(const std::filesystem::path& filePath) const;
 
  private:
+  Surface();
   std::unique_ptr<SurfaceImpl> _surfaceImpl;
 };
 

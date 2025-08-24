@@ -14,6 +14,7 @@ auto main() -> int {
   try {
     SDL sdl;
     sdl.initSubSystem(SDL::kVideo);
+    sdl.initSubSystem(SDL::kEvents);
 
     auto eventBus = std::make_shared<EventBus>();
     auto eventRouter = std::make_shared<EventRouter>(std::static_pointer_cast<BaseEventBus>(eventBus));

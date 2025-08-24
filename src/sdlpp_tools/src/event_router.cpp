@@ -36,6 +36,43 @@ void EventRouter::run() {
   }
 }
 
+auto EventRouter::hasEvents() const -> bool {
+  // Check if there are events available by doing a non-blocking poll
+  // We don't actually consume the event here, just check availability
+  auto maybeEvent = _eventRouterImpl->_eventBus->poll();
+  return maybeEvent.has_value();
+}
+
+auto EventRouter::processNextEvent() -> bool {
+  if (_eventRouterImpl->quitFlag) {
+    return false;
+  }
+
+  try {
+    auto maybeEvent = _eventRouterImpl->_eventBus->poll();
+    if (maybeEvent.has_value()) {
+      for (const auto& handler : _eventRouterImpl->_eventHandlers) {
+        maybeEvent.value()->handle(handler);
+      }
+      return true;
+    }
+    return false;
+  } catch ([[maybe_unused]] sdlpp::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
+    // Unknown events are currently ignored
+    return false;
+  }
+}
+
+void EventRouter::routeEvent(std::unique_ptr<BaseEvent> event) {
+  if (!event) {
+    return;
+  }
+  
+  for (const auto& handler : _eventRouterImpl->_eventHandlers) {
+    event->handle(handler);
+  }
+}
+
 void EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) {
   _eventRouterImpl->_eventHandlers.push_back(std::ref(baseEventHandler));
 }

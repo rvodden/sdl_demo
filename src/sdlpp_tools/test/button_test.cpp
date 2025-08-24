@@ -9,6 +9,7 @@
 #include <vector>
 #include <chrono>
 #include <queue>
+#include <optional>
 
 using namespace sdlpp;
 using namespace sdlpp::tools;
@@ -48,9 +49,27 @@ public:
         return event;
     }
     
+    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
+        if (eventQueue_.empty()) {
+            return std::nullopt;
+        }
+        
+        auto event = std::move(eventQueue_.front());
+        eventQueue_.pop();
+        return event;
+    }
+    
     void publish(std::unique_ptr<UserEvent> event) override {
         publishedEvents_.push_back(std::move(event));
     }
+
+    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
+        // Mock implementation - store callback if needed for testing
+        routeCallback_ = std::move(callback);
+    }
+
+private:
+    std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
 };
 
 // Test EventRouter wrapper that allows controlled event injection

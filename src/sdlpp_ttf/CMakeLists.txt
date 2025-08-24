@@ -1,4 +1,4 @@
-project(sdlpp LANGUAGES CXX)
+project(sdlpp_ttf LANGUAGES CXX)
 
 add_library(${PROJECT_NAME}_private INTERFACE)
 target_include_directories(${PROJECT_NAME}_private INTERFACE 
@@ -8,7 +8,7 @@ target_include_directories(${PROJECT_NAME}_private INTERFACE
 add_library(${PROJECT_NAME} SHARED)
 
 include(GenerateExportHeader)
-generate_export_header(${PROJECT_NAME}) # public export header
+generate_export_header(${PROJECT_NAME})
 
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
@@ -25,10 +25,11 @@ target_sources(${PROJECT_NAME}
             FILES ${CMAKE_CURRENT_BINARY_DIR}/$<LOWER_CASE:${PROJECT_NAME}>_export.h
     )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_private)
+target_link_libraries(${PROJECT_NAME} PRIVATE sdlpp_ttf_private)
+target_link_libraries(${PROJECT_NAME} PRIVATE sdlpp_private)
+target_link_libraries(${PROJECT_NAME} PRIVATE sdlpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3_image::SDL3_image)
-target_link_libraries(${PROJECT_NAME} PRIVATE utils)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3_ttf::SDL3_ttf)
 
 if(NOT MSVC)
     target_link_libraries(${PROJECT_NAME} PUBLIC m)

@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "renderer.h"
+#include "surface.h"
 #include "sdlpp_export.h"
 
 namespace sdlpp {
@@ -28,6 +29,9 @@ class SDLPP_EXPORT Texture {
 
   //! @brief creates a texture from raw RGBA pixel data
   Texture(const Renderer& renderer, uint32_t width, uint32_t height, const uint32_t* pixels);
+
+  //! @brief create a texture from a Surface
+  Texture(const Renderer& renderer, const Surface& surface);
 
   Texture(Texture& other) = delete;
   Texture(Texture&& other) noexcept;

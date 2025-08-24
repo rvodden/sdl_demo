@@ -81,6 +81,35 @@ class SDLPP_TOOLS_EXPORT EventRouter {
   void run();
 
   /**
+   * @brief Check if events are available for processing
+   * @return True if events are available, false otherwise
+   */
+  auto hasEvents() const -> bool;
+
+  /**
+   * @brief Process a single event without blocking
+   *
+   * This method processes one event from the event bus without blocking.
+   * If no events are available, it returns immediately without waiting.
+   * This is useful for integration with other event loops or callback systems.
+   *
+   * @return True if an event was processed, false if no events were available
+   */
+  auto processNextEvent() -> bool;
+
+  /**
+   * @brief Route a single event to all registered handlers
+   *
+   * This method routes the provided event to all registered handlers.
+   * It's designed to be used as a callback from EventBus or TemplatedEventBus,
+   * enabling non-blocking, callback-based event processing suitable for
+   * integration with SDL's event callback system.
+   *
+   * @param event The event to route to all registered handlers
+   */
+  void routeEvent(std::unique_ptr<BaseEvent> event);
+
+  /**
    * @brief Register an event handler to receive dispatched events
    *
    * Adds the given event handler to the list of handlers that will receive

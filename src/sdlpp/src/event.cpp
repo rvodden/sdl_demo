@@ -12,9 +12,29 @@
 
 namespace sdlpp {
 
+EventBus::EventBus() : _impl(std::make_unique<EventBusImpl>()) {}
+
+EventBus::~EventBus() = default;
+
+EventBus::EventBus(EventBus&&) noexcept = default;
+
+auto EventBus::operator=(EventBus&&) noexcept -> EventBus& = default;
+
 auto EventBus::wait() -> std::unique_ptr<BaseEvent> {
   SDL_Event event;
   SDL_WaitEvent(&event);
+  return _impl->processSDLEvent(event);
+}
+
+auto EventBus::poll() -> std::optional<std::unique_ptr<BaseEvent>> {
+  SDL_Event event;
+  if (SDL_PollEvent(&event)) {
+    return _impl->processSDLEvent(event);
+  }
+  return std::nullopt;
+}
+
+auto EventBusImpl::processSDLEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
   switch (event.type) {
     case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_DOWN:
     case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_UP:
@@ -41,6 +61,10 @@ void EventBus::publish(std::unique_ptr<UserEvent> userEvent) {
   if (!result) {
     throw Exception(SDL_GetError());
   }
+}
+
+void EventBus::setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) {
+  _impl->setRouteCallback(std::move(callback));
 }
 
 auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
@@ -77,6 +101,41 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
       sdlUserEvent->code, sdlUserEvent->data2);
   std::unique_ptr<BaseEvent> baseEvent = std::move(userEvent);
   return baseEvent;
+}
+
+auto createSDLEventBus() -> std::unique_ptr<BaseEventBus> {
+  return std::make_unique<SDLEventBus>();
+}
+
+// Implementation of CRTP methods for SDLEventBus
+auto SDLEventBus::waitImpl() -> std::unique_ptr<BaseEvent> {
+  SDL_Event event;
+  SDL_WaitEvent(&event);
+  EventAdaptor<SDL_Event> adaptor;
+  return adaptor.convertEvent(event);
+}
+
+auto SDLEventBus::pollImpl() -> std::optional<std::unique_ptr<BaseEvent>> {
+  SDL_Event event;
+  if (SDL_PollEvent(&event)) {
+    EventAdaptor<SDL_Event> adaptor;
+    if (auto convertedEvent = adaptor.convertEvent(event)) {
+      return convertedEvent;
+    }
+  }
+  return std::nullopt;
+}
+
+void SDLEventBus::publishImpl(std::unique_ptr<UserEvent> userEvent) {
+  auto sdlEvent = userEvent->_userEventImpl->_createSDLUserEvent();
+  
+  // Release ownership of the event - it will be reclaimed when SDL returns it
+  userEvent.release();  // NOLINT(bugprone-unused-return-value)
+  
+  auto result = SDL_PushEvent(sdlEvent.get());
+  if (!result) {
+    throw Exception(SDL_GetError());
+  }
 }
 
 }  // namespace sdlpp

@@ -56,6 +56,7 @@ if(SDLXX_USE_VENDORED_SDL3)
         set(SDLIMAGE_DAV1D OFF)
         set(SDLIMAGE_TIF OFF)
         set(SDLIMAGE_WEBP OFF)
+        set(SDL3IMAGE_INSTALL OFF)
         FetchContent_Declare(
                 SDL3_image
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
@@ -64,7 +65,16 @@ if(SDLXX_USE_VENDORED_SDL3)
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
         )
-        set(SDL3IMAGE_INSTALL OFF)
+
+        set(SDLTTF_VENDORED ON)
+        FetchContent_Declare(
+                SDL3_ttf
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf
+                GIT_TAG release-3.2.2
+                DOWNLOAD_EXTRACT_TIMESTAMP false
+                OVERRIDE_FIND_PACKAGE
+                SYSTEM
+        )
 endif()
 
 if(SDLXX_USE_VENDORED_GTEST)
@@ -74,4 +84,5 @@ endif()
 if(SDLXX_USE_VENDORED_SDL3)
         FetchContent_MakeAvailable(SDL3)
         FetchContent_MakeAvailable(SDL3_image)
+        FetchContent_MakeAvailable(SDL3_ttf)
 endif()

@@ -17,6 +17,7 @@
 namespace sdlpp {
 
 class UserEventImpl;
+class SDLEventBus;
 /**
  * @brief Helper function to register SDL event types
  * @return The registered SDL event type ID
@@ -56,6 +57,7 @@ SDLPP_EXPORT auto registerEventType() -> uint32_t;
  */
 class SDLPP_EXPORT UserEvent : public Event {
   friend EventBus;
+  friend class SDLEventBus;
 
  public:
   /**

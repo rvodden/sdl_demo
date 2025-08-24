@@ -5,6 +5,7 @@
 
 #include "exception.h"
 #include "renderer_impl.h"
+#include "surface_impl.h"
 #include "texture_impl.h"
 
 namespace sdlpp {
@@ -28,7 +29,7 @@ Texture::Texture(const Renderer& renderer, const void* location,
   
   SDL_IOStream* ioStream = SDL_IOFromConstMem(location, size);
   if (ioStream == nullptr) {
-    throw Exception("SDL_IOFromConstMem failed");
+    throw Exception("SDL_IOFromConstMem");
   }
 
   _textureImpl->_sdlTexture =
@@ -73,6 +74,10 @@ Texture::Texture(const Renderer& renderer, uint32_t width, uint32_t height, cons
       throw Exception("SDL_UpdateTexture");
     }
   }
+}
+
+Texture::Texture(const Renderer& renderer, const Surface& surface) {
+  _textureImpl->_sdlTexture = SDL_CreateTextureFromSurface(renderer._rendererImpl->_sdlRenderer, surface._surfaceImpl->_sdlSurface);
 }
 
 Texture::Texture(Texture&& other) noexcept

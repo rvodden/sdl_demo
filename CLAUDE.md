@@ -59,6 +59,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 - Raw pointers should never be used.
 - Prefer trailing return types.
 - **Header guards**: Use traditional `#ifndef`/`#define`/`#endif` include guards instead of `#pragma once`. Follow the pattern `#ifndef PROJECT_MODULE_FILENAME_H` / `#define PROJECT_MODULE_FILENAME_H` / `#endif // PROJECT_MODULE_FILENAME_H`
+- **Unused variables**: Use `[[maybe_unused]]` attribute instead of void casting `(void)variable` to suppress unused variable warnings.
 
 ## Key Features
 

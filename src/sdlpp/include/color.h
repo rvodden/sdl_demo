@@ -20,12 +20,12 @@ class SDLPP_EXPORT Color {
       const uint8_t& alpha)
       : _color{std::make_tuple(red, green, blue)}, _alpha{alpha} {};
 
-  [[nodiscard]] auto getRed() const -> uint8_t { return std::get<0>(_color); };
-  [[nodiscard]] auto getGreen() const -> uint8_t {
+  [[nodiscard]] auto constexpr getRed() const -> uint8_t { return std::get<0>(_color); };
+  [[nodiscard]] auto constexpr getGreen() const -> uint8_t {
     return std::get<1>(_color);
   };
-  [[nodiscard]] auto getBlue() const -> uint8_t { return std::get<2>(_color); };
-  [[nodiscard]] auto getAlpha() const -> uint8_t { return _alpha; };
+  [[nodiscard]] auto constexpr getBlue() const -> uint8_t { return std::get<2>(_color); };
+  [[nodiscard]] auto constexpr getAlpha() const -> uint8_t { return _alpha; };
 
  private:
   std::tuple<uint8_t, uint8_t, uint8_t> _color{0, 0, 0};
