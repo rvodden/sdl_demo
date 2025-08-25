@@ -6,9 +6,9 @@
 static const uint8_t kCellColumns = 3;
 static const uint8_t kCellRows = 3;
 
-enum class GameState : std::uint8_t { Playing,
-                                 PlayerOWins,
-                                 PlayerXWins,
-                                 Draw };
+enum class GameState : std::uint8_t { kPlaying,
+                                 kPlayerOWins,
+                                 kPlayerXWins,
+                                 kDraw };
 
 #endif // TICTACTOE_GAME_CONSTANTS_H

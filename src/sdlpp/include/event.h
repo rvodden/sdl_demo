@@ -389,7 +389,10 @@ class EventBusImpl;
 template<typename Derived, typename PlatformEventType, typename AdaptorType = EventAdaptor<PlatformEventType>>
 class TemplatedEventBus {
  public:
-  TemplatedEventBus() = default;
+ private:
+ TemplatedEventBus() = default;
+public:
+
 
   /**
    * @brief Set the callback for routing converted events
@@ -442,6 +445,7 @@ class TemplatedEventBus {
  private:
   AdaptorType _adaptor;
   std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
+friend Derived;
 };
 
 /**
@@ -492,13 +496,12 @@ class SDLPP_EXPORT EventBus : public BaseEventBus {
 /**
  * @brief Factory function to create an SDL event bus
  * 
- * This function creates a TemplatedEventBus specialized for SDL events
- * without exposing SDL types in the public API. The returned bus uses CRTP
- * internally for zero-cost abstraction while providing the standard BaseEventBus interface.
+ * This function creates an SDLEventBus instance that uses CRTP internally
+ * for zero-cost abstraction while providing the BaseEventBus interface.
  * 
- * @return A unique pointer to an SDL event bus
+ * @return A shared pointer to an SDL event bus as BaseEventBus
  */
-SDLPP_EXPORT auto createSDLEventBus() -> std::unique_ptr<BaseEventBus>;
+[[nodiscard]] SDLPP_EXPORT auto createSDLEventBus() -> std::shared_ptr<BaseEventBus>;
 
 }  // namespace sdlpp
 

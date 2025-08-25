@@ -4,7 +4,7 @@
 #include <event.h>
 #include <float_rectangle.h>
 
-#include <forward_list>
+#include <vector>
 
 #include "button.h"
 
@@ -15,10 +15,10 @@ class ButtonImpl {
 
  public:
   ButtonImpl(std::shared_ptr<EventRouter> eventRouter,
-             sdlpp::FloatRectangle rectangle)
-      : _rectangle{std::move(rectangle)},
+             const sdlpp::FloatRectangle& rectangle)
+      : _rectangle{rectangle},
         _eventRouter{std::move(eventRouter)},
-        _eventHandlers{std::make_shared<std::forward_list<Button::Handler>>()},
+        _eventHandlers{std::make_shared<std::vector<Button::Handler>>()},
         _mouseEventHandler{_rectangle, _eventHandlers} {};
 
   class MouseEventHandler : public sdlpp::EventHandler<sdlpp::MouseButtonEvent>,
@@ -26,13 +26,13 @@ class ButtonImpl {
    public:
     MouseEventHandler(
         FloatRectangle& rectangle,
-        std::shared_ptr<std::forward_list<Button::Handler>> eventHandlers)
+        std::shared_ptr<std::vector<Button::Handler>> eventHandlers)
         : _rectangle{rectangle}, _eventHandlers{std::move(eventHandlers)} {};
     void handle(const sdlpp::MouseButtonEvent& mouseButtonEvent) override;
 
    private:
     FloatRectangle _rectangle;
-    std::shared_ptr<std::forward_list<Button::Handler>> _eventHandlers;
+    std::shared_ptr<std::vector<Button::Handler>> _eventHandlers;
   };
 
  private:
@@ -40,7 +40,7 @@ class ButtonImpl {
 
   sdlpp::FloatRectangle _rectangle;
   std::shared_ptr<EventRouter> _eventRouter;
-  std::shared_ptr<std::forward_list<Button::Handler>> _eventHandlers;
+  std::shared_ptr<std::vector<Button::Handler>> _eventHandlers;
   MouseEventHandler _mouseEventHandler;
 };
 

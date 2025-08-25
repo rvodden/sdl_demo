@@ -34,16 +34,16 @@ auto main() -> int {
       [=](const GameCompletedEvent& gCE) -> void {
         using enum GameState;
         switch(gCE.getState()) {
-          case PlayerOWins:
+          case kPlayerOWins:
             std::cout << "O Wins!\n";
             break;
-          case PlayerXWins:
+          case kPlayerXWins:
             std::cout << "X Wins!\n";
             break;
-          case Draw:
+          case kDraw:
             std::cout << "It's a draw!\n";
             break;
-          case Playing:
+          case kPlaying:
             std::cout << "The game isn't over!\n";
             break;
         }

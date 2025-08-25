@@ -34,8 +34,8 @@ auto Button::operator=(Button&& other) noexcept -> Button& {
   return *this;
 }
 
-void Button::registerEventHandler(const Handler& handler) {
-  _buttonImpl->_eventHandlers->push_front(handler);
+void Button::registerEventHandler(Handler&& handler) {
+  _buttonImpl->_eventHandlers->emplace_back(std::forward<Handler>(handler));
 };
 
 void ButtonImpl::eventHandler(

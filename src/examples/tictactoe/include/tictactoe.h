@@ -11,8 +11,8 @@
 
 class TicTacToe {
  public:
-  enum class Player : std::uint8_t { O,
-                                     X };
+  enum class Player : std::uint8_t { kO,
+                                     kX };
 
   TicTacToe(std::shared_ptr<sdlpp::EventBus> eventBus);
 
@@ -28,7 +28,7 @@ class TicTacToe {
       _cells{std::nullopt, std::nullopt, std::nullopt,
              std::nullopt, std::nullopt, std::nullopt,
              std::nullopt, std::nullopt, std::nullopt};
-  Player _turn{Player::O};
+  Player _turn{Player::kO};
 
   static auto _index(uint8_t x, uint8_t y) -> uint8_t;
   [[nodiscard]] auto _checkWinCondition() const -> GameState;

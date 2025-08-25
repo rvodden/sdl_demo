@@ -14,6 +14,7 @@
 
 #include "event.h"
 #include "event_router.h"
+#include "event_impl.h"
 
 using namespace sdlpp;
 using namespace sdlpp::tools;
@@ -56,7 +57,7 @@ auto main() -> int {
     
     // 3. Create CRTP-based SDL event bus (zero virtual function overhead!)
     std::cout << "3. Creating CRTP-based SDLEventBus (zero-cost abstraction)...\n";
-    auto sdlEventBus = createSDLEventBus();
+    auto sdlEventBus = sdlpp::createSDLEventBus();
     
     // 4. Connect EventBus to EventRouter via callback
     std::cout << "4. Setting up callback-based routing...\n";
@@ -73,20 +74,30 @@ auto main() -> int {
     sdlEvent.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
     sdlEvent.button.windowID = 1;
     sdlEvent.button.which = 1;
-    sdlEvent.button.x = 100.0f;
-    sdlEvent.button.y = 200.0f;
+    sdlEvent.button.x = 100.0F;
+    sdlEvent.button.y = 200.0F;
     sdlEvent.button.button = SDL_BUTTON_LEFT;
     sdlEvent.button.down = true;
     sdlEvent.button.clicks = 1;
     
-    // Process event through the new architecture
-    std::cout << "   Processing mouse button press...\n";
-    sdlEventBus->handlePlatformEvent(sdlEvent);
+    // Process event through the new architecture (push to SDL event queue)
+    std::cout << "   Pushing mouse button press to SDL queue...\n";
+    SDL_PushEvent(&sdlEvent);
+    
+    // Poll and route the event
+    if (auto event = sdlEventBus->poll()) {
+        std::cout << "   Event polled and routed successfully!\n";
+    }
     
     // Simulate mouse button release
     sdlEvent.button.down = false;
-    std::cout << "   Processing mouse button release...\n";
-    sdlEventBus->handlePlatformEvent(sdlEvent);
+    std::cout << "   Pushing mouse button release to SDL queue...\n";
+    SDL_PushEvent(&sdlEvent);
+    
+    // Poll and route the release event
+    if (auto event = sdlEventBus->poll()) {
+        std::cout << "   Release event polled and routed successfully!\n";
+    }
     
     std::cout << "\n✓ Success! EventBus and EventRouter are now decoupled.\n";
     std::cout << "✓ EventRouter.routeEvent() can be used in SDL_AppEvent callbacks.\n";

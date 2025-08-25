@@ -10,7 +10,7 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
     : _eventBus(std::move(bus)),
       _eventRouter(std::move(router)) {
   _spriteSheet->setTextureBlendMode(sdlpp::Texture::kBlend);
-  buttons.reserve(static_cast<std::size_t>(kCellColumns * kCellRows));
+  _buttons.reserve(static_cast<std::size_t>(kCellColumns * kCellRows));
   for (uint8_t x :
        std::ranges::iota_view<uint8_t, uint8_t>{0, kCellColumns}) {
     for (uint8_t y : std::ranges::iota_view<uint8_t, uint8_t>{0, kCellRows}) {
@@ -28,7 +28,7 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
                   std::make_unique<ClickEvent>(now, 0, x, y));
             }
           });
-      buttons.emplace_back(std::move(button));
+      _buttons.emplace_back(std::move(button));
     }
   }
 }
@@ -47,7 +47,7 @@ void TicTacToeUI::render(const std::shared_ptr<TicTacToe>& ticTacToe) {
         continue;
       }
       _spriteRenderer->render(
-          cellState.value() == TicTacToe::Player::O ? _letterO : _letterX,
+          cellState.value() == TicTacToe::Player::kO ? _letterO : _letterX,
           static_cast<float>(x) * kCellWidth,
           static_cast<float>(y) * kCellHeight);
     }

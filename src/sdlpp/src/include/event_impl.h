@@ -12,7 +12,7 @@
 namespace sdlpp {
 
 static constexpr vodden::Map<uint32_t, MouseButtonEvent::Button, 5>
-    sdlMouseButtonEventButtonMap{{
+    kSdlMouseButtonEventButtonMap{{
         {SDL_BUTTON_LEFT, MouseButtonEvent::Button::kLeft},
         {SDL_BUTTON_MIDDLE, MouseButtonEvent::Button::kMiddle},
         {SDL_BUTTON_RIGHT, MouseButtonEvent::Button::kRight},
@@ -33,15 +33,15 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
  * This specialization provides the conversion logic from SDL_Event
  * to sdlpp event objects, reusing the existing conversion functions.
  */
-template<>
-class EventAdaptor<SDL_Event> {
+ template<>
+ class EventAdaptor<SDL_Event> {
  public:
   /**
    * @brief Convert SDL_Event to sdlpp event
    * @param event The SDL event to convert
    * @return Converted sdlpp event, or nullptr if conversion not supported
    */
-  auto convertEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
+  static auto convertEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
     switch (event.type) {
       case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_DOWN:
       case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_UP:
@@ -114,8 +114,8 @@ class SDLEventBus : public TemplatedEventBus<SDLEventBus, SDL_Event>, public Bas
  * This function creates an SDLEventBus instance that uses CRTP internally
  * for zero-cost abstraction while providing the BaseEventBus interface.
  * 
- * @return A unique pointer to an SDL event bus as BaseEventBus
+ * @return A shared pointer to an SDL event bus as BaseEventBus
  */
-auto createSDLEventBus() -> std::unique_ptr<BaseEventBus>;
+auto createSDLEventBus() -> std::shared_ptr<BaseEventBus>;
 
 }  // namespace sdlpp

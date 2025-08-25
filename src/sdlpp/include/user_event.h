@@ -93,37 +93,37 @@ class SDLPP_EXPORT UserEvent : public Event {
    * @brief Get the window ID associated with this event
    * @return The window ID
    */
-  [[nodiscard]] auto getWindowId() const -> uint32_t { return windowId; }
+  [[nodiscard]] auto getWindowId() const -> uint32_t { return _windowId; }
 
   /**
    * @brief Set the window ID associated with this event
    * @param winId The window ID to set
    */
-  void setWindowId(uint32_t winId) { windowId = winId; }
+  void setWindowId(uint32_t winId) { _windowId = winId; }
 
   /**
    * @brief Get the user-defined event code
    * @return The event code
    */
-  [[nodiscard]] auto getCode() const -> int32_t { return code; }
+  [[nodiscard]] auto getCode() const -> int32_t { return _code; }
 
   /**
    * @brief Set the user-defined event code
    * @param cde The event code to set
    */
-  void setCode(int32_t cde) { code = cde; }
+  void setCode(int32_t cde) { _code = cde; }
 
   /**
    * @brief Get the generic data pointer
    * @return The data pointer
    */
-  [[nodiscard]] auto getData() const -> void* { return data; }
+  [[nodiscard]] auto getData() const -> void* { return _data; }
 
   /**
    * @brief Set the generic data pointer
    * @param d The data pointer to set
    */
-  void setData(void* d) { data = d; }
+  void setData(void* d) { _data = d; }
 
   auto static getEventType() -> uint32_t {
     static uint32_t eventCode = registerEventType();  // Once per type
@@ -132,11 +132,11 @@ class SDLPP_EXPORT UserEvent : public Event {
 
  private:
   /** @brief ID of the window associated with this event */
-  uint32_t windowId;
+  uint32_t _windowId;
   /** @brief User-defined event code for categorizing different event types */
-  int32_t code;
+  int32_t _code;
   /** @brief Generic data pointer for passing custom data */
-  void* data;
+  void* _data;
 
   std::unique_ptr<UserEventImpl> _userEventImpl;
 };

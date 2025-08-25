@@ -44,7 +44,7 @@ class TicTacToeUI {
   sdlpp::tools::Sprite _letterX{_spriteSheet,
                   {kCellWidth * kCellColumns, 0, kCellWidth, kCellHeight}};
 
-  std::vector<std::unique_ptr<sdlpp::tools::Button>> buttons;
+  std::vector<std::unique_ptr<sdlpp::tools::Button>> _buttons;
 
   static const uint8_t kCellWidth = 128;
   static const uint8_t kCellHeight = kCellWidth;

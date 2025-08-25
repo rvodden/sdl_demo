@@ -78,7 +78,7 @@ auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
       std::chrono::milliseconds(SDL_GetTicks()), sdlMouseButtonEvent->windowID,
       sdlMouseButtonEvent->which, sdlMouseButtonEvent->x,
       sdlMouseButtonEvent->y,
-      sdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
+      kSdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
       sdlMouseButtonEvent->down, sdlMouseButtonEvent->clicks);
 }
 
@@ -103,8 +103,8 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
   return baseEvent;
 }
 
-auto createSDLEventBus() -> std::unique_ptr<BaseEventBus> {
-  return std::make_unique<SDLEventBus>();
+auto createSDLEventBus() -> std::shared_ptr<BaseEventBus> {
+  return static_cast<std::shared_ptr<BaseEventBus>>(std::make_shared<SDLEventBus>());
 }
 
 // Implementation of CRTP methods for SDLEventBus

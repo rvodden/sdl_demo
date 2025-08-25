@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Be brutally honest, don't be a yes man. If I am wrong, point it out bluntly. I need honest feedback on my code.
+
 ## Build System
 
 This project uses CMake with presets for configuration and building:

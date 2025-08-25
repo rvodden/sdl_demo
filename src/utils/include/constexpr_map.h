@@ -12,8 +12,8 @@ namespace vodden {
 //! @brief A simple map class capable of being used as a constexpr
 template <class Key, class Value, std::size_t Size>
 struct Map {
-  constexpr Map(std::initializer_list<std::pair<Key, Value>> _initList) {
-    auto it = _initList.begin();
+  constexpr Map(std::initializer_list<std::pair<Key, Value>> initList) {
+    auto it = initList.begin();
     for (std::size_t i = 0; i < Size; ++i) {
       _data.at(i) = *std::next(it, static_cast<int32_t>(i));
     }
@@ -32,7 +32,7 @@ struct Map {
 //! @brief Helper function to create a Map from initializer list with
 //! automatic size deduction
 template <class Key, class Value, class... Pairs>
-constexpr auto make_map(Pairs&&... pairs) -> Map<Key, Value, sizeof...(pairs)> {
+constexpr auto makeMap(Pairs&&... pairs) -> Map<Key, Value, sizeof...(pairs)> {
   return Map<Key, Value, sizeof...(pairs)>(
       std::array<std::pair<Key, Value>, sizeof...(pairs)>{
           {std::forward<Pairs>(pairs)...}});
@@ -60,7 +60,7 @@ Map(std::array<std::pair<Key, Value>, N>&&) -> Map<Key, Value, N>;
 //! @brief Convenient alias for creating maps with automatic size deduction
 //! from arrays
 template <class Key, class Value, std::size_t N>
-constexpr auto make_constexpr_map(
+constexpr auto makeConstexprMap(
     const std::array<std::pair<Key, Value>, N>& data) -> Map<Key, Value, N> {
   return Map<Key, Value, N>(data);
 }

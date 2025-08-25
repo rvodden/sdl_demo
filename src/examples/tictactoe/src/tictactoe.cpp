@@ -20,11 +20,11 @@ void TicTacToe::play(uint8_t x, uint8_t y) {
   _cells.at(index) = {_turn};
   
   const auto state = _checkWinCondition();
-  if(state != GameState::Playing) {
+  if(state != GameState::kPlaying) {
     _eventBus->publish(std::make_unique<GameCompletedEvent>(state));
   }
   
-  _turn = _turn == Player::O ? Player::X : Player::O;
+  _turn = _turn == Player::kO ? Player::kX : Player::kO;
 }
 
 auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
@@ -38,26 +38,26 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
 [[nodiscard]] auto TicTacToe::_checkWinCondition() const -> GameState {
   using enum GameState;
   auto state = _checkRows();
-  if (state != Playing) {
+  if (state != kPlaying) {
     return state;
   }
 
   state = _checkColumns();
-  if (state != Playing) {
+  if (state != kPlaying) {
     return state;
   }
 
   state = _checkDiagonals();
-  if (state != Playing) {
+  if (state != kPlaying) {
     return state;
   }
 
   state = _checkForDraw();
-  if (state != Playing) {
+  if (state != kPlaying) {
     return state;
   }
 
-  return Playing;
+  return kPlaying;
 }
 
 [[nodiscard]] auto TicTacToe::_checkRows() const -> GameState {
@@ -66,11 +66,11 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
     if (_cells.at(_index(0, row)) &&
         _cells.at(_index(0, row)) == _cells.at(_index(1, row)) &&
         _cells.at(_index(1, row)) == _cells.at(_index(2, row))) {
-      return _cells.at(_index(0, row)) == Player::O ? PlayerOWins
-                                                    : PlayerXWins;
+      return _cells.at(_index(0, row)) == Player::kO ? kPlayerOWins
+                                                    : kPlayerXWins;
     }
   }
-  return Playing;
+  return kPlaying;
 }
 
 [[nodiscard]] auto TicTacToe::_checkColumns() const -> GameState {
@@ -79,11 +79,11 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
     if (_cells.at(_index(col, 0)) &&
         _cells.at(_index(col, 0)) == _cells.at(_index(col, 1)) &&
         _cells.at(_index(col, 1)) == _cells.at(_index(col, 2))) {
-      return _cells.at(_index(col, 0)) == Player::O ? PlayerOWins
-                                                    : PlayerXWins;
+      return _cells.at(_index(col, 0)) == Player::kO ? kPlayerOWins
+                                                    : kPlayerXWins;
     }
   }
-  return Playing;
+  return kPlaying;
 }
 
 [[nodiscard]] auto TicTacToe::_checkDiagonals() const -> GameState {
@@ -92,18 +92,18 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
   if (_cells.at(_index(0, 0)) &&
       _cells.at(_index(0, 0)) == _cells.at(_index(1, 1)) &&
       _cells.at(_index(1, 1)) == _cells.at(_index(2, 2))) {
-    return _cells.at(_index(0, 0)) == Player::O ? PlayerOWins
-                                                : PlayerXWins;
+    return _cells.at(_index(0, 0)) == Player::kO ? kPlayerOWins
+                                                : kPlayerXWins;
   }
 
   if (_cells.at(_index(2, 0)) &&
       _cells.at(_index(2, 0)) == _cells.at(_index(1, 1)) &&
       _cells.at(_index(1, 1)) == _cells.at(_index(0, 2))) {
-    return _cells.at(_index(2, 0)) == Player::O ? PlayerOWins
-                                                : PlayerXWins;
+    return _cells.at(_index(2, 0)) == Player::kO ? kPlayerOWins
+                                                : kPlayerXWins;
   }
 
-  return Playing;
+  return kPlaying;
 }
 
 [[nodiscard]] auto TicTacToe::_checkForDraw() const -> GameState {
@@ -116,5 +116,5 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
     }
   }
 
-  return allFilled ? GameState::Draw : GameState::Playing;
+  return allFilled ? GameState::kDraw : GameState::kPlaying;
 }

@@ -22,7 +22,7 @@ class GameCompletedEvent : public sdlpp::CustomUserEvent<GameCompletedEvent> {
   GameCompletedEvent(const GameState& state)
       : CustomUserEvent(std::chrono::duration_cast<std::chrono::milliseconds>(
                   std::chrono::steady_clock::now().time_since_epoch()), 0), _state(state) {}
-  auto getState() const noexcept -> GameState { return _state; }
+  [[nodiscard]] auto getState() const noexcept -> GameState { return _state; }
  
  private:
   GameState _state;

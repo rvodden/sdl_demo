@@ -77,7 +77,27 @@
         "text_encoding": "cpp",
         "cfenv": "cpp",
         "future": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "barrier": "cpp",
+        "complex": "cpp",
+        "coroutine": "cpp",
+        "csetjmp": "cpp",
+        "cuchar": "cpp",
+        "expected": "cpp",
+        "netfwd": "cpp",
+        "source_location": "cpp",
+        "rope": "cpp",
+        "slist": "cpp",
+        "latch": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "spanstream": "cpp",
+        "stacktrace": "cpp",
+        "syncstream": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "generator": "cpp",
+        "print": "cpp"
     },
     "files.exclude": {
         "**/build/**": true
