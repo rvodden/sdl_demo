@@ -17,7 +17,7 @@ void ButtonImpl::MouseEventHandler::handle(
 }
 
 Button::Button(std::shared_ptr<EventRouter> eventProcessor,
-               FloatRectangle rectangle)
+               sdlpp::Rectangle<float> rectangle)
     : _buttonImpl{std::make_unique<ButtonImpl>(std::move(eventProcessor),
                                                std::move(rectangle))} {
   _buttonImpl->_eventRouter->registerEventHandler(

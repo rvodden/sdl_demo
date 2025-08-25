@@ -18,7 +18,7 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
       float buttonY = (static_cast<float>(y) * kCellHeight) + 1;
       auto button = std::make_unique<sdlpp::tools::Button>(
           _eventRouter,
-          sdlpp::FloatRectangle{buttonX, buttonY, kCellWidth, kCellHeight});
+          sdlpp::Rectangle<float>{buttonX, buttonY, kCellWidth, kCellHeight});
       button->registerEventHandler(
           [this, x, y](const sdlpp::MouseButtonEvent& mouseButtonEvent) -> void {
             auto now = std::chrono::duration_cast<std::chrono::milliseconds>(

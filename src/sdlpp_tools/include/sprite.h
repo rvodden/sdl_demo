@@ -6,6 +6,7 @@
 #include "sdlpp_tools_export.h"
 #include "sprite_renderer.h"
 #include "texture.h"
+#include "rectangle.h"
 
 namespace sdlpp::tools {
 
@@ -22,7 +23,7 @@ class SpriteRenderer;
  * performance through batching.
  *
  * Sprites maintain a reference to their source texture and define their
- * region using a FloatRectangle, allowing for pixel-perfect extraction
+ * region using a sdlpp::Rectangle<float>, allowing for pixel-perfect extraction
  * from sprite sheets, tile sets, and texture atlases. The sprite itself
  * is lightweight and can be efficiently copied and managed.
  *
@@ -40,7 +41,7 @@ class SpriteRenderer;
  * @note Sprites are lightweight - the texture data is shared, not duplicated
  * @see SpriteRenderer for efficient batch rendering of multiple sprites
  * @see Texture for the underlying graphics resource
- * @see FloatRectangle for the sprite region definition
+ * @see sdlpp::Rectangle<float> for the sprite region definition
  *
  * Example usage:
  * @code
@@ -49,9 +50,9 @@ class SpriteRenderer;
  * auto sharedTexture = std::make_shared<const sdlpp::Texture>(std::move(spriteSheet));
  * 
  * // Create sprites from different regions of the same texture
- * sdlpp::tools::Sprite playerIdle(sharedTexture, FloatRectangle(0, 0, 32, 48));
- * sdlpp::tools::Sprite playerWalk1(sharedTexture, FloatRectangle(32, 0, 32, 48));
- * sdlpp::tools::Sprite playerWalk2(sharedTexture, FloatRectangle(64, 0, 32, 48));
+ * sdlpp::tools::Sprite playerIdle(sharedTexture, sdlpp::Rectangle<float>(0, 0, 32, 48));
+ * sdlpp::tools::Sprite playerWalk1(sharedTexture, sdlpp::Rectangle<float>(32, 0, 32, 48));
+ * sdlpp::tools::Sprite playerWalk2(sharedTexture, sdlpp::Rectangle<float>(64, 0, 32, 48));
  * 
  * // Render multiple sprites efficiently
  * sdlpp::tools::SpriteRenderer spriteRenderer(renderer);
@@ -93,19 +94,19 @@ class SDLPP_TOOLS_EXPORT Sprite {
    * auto texture = std::make_shared<const Texture>(renderer, "tileset.png");
    * 
    * // Extract tile at row 2, column 5 (0-indexed)
-   * FloatRectangle tileRegion(5 * 32, 2 * 32, 32, 32);
+   * sdlpp::Rectangle<float> tileRegion(5 * 32, 2 * 32, 32, 32);
    * Sprite grassTile(texture, tileRegion);
    * 
    * // Extract animated frames from a character sheet
    * std::vector<Sprite> walkAnimation;
    * for (int frame = 0; frame < 4; ++frame) {
-   *     FloatRectangle frameRegion(frame * 64, 0, 64, 64);
+   *     sdlpp::Rectangle<float> frameRegion(frame * 64, 0, 64, 64);
    *     walkAnimation.emplace_back(texture, frameRegion);
    * }
    * @endcode
    */
   Sprite(std::shared_ptr<const Texture> texture,
-         const FloatRectangle& rectangle);
+         const sdlpp::Rectangle<float>& rectangle);
          
   /**
    * @brief Copy constructor is explicitly deleted

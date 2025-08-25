@@ -4,6 +4,7 @@
 #include <text.h>
 #include <ttf.h>
 #include <window.h>
+#include <application.h>
 
 #include <string_view>
 
@@ -15,24 +16,44 @@ using namespace std::literals;
 
 const uint32_t kScreenWidth = 800;
 const uint32_t kScreenHeight = 600;
+const float kScale = 4.0;
 
-auto main() -> int {
-  auto sdl = SDL();
-  sdl.initSubSystem(SDL::kVideo);
-  sdl.initSubSystem(SDL::kEvents);
-  
-  auto window = Window("Hello, World!", kScreenWidth, kScreenHeight, 0);
-  auto renderer = Renderer(window);
+class HelloWorld : public BaseApplication {
+ public:
+  auto init() -> bool override {
+    auto sdl = SDL();
+    sdl.initSubSystem(SDL::kVideo);
+    sdl.initSubSystem(SDL::kEvents);
 
-  [[maybe_unused]] auto ttf = TTF();
+    _window = std::make_unique<Window>("Hello, World!", kScreenWidth, kScreenHeight, 0);
+    _renderer = std::make_unique<Renderer>(*_window);
 
-  const float fontSize = 18.0F;
-  auto font = Font(tiny_ttf.data(), tiny_ttf.size(), fontSize);
-  auto text = Text::renderBlended(font, "Hello, World!", NamedColor::kWhite);
-  auto texture = Texture(renderer, text);
+    [[maybe_unused]] auto ttf = TTF();
 
-  return 0;
-}
+    const float fontSize = 18.0F;
+    auto font = Font(tiny_ttf.data(), tiny_ttf.size(), fontSize);
+    auto text = Text::renderBlended(font, "Hello, World!", NamedColor::kWhite);
+    _texture = std::make_unique<Texture>(*_renderer, text);
+
+    return true;
+  }
+
+  auto iterate() -> bool override { 
+    auto outputSize = _renderer->getOutputSize();
+    _renderer.setScale(kScale);
+    auto textureSize = _texture.getSize():
+    return true; 
+  }
+
+  void quit() override {}
+
+ private:
+  std::unique_ptr<Window> _window  = nullptr;
+  std::unique_ptr<Renderer> _renderer = nullptr;
+  std::unique_ptr<Texture> _texture = nullptr;
+};
+
+REGISTER_APPLICATION(HelloWorld)
 
 /* Data used by this example */
 /* tiny.txt

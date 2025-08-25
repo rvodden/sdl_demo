@@ -3,7 +3,7 @@
 namespace sdlpp::tools {
 
 Sprite::Sprite(std::shared_ptr<const Texture> texture,
-               const FloatRectangle& rectangle)
+               const sdlpp::Rectangle<float>& rectangle)
     : _spriteImpl{std::make_unique<SpriteImpl>(std::move(texture), rectangle)} {
 }
 

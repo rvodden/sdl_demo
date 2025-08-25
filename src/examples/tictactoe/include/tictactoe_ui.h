@@ -7,7 +7,7 @@
 #include <button.h>
 #include <color.h>
 #include <event_router.h>
-#include <float_rectangle.h>
+#include <rectangle.h>
 #include <images.h>
 #include <renderer.h>
 #include <sprite.h>

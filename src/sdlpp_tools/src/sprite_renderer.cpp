@@ -24,9 +24,9 @@ SpriteRenderer::~SpriteRenderer() = default;
 
 void SpriteRenderer::render(const Sprite& sprite, const float x,
                             const float y) const {
-  const FloatRectangle destination = {
+  const sdlpp::Rectangle<float> destination(
       x, y, sprite._spriteImpl->_rectangle.getWidth(),
-      sprite._spriteImpl->_rectangle.getHeight()};
+      sprite._spriteImpl->_rectangle.getHeight());
 
   _spriteRendererImpl->_renderer->copy(*sprite._spriteImpl->_spriteSheet,
                                        sprite._spriteImpl->_rectangle,

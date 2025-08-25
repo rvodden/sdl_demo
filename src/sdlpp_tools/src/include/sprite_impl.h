@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "float_rectangle.h"
+#include "rectangle.h"
 #include "sprite.h"
 
 namespace sdlpp::tools {
@@ -15,12 +15,12 @@ class SpriteImpl {
   friend SpriteRenderer;
 
  public:
-  SpriteImpl(std::shared_ptr<const Texture> texture, FloatRectangle rectangle)
+  SpriteImpl(std::shared_ptr<const Texture> texture, sdlpp::Rectangle<float> rectangle)
       : _spriteSheet{std::move(texture)}, _rectangle{std::move(rectangle)} {};
 
  private:
   std::shared_ptr<const Texture> _spriteSheet;
-  FloatRectangle _rectangle;
+  sdlpp::Rectangle<float> _rectangle;
 };
 
 }  // namespace sdlpp::tools

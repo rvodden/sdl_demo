@@ -1,77 +1,93 @@
-#include "float_rectangle.h"
-#include "float_rectangle_impl.h"
+#include "rectangle.h"
+#include "include/rectangle_impl.h"
 
 namespace sdlpp {
 
-FloatRectangle::FloatRectangle(float x, float y, float width, float height)
-    : _rectangleImpl{std::make_unique<FloatRectangleImpl>()} {
-  _rectangleImpl->_sdlFRect.x = x;
-  _rectangleImpl->_sdlFRect.y = y;
-  _rectangleImpl->_sdlFRect.w = width;
-  _rectangleImpl->_sdlFRect.h = height;
+// Template explicit instantiations
+template class Rectangle<int32_t>;
+template class Rectangle<float>;
+
+// Constructor
+template<typename T>
+Rectangle<T>::Rectangle(T x, T y, T width, T height)
+    : impl_(std::make_unique<RectangleImpl<T>>(x, y, width, height)) {
 }
 
-FloatRectangle::FloatRectangle(const FloatRectangle& other)
-    : _rectangleImpl{std::make_unique<FloatRectangleImpl>(
-          other._rectangleImpl->_sdlFRect)} {}
+// Copy constructor
+template<typename T>
+Rectangle<T>::Rectangle(const Rectangle& other)
+    : impl_(std::make_unique<RectangleImpl<T>>(*other.impl_)) {
+}
 
-FloatRectangle::FloatRectangle(FloatRectangle&& other) noexcept
-    : _rectangleImpl{std::move(other._rectangleImpl)} {}
+// Move constructor
+template<typename T>
+Rectangle<T>::Rectangle(Rectangle&& other) noexcept = default;
 
-FloatRectangle::~FloatRectangle() = default;
+// Destructor
+template<typename T>
+Rectangle<T>::~Rectangle() = default;
 
-auto FloatRectangle::operator=(const FloatRectangle& other) -> FloatRectangle& {
-  if (this == &other) {
+// Copy assignment operator
+template<typename T>
+auto Rectangle<T>::operator=(const Rectangle& other) -> Rectangle& {
+    if (this != &other) {
+        impl_ = std::make_unique<RectangleImpl<T>>(*other.impl_);
+    }
     return *this;
-  }
-
-  _rectangleImpl =
-      std::make_unique<FloatRectangleImpl>(other._rectangleImpl->_sdlFRect);
-  return *this;
 }
 
-auto FloatRectangle::operator=(FloatRectangle&& other) noexcept
-    -> FloatRectangle& {
-  _rectangleImpl = std::move(other._rectangleImpl);
-  return *this;
+// Move assignment operator
+template<typename T>
+auto Rectangle<T>::operator=(Rectangle&& other) noexcept -> Rectangle& = default;
+
+// Getters
+template<typename T>
+auto Rectangle<T>::getX() const -> T {
+    return impl_->getSDLRect()->x;
 }
 
-auto FloatRectangle::getX() const -> float {
-  return _rectangleImpl->_sdlFRect.x;
+template<typename T>
+auto Rectangle<T>::getY() const -> T {
+    return impl_->getSDLRect()->y;
 }
 
-auto FloatRectangle::getY() const -> float {
-  return _rectangleImpl->_sdlFRect.y;
+template<typename T>
+auto Rectangle<T>::getWidth() const -> T {
+    return impl_->getSDLRect()->w;
 }
 
-auto FloatRectangle::getHeight() const -> float {
-  return _rectangleImpl->_sdlFRect.h;
+template<typename T>
+auto Rectangle<T>::getHeight() const -> T {
+    return impl_->getSDLRect()->h;
 }
 
-auto FloatRectangle::getWidth() const -> float {
-  return _rectangleImpl->_sdlFRect.w;
-};
+// Setters
+template<typename T>
+auto Rectangle<T>::setX(T x) -> void {
+    impl_->getSDLRect()->x = x;
+}
 
-auto FloatRectangle::contains(const float& x, const float& y) const -> bool {
-  float rx = getX();
-  float ry = getY();
-  float height = getHeight();
-  float width = getWidth();
+template<typename T>
+auto Rectangle<T>::setY(T y) -> void {
+    impl_->getSDLRect()->y = y;
+}
 
-  if (x < rx) {
-    return false;
-  }
-  if (x > rx + width) {
-    return false;
-  }
-  if (y < ry) {
-    return false;
-  }
-  if (y > ry + height) {
-    return false;
-  }
+template<typename T>
+auto Rectangle<T>::setWidth(T width) -> void {
+    impl_->getSDLRect()->w = width;
+}
 
-  return true;
+template<typename T>
+auto Rectangle<T>::setHeight(T height) -> void {
+    impl_->getSDLRect()->h = height;
+}
+
+// Contains method
+template<typename T>
+auto Rectangle<T>::contains(T x, T y) const -> bool {
+    const auto* rect = impl_->getSDLRect();
+    return (x >= rect->x && y >= rect->y && 
+            x < rect->x + rect->w && y < rect->y + rect->h);
 }
 
 }  // namespace sdlpp

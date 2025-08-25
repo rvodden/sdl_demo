@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <cstdint>
+#include <concepts>
 
 #include "sdlpp_application_export.h"
 
@@ -64,13 +65,21 @@ class SDLPP_APPLICATION_EXPORT ApplicationRunner {
   
 };
 
+// Concept to enforce that registered applications derive from BaseApplication
+template<typename T>
+concept ApplicationType = std::derived_from<T, BaseApplication>;
+
+// Template function for type-safe application registration
+template<ApplicationType AppClass>
+inline auto register_application() -> int {
+  ApplicationRunner::registerApplication(std::make_unique<AppClass>());
+  return 0;
+}
+
 }  // namespace sdlpp
 
 // Convenience macro for application registration
 #define REGISTER_APPLICATION(AppClass) \
-  static auto _ = []() { \
-    sdlpp::ApplicationRunner::registerApplication(std::make_unique<AppClass>()); \
-    return 0; \
-  }();
+    static auto _register_##AppClass = sdlpp::register_application<AppClass>();
 
 #endif  // SDLPP_APPLICATION_H

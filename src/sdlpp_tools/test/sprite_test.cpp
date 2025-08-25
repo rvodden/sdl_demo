@@ -4,7 +4,7 @@
 #include <renderer.h>
 #include <window.h>
 #include <sdl.h>
-#include <float_rectangle.h>
+#include <rectangle.h>
 #include <memory>
 
 constexpr uint16_t kTestWidth = 800;
@@ -36,7 +36,7 @@ protected:
 TEST_F(SpriteTest, testSpriteCreation) {
   constexpr float kRectSize = 100.0F;
   constexpr float kZero = 0.0F;
-  sdlpp::FloatRectangle rect(kZero, kZero, kRectSize, kRectSize);
+  sdlpp::Rectangle<float> rect(kZero, kZero, kRectSize, kRectSize);
   
   // Should not throw when creating sprite
   ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));
@@ -47,7 +47,7 @@ TEST_F(SpriteTest, testSpriteMoveConstructor) {
   constexpr float kY = 20.0F;
   constexpr float kWidth = 50.0F;
   constexpr float kHeight = 60.0F;
-  sdlpp::FloatRectangle rect(kX, kY, kWidth, kHeight);
+  sdlpp::Rectangle<float> rect(kX, kY, kWidth, kHeight);
   sdlpp::tools::Sprite sprite1(texture, rect);
   
   // Move constructor should work
@@ -64,8 +64,8 @@ TEST_F(SpriteTest, testSpriteMoveAssignment) {
   constexpr float kWidth2 = 70.0F;
   constexpr float kHeight2 = 80.0F;
   
-  sdlpp::FloatRectangle rect1(kX1, kY1, kWidth1, kHeight1);
-  sdlpp::FloatRectangle rect2(kX2, kY2, kWidth2, kHeight2);
+  sdlpp::Rectangle<float> rect1(kX1, kY1, kWidth1, kHeight1);
+  sdlpp::Rectangle<float> rect2(kX2, kY2, kWidth2, kHeight2);
   
   sdlpp::tools::Sprite sprite1(texture, rect1);
   sdlpp::tools::Sprite sprite2(texture, rect2);
@@ -82,9 +82,9 @@ TEST_F(SpriteTest, testSpriteWithDifferentRectangles) {
   constexpr float kOffset = 100.0F;
   
   // Test with various rectangle configurations
-  sdlpp::FloatRectangle smallRect(kZero, kZero, kSmallSize, kSmallSize);
-  sdlpp::FloatRectangle largeRect(kZero, kZero, kLargeSize, kLargeSize);
-  sdlpp::FloatRectangle offsetRect(kOffset, kOffset, kMidSize, kMidSize);
+  sdlpp::Rectangle<float> smallRect(kZero, kZero, kSmallSize, kSmallSize);
+  sdlpp::Rectangle<float> largeRect(kZero, kZero, kLargeSize, kLargeSize);
+  sdlpp::Rectangle<float> offsetRect(kOffset, kOffset, kMidSize, kMidSize);
   
   ASSERT_NO_THROW(sdlpp::tools::Sprite sprite1(texture, smallRect));
   ASSERT_NO_THROW(sdlpp::tools::Sprite sprite2(texture, largeRect));
@@ -96,7 +96,7 @@ TEST_F(SpriteTest, testSpriteWithNegativeCoordinates) {
   constexpr float kNegY = -20.0F;
   constexpr float kWidth = 50.0F;
   constexpr float kHeight = 60.0F;
-  sdlpp::FloatRectangle rect(kNegX, kNegY, kWidth, kHeight);
+  sdlpp::Rectangle<float> rect(kNegX, kNegY, kWidth, kHeight);
   
   // Should handle negative coordinates
   ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));
@@ -104,7 +104,7 @@ TEST_F(SpriteTest, testSpriteWithNegativeCoordinates) {
 
 TEST_F(SpriteTest, testSpriteWithZeroDimensions) {
   constexpr float kZero = 0.0F;
-  sdlpp::FloatRectangle rect(kZero, kZero, kZero, kZero);
+  sdlpp::Rectangle<float> rect(kZero, kZero, kZero, kZero);
   
   // Should handle zero dimensions
   ASSERT_NO_THROW(sdlpp::tools::Sprite sprite(texture, rect));

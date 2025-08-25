@@ -3,7 +3,7 @@
 
 #include <event.h>
 #include <event_router.h>
-#include <float_rectangle.h>
+#include <rectangle.h>
 
 #include <memory>
 
@@ -35,14 +35,14 @@ class ButtonImpl;
  * @note Multiple event handlers can be registered and will all be called
  * @see EventRouter for the event distribution system
  * @see MouseButtonEvent for the event data structure
- * @see FloatRectangle for the clickable area definition
+ * @see sdlpp::Rectangle<float> for the clickable area definition
  *
  * Example usage:
  * @code
  * auto eventRouter = std::make_shared<EventRouter>(eventBus);
  * 
  * // Create button covering rectangle from (100,50) with size 200x75
- * FloatRectangle bounds(100.0f, 50.0f, 200.0f, 75.0f);
+ * sdlpp::Rectangle<float> bounds(100.0f, 50.0f, 200.0f, 75.0f);
  * Button playButton(eventRouter, bounds);
  * 
  * // Register click handler
@@ -82,7 +82,7 @@ class SDLPP_TOOLS_EXPORT Button {
    * @note Rectangle coordinates should match your visual button representation
    */
   Button(std::shared_ptr<EventRouter> eventRouter,
-         sdlpp::FloatRectangle rectangle);
+         sdlpp::Rectangle<float> rectangle);
          
   /**
    * @brief Copy constructor is explicitly deleted

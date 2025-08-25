@@ -2,7 +2,7 @@
 #include <button.h>
 #include <event.h>
 #include <event_router.h>
-#include <float_rectangle.h>
+#include <rectangle.h>
 #include <user_event.h>
 
 #include <memory>
@@ -107,7 +107,7 @@ class ButtonTest : public ::testing::Test {
 protected:
     void SetUp() override {
         testEventRouter = std::make_unique<TestEventRouter>();
-        testRect = std::make_unique<FloatRectangle>(10.0f, 10.0f, 100.0f, 50.0f);
+        testRect = std::make_unique<sdlpp::Rectangle<float>>(10.0f, 10.0f, 100.0f, 50.0f);
     }
 
     void TearDown() override {
@@ -130,7 +130,7 @@ protected:
     }
 
     std::unique_ptr<TestEventRouter> testEventRouter;
-    std::unique_ptr<FloatRectangle> testRect;
+    std::unique_ptr<sdlpp::Rectangle<float>> testRect;
     std::unique_ptr<Button> button;
 };
 
@@ -188,7 +188,7 @@ TEST_F(ButtonTest, MoveConstructor) {
 TEST_F(ButtonTest, MoveAssignment) {
     // Create two buttons
     button = std::make_unique<Button>(testEventRouter->getEventRouter(), *testRect);
-    FloatRectangle otherRect(200.0f, 200.0f, 50.0f, 25.0f);
+    sdlpp::Rectangle<float> otherRect(200.0f, 200.0f, 50.0f, 25.0f);
     Button otherButton(testEventRouter->getEventRouter(), otherRect);
     
     // Move assign
@@ -345,7 +345,7 @@ TEST_F(ButtonTest, MultipleHandlersAllReceiveEvent) {
 
 // Edge Cases Tests
 TEST_F(ButtonTest, ZeroSizeRectangle) {
-    FloatRectangle zeroRect(10.0f, 10.0f, 0.0f, 0.0f);
+    sdlpp::Rectangle<float> zeroRect(10.0f, 10.0f, 0.0f, 0.0f);
     
     EXPECT_NO_THROW(
         button = std::make_unique<Button>(testEventRouter->getEventRouter(), zeroRect)
@@ -354,14 +354,13 @@ TEST_F(ButtonTest, ZeroSizeRectangle) {
     TestButtonHandler handler;
     button->registerEventHandler([&handler](const MouseButtonEvent& e) { handler(e); });
     
-    // Based on FloatRectangle tests, zero-size rectangle at (10,10) should contain point (10,10)
+    // Zero-size rectangle should not contain any points (correct behavior)
     auto clickEvent = std::make_unique<MouseButtonEvent>(createMouseEvent(10.0f, 10.0f));
     testEventRouter->injectAndProcess(std::move(clickEvent));
     
-    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.callCount, 0);
     
-    // But not contain nearby points
-    handler.callCount = 0;
+    // Also should not contain nearby points
     auto outsideEvent = std::make_unique<MouseButtonEvent>(createMouseEvent(11.0f, 11.0f));
     testEventRouter->injectAndProcess(std::move(outsideEvent));
     
@@ -369,7 +368,7 @@ TEST_F(ButtonTest, ZeroSizeRectangle) {
 }
 
 TEST_F(ButtonTest, NegativeCoordinateRectangle) {
-    FloatRectangle negativeRect(-50.0f, -30.0f, 100.0f, 60.0f);
+    sdlpp::Rectangle<float> negativeRect(-50.0f, -30.0f, 100.0f, 60.0f);
     
     EXPECT_NO_THROW(
         button = std::make_unique<Button>(testEventRouter->getEventRouter(), negativeRect)

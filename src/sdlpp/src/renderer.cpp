@@ -2,11 +2,13 @@
 
 #include <SDL3/SDL.h>
 
+#include <algorithm>
 #include <cinttypes>
+#include <cstring>
 #include <memory>
 
 #include "exception.h"
-#include "float_rectangle_impl.h"
+#include "rectangle_impl.h"
 #include "renderer_impl.h"
 #include "texture_impl.h"
 #include "window.h"
@@ -63,10 +65,10 @@ void Renderer::copy(const Texture& texture) {
   }
 }
 
-void Renderer::copy(const Texture& texture, const FloatRectangle& source,
-                    const FloatRectangle& destination) {
-  SDL_FRect* sourceRect = source._rectangleImpl->getSDLRect();
-  SDL_FRect* destRect = destination._rectangleImpl->getSDLRect();
+void Renderer::copy(const Texture& texture, const Rectangle<float>& source,
+                    const Rectangle<float>& destination) {
+  SDL_FRect* sourceRect = source.impl_->getSDLRect();
+  SDL_FRect* destRect = destination.impl_->getSDLRect();
 
   auto returnValue = SDL_RenderTexture(_rendererImpl->_sdlRenderer,
                                        texture._textureImpl->_sdlTexture,
@@ -87,5 +89,36 @@ void Renderer::present() const {
   SDL_RenderPresent(_rendererImpl->_sdlRenderer);
 }
 
+auto Renderer::readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const -> std::vector<uint8_t> {
+  SDL_Rect rect{static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height)};
+  
+  SDL_Surface* surface = SDL_RenderReadPixels(_rendererImpl->_sdlRenderer, &rect);
+  if (surface == nullptr) {
+    throw Exception("SDL_RenderReadPixels");
+  }
+  
+  // Assume 4 bytes per pixel (RGBA) for simplicity
+  std::vector<uint8_t> pixels;
+  size_t pixelCount = static_cast<size_t>(surface->w * surface->h * 4);
+  pixels.resize(pixelCount);
+  
+  if (SDL_LockSurface(surface)) {
+    std::memcpy(pixels.data(), surface->pixels, std::min(pixelCount, static_cast<size_t>(surface->pitch * surface->h)));
+    SDL_UnlockSurface(surface);
+  }
+  
+  SDL_DestroySurface(surface);
+  return pixels;
+}
+
+auto Renderer::getOutputSize() -> Rectangle<int> {
+  int width = 0;
+  int height = 0;
+  auto retVal = SDL_GetCurrentRenderOutputSize(_rendererImpl->_sdlRenderer, &width, &height);
+  if (!retVal) {
+    throw Exception("SDL_GetCurrentRenderOutputSize");
+  }
+  return { 0, 0, width, height };
+}
 
 }  // namespace sdlpp

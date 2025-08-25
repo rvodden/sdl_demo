@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <sprite.h>
-#include <float_rectangle.h>
+#include <rectangle.h>
 
 // Simple compilation test to ensure sdlpp_tools headers work
 TEST(SdlToolsTest, testBasicCompilation) {
@@ -10,7 +10,7 @@ TEST(SdlToolsTest, testBasicCompilation) {
   constexpr float kWidth = 100.0F;
   constexpr float kHeight = 200.0F;
   
-  sdlpp::FloatRectangle rect(kX, kY, kWidth, kHeight);
+  sdlpp::Rectangle<float> rect(kX, kY, kWidth, kHeight);
   
   ASSERT_EQ(rect.getX(), kX);
   ASSERT_EQ(rect.getY(), kY);

@@ -18,13 +18,13 @@ SDL++ follows a clean three-layer architecture:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                Applications                          │
+│                Applications                         │
 │  (TicTacToe, Snippets, Examples)                    │
 ├─────────────────────────────────────────────────────┤
-│                SDL++ Tools                           │
+│                SDL++ Tools                          │
 │  (EventRouter, Sprite System, UI Components)        │
 ├─────────────────────────────────────────────────────┤
-│                Core SDL++ Wrapper                    │
+│                Core SDL++ Wrapper                   │
 │  (Window, Renderer, Texture, Surface, Events)       │
 └─────────────────────────────────────────────────────┘
 ```

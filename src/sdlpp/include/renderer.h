@@ -7,13 +7,13 @@
 #include <vector>
 
 #include "color.h"
-#include "float_rectangle.h"
+#include "rectangle.h"
 #include "sdlpp_export.h"
 #include "texture.h"
 
 namespace sdlpp {
 
-class FloatRectangle;
+template<typename T> class Rectangle;
 class Texture;
 class Window;
 class RendererImpl;
@@ -137,7 +137,7 @@ class SDLPP_EXPORT Renderer {
    *
    * @note The texture must have been created from this renderer
    * @note Drawing is not immediately visible until present() is called
-   * @see copy(const Texture&, const FloatRectangle&, const FloatRectangle&) for partial copies
+   * @see copy(const Texture&, const Rectangle<float>&, const Rectangle<float>&) for partial copies
    */
   void copy(const Texture& texture);
 
@@ -156,8 +156,8 @@ class SDLPP_EXPORT Renderer {
    * @note Destination coordinates are in screen space (0,0 = top-left of window)
    * @note Drawing is not immediately visible until present() is called
    */
-  void copy(const Texture& texture, const FloatRectangle& source,
-            const FloatRectangle& destination);
+  void copy(const Texture& texture, const Rectangle<float>& source,
+            const Rectangle<float>& destination);
 
   /**
    * @brief Clear the entire render target with the current draw color
@@ -204,6 +204,8 @@ class SDLPP_EXPORT Renderer {
    * @note Consider caching results if reading the same region repeatedly
    */
   [[nodiscard]] auto readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const -> std::vector<uint8_t>;
+
+  [[nodiscard]] auto getOutputSize() -> Rectangle<int>;
 
   /** @brief Software-only rendering (slowest, most compatible) */
   static constexpr RendererFlag kSoftware = 0;
