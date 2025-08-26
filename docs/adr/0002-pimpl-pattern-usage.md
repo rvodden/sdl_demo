@@ -36,15 +36,16 @@ class Surface {
 public:
   Surface(const std::filesystem::path& filePath);
   // ... public interface
+  [[nodiscard]] auto getImpl() const -> const SurfaceImpl&;
 private:
-  std::unique_ptr<SurfaceImpl> _surfaceImpl;  // Pimpl
+  std::unique_ptr<SurfaceImpl> _impl;  // Standardized pimpl naming
 };
 ```
 
 ### Implementation Header Structure  
 - Implementation details isolated in `src/sdlpp/src/include/*_impl.h` files
 - SDL dependencies contained within implementation
-- Friend relationships for internal access
+- Friend relationships contained at impl level only - no coupling exposed in public API
 
 **Example (`src/sdlpp/src/include/surface_impl.h`):**
 ```cpp
@@ -53,9 +54,10 @@ private:
 
 class SurfaceImpl {
   friend class Surface;
-  friend class Texture;
+  friend class TextureImpl;  // Friend at impl level only
 public:
   static auto createSurface(SDL_Surface* sdlSurface) -> Surface;
+  SDL_Surface* getSdlSurface() const; // Controlled access for other impls
 private:
   SDL_Surface* _sdlSurface = nullptr;  // Raw SDL resource
 };
@@ -67,6 +69,9 @@ All classes follow the same pattern:
 2. **Public methods**: Delegate to `_impl->method()` calls
 3. **Resource management**: RAII cleanup in destructors
 4. **Move semantics**: Proper transfer of `unique_ptr` ownership
+5. **Inter-class access**: Public classes expose `getImpl()` methods for controlled access to impl data
+6. **Friend relationships**: Contained entirely at impl level (e.g., `SpriteImpl` friends `SpriteRendererImpl`)
+7. **Naming convention**: All pimpl members use standardized `_impl` naming (not `_classNameImpl`)
 
 ## Consequences
 
@@ -78,9 +83,11 @@ All classes follow the same pattern:
 
 **ABI Stability**: Internal implementation changes don't require user code recompilation. We can upgrade SDL versions without breaking user builds.
 
-**Clean API Surface**: Public headers are readable and focused. No SDL-specific types, macros, or platform dependencies leak through.
+**Clean API Surface**: Public headers are readable and focused. No SDL-specific types, macros, platform dependencies, or implementation coupling leak through.
 
 **Implementation Flexibility**: We can change internal SDL usage patterns, add caching, or even switch SDL versions without affecting the public API.
+
+**Consistent Naming**: Standardized `_impl` naming across all classes improves code maintainability and reduces cognitive load when working with pimpl patterns.
 
 ### Negative Consequences
 
@@ -92,7 +99,7 @@ All classes follow the same pattern:
 
 **Debugging Difficulty**: Debugger must follow pointer to reach actual SDL resources. Modern debuggers handle this well with proper debug symbols.
 
-**Friend Relationships**: Some implementation classes need `friend` access for internal operations, slightly coupling the design.
+**Friend Relationships**: Implementation classes use `friend` access for internal operations, but these relationships are contained entirely within the impl layer, keeping public headers clean.
 
 ## Alternatives Considered
 
@@ -136,11 +143,11 @@ All classes follow the same pattern:
 
 The pattern's effectiveness is visible throughout our codebase:
 
-**Consistent Application**: All 8 major wrapper classes (`Window`, `Renderer`, `Surface`, `Texture`, `EventBus`, etc.) follow identical pimpl structure.
+**Consistent Application**: All 14 major wrapper classes (`Window`, `Renderer`, `Surface`, `Texture`, `EventBus`, `Sprite`, `Button`, etc.) follow identical pimpl structure with standardized `_impl` naming.
 
-**Clean Public Headers**: Zero SDL includes in `src/sdlpp/include/` - only standard library and our own headers.
+**Clean Public Headers**: Zero SDL includes in `src/sdlpp/include/` - only standard library and our own headers. No friend statements exposing internal coupling.
 
-**Isolated Dependencies**: All SDL includes contained within `src/sdlpp/src/include/*_impl.h` files.
+**Isolated Dependencies**: All SDL includes and friend relationships contained within `src/sdlpp/src/include/*_impl.h` files.
 
 **User Experience**: TicTacToe example includes only `#include <sdl.h>` and compiles without any SDL configuration.
 

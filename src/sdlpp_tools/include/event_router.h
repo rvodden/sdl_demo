@@ -308,7 +308,7 @@ class SDLPP_TOOLS_EXPORT EventRouter {
 
  private:
   /** @brief Pointer to implementation (pimpl idiom) */
-  std::unique_ptr<EventRouterImpl> _eventRouterImpl;
+  std::unique_ptr<EventRouterImpl> _impl;
 
   /** @brief Storage for function-based event handlers to manage their
    * lifetime */

@@ -51,7 +51,6 @@ class Texture;
  */
 class SDLPP_EXPORT Surface {
   friend SurfaceImpl;
-  friend Texture;
  public:
   /**
    * @brief Create a surface by loading an image file
@@ -294,9 +293,16 @@ class SDLPP_EXPORT Surface {
    */
   void save(const std::filesystem::path& filePath) const;
 
+  /**
+   * @brief Get controlled access to implementation details
+   * @return Const reference to the surface implementation
+   * @note This method is used internally by related classes like Texture
+   */
+  [[nodiscard]] auto getImpl() const -> const SurfaceImpl&;
+
  private:
   Surface();
-  std::unique_ptr<SurfaceImpl> _surfaceImpl;
+  std::unique_ptr<SurfaceImpl> _impl;
 };
 
 }  // namespace sdlpp

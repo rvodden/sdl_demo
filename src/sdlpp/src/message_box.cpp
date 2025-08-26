@@ -16,8 +16,8 @@ MessageBoxImpl::MessageBoxImpl(std::string titleText, std::string messageText)
 }
 
 auto MessageBoxImpl::getSdlWindow() const -> SDL_Window* {
-    if (parentWindow && parentWindow->_windowImpl) {
-        return parentWindow->_windowImpl->_sdlWindow;
+    if (parentWindow) {
+        return parentWindow->getImpl().getSdlWindow();
     }
     return nullptr;
 }

@@ -12,17 +12,17 @@ namespace sdlpp {
 
 Texture::Texture(const Renderer& renderer,
                  const std::filesystem::path& filePath)
-    : _textureImpl{std::make_unique<TextureImpl>()} {
-  _textureImpl->_sdlTexture =
-      IMG_LoadTexture(renderer._rendererImpl->_sdlRenderer, filePath.string().c_str());
-  if (_textureImpl->_sdlTexture == nullptr) {
+    : _impl{std::make_unique<TextureImpl>()} {
+  _impl->_sdlTexture =
+      IMG_LoadTexture(renderer.getImpl().getSdlRenderer(), filePath.string().c_str());
+  if (_impl->_sdlTexture == nullptr) {
     throw Exception("IMG_LoadTexture");
   }
 }
 
 Texture::Texture(const Renderer& renderer, const void* location,
                  std::size_t size)
-    : _textureImpl{std::make_unique<TextureImpl>()} {
+    : _impl{std::make_unique<TextureImpl>()} {
   if (location == nullptr || size == 0) {
     throw Exception("Invalid texture data: null pointer or zero size");
   }
@@ -32,15 +32,15 @@ Texture::Texture(const Renderer& renderer, const void* location,
     throw Exception("SDL_IOFromConstMem");
   }
 
-  _textureImpl->_sdlTexture =
-      IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, true);
-  if (_textureImpl->_sdlTexture == nullptr) {
+  _impl->_sdlTexture =
+      IMG_LoadTexture_IO(renderer.getImpl().getSdlRenderer(), ioStream, true);
+  if (_impl->_sdlTexture == nullptr) {
     throw Exception("IMG_LoadTexture");
   }
 }
 
 Texture::Texture(const Renderer& renderer, void* location, std::size_t size)
-    : _textureImpl{std::make_unique<TextureImpl>()} {
+    : _impl{std::make_unique<TextureImpl>()} {
   if (location == nullptr || size == 0) {
     throw Exception("Invalid texture data: null pointer or zero size");
   }
@@ -50,42 +50,42 @@ Texture::Texture(const Renderer& renderer, void* location, std::size_t size)
     throw Exception("SDL_IOFromMem failed");
   }
 
-  _textureImpl->_sdlTexture =
-      IMG_LoadTexture_IO(renderer._rendererImpl->_sdlRenderer, ioStream, true);
-  if (_textureImpl->_sdlTexture == nullptr) {
+  _impl->_sdlTexture =
+      IMG_LoadTexture_IO(renderer.getImpl().getSdlRenderer(), ioStream, true);
+  if (_impl->_sdlTexture == nullptr) {
     throw Exception("IMG_LoadTexture");
   }
 }
 
 Texture::Texture(const Renderer& renderer, uint32_t width, uint32_t height, const uint32_t* pixels)
-    : _textureImpl{std::make_unique<TextureImpl>()} {
-  _textureImpl->_sdlTexture = SDL_CreateTexture(
-      renderer._rendererImpl->_sdlRenderer, SDL_PIXELFORMAT_RGBA8888, 
+    : _impl{std::make_unique<TextureImpl>()} {
+  _impl->_sdlTexture = SDL_CreateTexture(
+      renderer.getImpl().getSdlRenderer(), SDL_PIXELFORMAT_RGBA8888, 
       SDL_TEXTUREACCESS_STATIC, static_cast<int>(width), static_cast<int>(height));
   
-  if (_textureImpl->_sdlTexture == nullptr) {
+  if (_impl->_sdlTexture == nullptr) {
     throw Exception("SDL_CreateTexture");
   }
 
   if (pixels != nullptr) {
     const int pitch = static_cast<int>(width * sizeof(uint32_t));
-    if (!SDL_UpdateTexture(_textureImpl->_sdlTexture, nullptr, pixels, pitch)) {
-      SDL_DestroyTexture(_textureImpl->_sdlTexture);
+    if (!SDL_UpdateTexture(_impl->_sdlTexture, nullptr, pixels, pitch)) {
+      SDL_DestroyTexture(_impl->_sdlTexture);
       throw Exception("SDL_UpdateTexture");
     }
   }
 }
 
-Texture::Texture(const Renderer& renderer, const Surface& surface) : _textureImpl(std::make_unique<TextureImpl>()) {
-  _textureImpl->_sdlTexture = SDL_CreateTextureFromSurface(renderer._rendererImpl->_sdlRenderer, surface._surfaceImpl->_sdlSurface);
+Texture::Texture(const Renderer& renderer, const Surface& surface) : _impl(std::make_unique<TextureImpl>()) {
+  _impl->_sdlTexture = SDL_CreateTextureFromSurface(renderer.getImpl().getSdlRenderer(), surface.getImpl().getSdlSurface());
 }
 
 Texture::Texture(Texture&& other) noexcept
-    : _textureImpl{std::move(other._textureImpl)} {}
+    : _impl{std::move(other._impl)} {}
 
 Texture::~Texture() {
-  if (_textureImpl->_sdlTexture != nullptr) {
-    SDL_DestroyTexture(_textureImpl->_sdlTexture);
+  if (_impl->_sdlTexture != nullptr) {
+    SDL_DestroyTexture(_impl->_sdlTexture);
   }
 }
 
@@ -93,15 +93,15 @@ auto Texture::operator=(Texture&& other) noexcept -> Texture& {
   if (&other == this) {
     return *this;
   }
-  if (_textureImpl->_sdlTexture != nullptr) {
-    SDL_DestroyTexture(_textureImpl->_sdlTexture);
+  if (_impl->_sdlTexture != nullptr) {
+    SDL_DestroyTexture(_impl->_sdlTexture);
   }
-  _textureImpl = std::move(other._textureImpl);
+  _impl = std::move(other._impl);
   return *this;
 }
 
 void Texture::setTextureBlendMode(const BlendMode& blendMode) {
-  bool returnValue = SDL_SetTextureBlendMode(_textureImpl->_sdlTexture,
+  bool returnValue = SDL_SetTextureBlendMode(_impl->_sdlTexture,
                                              sdlBlendModeMap[blendMode]);
   if (!returnValue) {
     throw Exception("SDL_SetTextureBlendMode");
@@ -111,13 +111,17 @@ void Texture::setTextureBlendMode(const BlendMode& blendMode) {
 auto Texture::getSize() -> Rectangle<float> {
   float x;
   float y;
-  auto success = SDL_GetTextureSize(_textureImpl->_sdlTexture, &x, &y);
+  auto success = SDL_GetTextureSize(_impl->_sdlTexture, &x, &y);
 
   if(!success) {
     throw Exception("SDL_GetTextureSize");
   }
 
   return { 0, 0, x, y };
+}
+
+auto Texture::getImpl() const -> const TextureImpl& {
+  return *_impl;
 }
 
 }  // namespace sdlpp

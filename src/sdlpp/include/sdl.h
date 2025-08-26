@@ -36,7 +36,7 @@ class SDLPP_EXPORT SDL {
   void initSubSystem(const SubSystem& subSystem);
 
  private:
-  std::unique_ptr<SDLImpl> _sdlImpl;
+  std::unique_ptr<SDLImpl> _impl;
 };
 
 void delay_ms(uint32_t duration);

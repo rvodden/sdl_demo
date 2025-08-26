@@ -41,8 +41,6 @@ class WindowImpl;
  * @endcode
  */
 class SDLPP_EXPORT Window {
-  friend Renderer;
-  friend class MessageBoxImpl;
 
  public:
   /**
@@ -117,9 +115,16 @@ class SDLPP_EXPORT Window {
    */
   void setTitle(const std::string& newTitle);
 
+  /**
+   * @brief Get controlled access to implementation details
+   * @return Const reference to the window implementation
+   * @note This method is used internally by related classes like Renderer
+   */
+  [[nodiscard]] auto getImpl() const -> const WindowImpl&;
+
  private:
   std::string _title;
-  std::unique_ptr<WindowImpl> _windowImpl;
+  std::unique_ptr<WindowImpl> _impl;
 };
 
 }  // namespace sdlpp

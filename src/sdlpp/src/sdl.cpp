@@ -9,10 +9,10 @@
 
 namespace sdlpp {
 
-SDL::SDL() { _sdlImpl = std::make_unique<SDLImpl>(); }
+SDL::SDL() { _impl = std::make_unique<SDLImpl>(); }
 
 SDL::~SDL() noexcept {
-  for (const auto& subSystem : _sdlImpl->subSystemInitializationStatus) {
+  for (const auto& subSystem : _impl->subSystemInitializationStatus) {
     SDL_QuitSubSystem(sdlSubSystemMap[subSystem]);
   }
 }
@@ -22,7 +22,7 @@ void SDL::initSubSystem(const SubSystem& subSystem) {
   if (!retVal) {
     throw Exception("SDL_InitSubSystem");
   }
-  _sdlImpl->subSystemInitializationStatus.insert(subSystem);
+  _impl->subSystemInitializationStatus.insert(subSystem);
 }
 
 void delay_ms(uint32_t duration) { SDL_Delay(duration); }

@@ -10,9 +10,9 @@ void DefaultQuitEventHandler::handle(
 }
 
 EventRouter::EventRouter(std::shared_ptr<BaseEventBus> eventBus)
-    : _eventRouterImpl(
+    : _impl(
           std::make_unique<EventRouterImpl>(std::move(eventBus))) {
-  registerEventHandler(_eventRouterImpl->defaultQuitEventHandler);
+  registerEventHandler(_impl->defaultQuitEventHandler);
 }
 
 EventRouter::~EventRouter() = default;
@@ -23,10 +23,10 @@ auto EventRouter::operator=(EventRouter&& other) noexcept -> EventRouter& = defa
 
 void EventRouter::run() {
   std::unique_ptr<BaseEvent> event;
-  while (!_eventRouterImpl->quitFlag) {
+  while (!_impl->quitFlag) {
     try {
-      event = _eventRouterImpl->_eventBus->wait();
-      for (const auto& handler : _eventRouterImpl->_eventHandlers) {
+      event = _impl->_eventBus->wait();
+      for (const auto& handler : _impl->_eventHandlers) {
         event->handle(handler);
       }
     } catch ([[maybe_unused]] sdlpp::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
@@ -39,19 +39,19 @@ void EventRouter::run() {
 auto EventRouter::hasEvents() const -> bool {
   // Check if there are events available by doing a non-blocking poll
   // We don't actually consume the event here, just check availability
-  auto maybeEvent = _eventRouterImpl->_eventBus->poll();
+  auto maybeEvent = _impl->_eventBus->poll();
   return maybeEvent.has_value();
 }
 
 auto EventRouter::processNextEvent() -> bool {
-  if (_eventRouterImpl->quitFlag) {
+  if (_impl->quitFlag) {
     return false;
   }
 
   try {
-    auto maybeEvent = _eventRouterImpl->_eventBus->poll();
+    auto maybeEvent = _impl->_eventBus->poll();
     if (maybeEvent.has_value()) {
-      for (const auto& handler : _eventRouterImpl->_eventHandlers) {
+      for (const auto& handler : _impl->_eventHandlers) {
         maybeEvent.value()->handle(handler);
       }
       return true;
@@ -68,13 +68,13 @@ void EventRouter::routeEvent(std::unique_ptr<BaseEvent> event) {
     return;
   }
   
-  for (const auto& handler : _eventRouterImpl->_eventHandlers) {
+  for (const auto& handler : _impl->_eventHandlers) {
     event->handle(handler);
   }
 }
 
 void EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) {
-  _eventRouterImpl->_eventHandlers.push_back(std::ref(baseEventHandler));
+  _impl->_eventHandlers.push_back(std::ref(baseEventHandler));
 }
 
 EventRouterImpl::~EventRouterImpl() = default;

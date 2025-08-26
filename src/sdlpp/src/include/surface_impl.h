@@ -9,15 +9,17 @@ namespace sdlpp {
 
 class SurfaceImpl {
   friend class Surface;
-  friend class Texture;
+  friend class TextureImpl;
 
   public:
     static auto createSurface(SDL_Surface* sdlSurface) -> Surface {
       auto surface = Surface();
-      surface._surfaceImpl->_sdlSurface = sdlSurface;
+      surface._impl->_sdlSurface = sdlSurface;
 
       return surface;
     }
+
+    [[nodiscard]] auto getSdlSurface() const -> SDL_Surface* { return _sdlSurface; }
 
  private:
   // Owning Surface class owns the SDL_Surface

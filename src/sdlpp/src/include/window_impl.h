@@ -7,11 +7,15 @@ namespace sdlpp {
 
 class Window;
 class Renderer;
+class RendererImpl;
 
 class WindowImpl {
   friend Window;
-  friend Renderer;
+  friend RendererImpl;
   friend class MessageBoxImpl;
+
+public:
+  [[nodiscard]] auto getSdlWindow() const -> SDL_Window* { return _sdlWindow; }
 
  private:
   SDL_Window* _sdlWindow{nullptr};

@@ -138,7 +138,7 @@ class SDLPP_EXPORT UserEvent : public Event {
   /** @brief Generic data pointer for passing custom data */
   void* _data;
 
-  std::unique_ptr<UserEventImpl> _userEventImpl;
+  std::unique_ptr<UserEventImpl> _impl;
 };
 
 /**

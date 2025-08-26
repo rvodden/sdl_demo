@@ -62,7 +62,6 @@ class SpriteRenderer;
  * @endcode
  */
 class SDLPP_TOOLS_EXPORT Sprite {
-  friend SpriteRenderer;
 
  public:
   /**
@@ -145,8 +144,15 @@ class SDLPP_TOOLS_EXPORT Sprite {
    */
   ~Sprite();
 
+  /**
+   * @brief Get controlled access to implementation details
+   * @return Const reference to the sprite implementation
+   * @note This method is used internally by related classes like SpriteRenderer
+   */
+  [[nodiscard]] auto getImpl() const -> const SpriteImpl&;
+
  private:
-  std::unique_ptr<SpriteImpl> _spriteImpl;
+  std::unique_ptr<SpriteImpl> _impl;
 };
 
 }  // namespace sdlpp::tools

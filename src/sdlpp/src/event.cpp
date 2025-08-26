@@ -52,7 +52,7 @@ auto EventBusImpl::processSDLEvent(const SDL_Event& event) -> std::unique_ptr<Ba
 }
 
 void EventBus::publish(std::unique_ptr<UserEvent> userEvent) {
-  auto sdlEvent = userEvent->_userEventImpl->_createSDLUserEvent();
+  auto sdlEvent = userEvent->_impl->_createSDLUserEvent();
 
   // Release ownership of the event - it will be reclaimed when SDL returns it
   userEvent.release();  // NOLINT(bugprone-unused-return-value)
@@ -123,7 +123,7 @@ auto SDLEventBus::pollImpl() -> std::optional<std::unique_ptr<BaseEvent>> {
 }
 
 void SDLEventBus::publishImpl(std::unique_ptr<UserEvent> userEvent) {
-  auto sdlEvent = userEvent->_userEventImpl->_createSDLUserEvent();
+  auto sdlEvent = userEvent->_impl->_createSDLUserEvent();
   
   // Release ownership of the event - it will be reclaimed when SDL returns it
   userEvent.release();  // NOLINT(bugprone-unused-return-value)

@@ -11,7 +11,10 @@ namespace sdlpp {
 
 class RendererImpl {
   friend Renderer;
-  friend Texture;
+  friend TextureImpl;
+
+public:
+  [[nodiscard]] auto getSdlRenderer() const -> SDL_Renderer* { return _sdlRenderer; }
 
  private:
   // This is ownned by the Window which was passed in - i.e. not us or the

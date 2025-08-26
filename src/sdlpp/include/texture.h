@@ -50,7 +50,6 @@ class TextureImpl;
  * @endcode
  */
 class SDLPP_EXPORT Texture {
-  friend Renderer;
 
  public:
   using BlendMode = uint8_t;
@@ -189,6 +188,13 @@ class SDLPP_EXPORT Texture {
 
   [[nodiscard]] auto getSize() -> Rectangle<float>;
 
+  /**
+   * @brief Get controlled access to implementation details
+   * @return Const reference to the texture implementation
+   * @note This method is used internally by related classes like Renderer
+   */
+  [[nodiscard]] auto getImpl() const -> const TextureImpl&;
+
   /** @brief No blending - source pixels replace destination pixels completely */
   static constexpr BlendMode kNone = 0;
   /** @brief Alpha blending - standard transparency using alpha channel */
@@ -201,7 +207,7 @@ class SDLPP_EXPORT Texture {
   static constexpr BlendMode kMul = 4;
 
  private:
-  std::unique_ptr<TextureImpl> _textureImpl;
+  std::unique_ptr<TextureImpl> _impl;
 };
 
 }  // namespace sdlpp

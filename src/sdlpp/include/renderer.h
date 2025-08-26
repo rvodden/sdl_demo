@@ -58,7 +58,6 @@ class RendererImpl;
  * @endcode
  */
 class SDLPP_EXPORT Renderer {
-  friend Texture;
 
  public:
   using RendererFlag = uint8_t;
@@ -221,6 +220,13 @@ class SDLPP_EXPORT Renderer {
 
   void setScale(float xScale, float yScale);
 
+  /**
+   * @brief Get controlled access to implementation details
+   * @return Const reference to the renderer implementation
+   * @note This method is used internally by related classes like Texture
+   */
+  [[nodiscard]] auto getImpl() const -> const RendererImpl&;
+
   /** @brief Software-only rendering (slowest, most compatible) */
   static constexpr RendererFlag kSoftware = 0;
   /** @brief Hardware-accelerated rendering (fastest when available) */
@@ -231,7 +237,7 @@ class SDLPP_EXPORT Renderer {
   static constexpr RendererFlag kTargetTexture = 3;
 
  private:
-  std::unique_ptr<RendererImpl> _rendererImpl;
+  std::unique_ptr<RendererImpl> _impl;
 };
 
 }  // namespace sdlpp

@@ -27,7 +27,7 @@ class SDLPP_TOOLS_EXPORT SpriteRenderer {
   void render(const Sprite& sprite, float x, float y) const;
 
  private:
-  std::unique_ptr<SpriteRendererImpl> _spriteRendererImpl;
+  std::unique_ptr<SpriteRendererImpl> _impl;
 };
 
 }  // namespace sdlpp::tools

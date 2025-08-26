@@ -9,14 +9,14 @@
 namespace sdlpp::tools {
 
 SpriteRenderer::SpriteRenderer(std::shared_ptr<Renderer> renderer)
-    : _spriteRendererImpl{
+    : _impl{
           std::make_unique<SpriteRendererImpl>(std::move(renderer))} {}
 SpriteRenderer::SpriteRenderer(SpriteRenderer&& other) noexcept
-    : _spriteRendererImpl{std::move(other._spriteRendererImpl)} {}
+    : _impl{std::move(other._impl)} {}
 
 auto SpriteRenderer::operator=(SpriteRenderer&& other) noexcept
     -> SpriteRenderer& {
-  std::swap(_spriteRendererImpl, other._spriteRendererImpl);
+  std::swap(_impl, other._impl);
   return *this;
 }
 
@@ -24,12 +24,13 @@ SpriteRenderer::~SpriteRenderer() = default;
 
 void SpriteRenderer::render(const Sprite& sprite, const float x,
                             const float y) const {
+  const auto& spriteImpl = sprite.getImpl();
   const sdlpp::Rectangle<float> destination(
-      x, y, sprite._spriteImpl->_rectangle.getWidth(),
-      sprite._spriteImpl->_rectangle.getHeight());
+      x, y, spriteImpl.getRectangle().getWidth(),
+      spriteImpl.getRectangle().getHeight());
 
-  _spriteRendererImpl->_renderer->copy(*sprite._spriteImpl->_spriteSheet,
-                                       sprite._spriteImpl->_rectangle,
+  _impl->_renderer->copy(*spriteImpl.getSpriteSheet(),
+                                       spriteImpl.getRectangle(),
                                        destination);
 }
 

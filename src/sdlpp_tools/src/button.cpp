@@ -18,24 +18,24 @@ void ButtonImpl::MouseEventHandler::handle(
 
 Button::Button(std::shared_ptr<EventRouter> eventProcessor,
                sdlpp::Rectangle<float> rectangle)
-    : _buttonImpl{std::make_unique<ButtonImpl>(std::move(eventProcessor),
+    : _impl{std::make_unique<ButtonImpl>(std::move(eventProcessor),
                                                std::move(rectangle))} {
-  _buttonImpl->_eventRouter->registerEventHandler(
-      _buttonImpl->_mouseEventHandler);
+  _impl->_eventRouter->registerEventHandler(
+      _impl->_mouseEventHandler);
 }
 
 Button::Button(Button&& other) noexcept
-    : _buttonImpl{std::move(other._buttonImpl)} {};
+    : _impl{std::move(other._impl)} {};
 
 Button::~Button() = default;
 
 auto Button::operator=(Button&& other) noexcept -> Button& {
-  std::swap(_buttonImpl, other._buttonImpl);
+  std::swap(_impl, other._impl);
   return *this;
 }
 
 void Button::registerEventHandler(Handler&& handler) {
-  _buttonImpl->_eventHandlers->emplace_back(std::forward<Handler>(handler));
+  _impl->_eventHandlers->emplace_back(std::forward<Handler>(handler));
 };
 
 void ButtonImpl::eventHandler(

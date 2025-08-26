@@ -10,8 +10,8 @@ UserEvent::UserEvent()
       _windowId(0),
       _code(0),
       _data(nullptr),
-      _userEventImpl{std::make_unique<UserEventImpl>(this)} {
-  _userEventImpl->_userEvent = this;
+      _impl{std::make_unique<UserEventImpl>(this)} {
+  _impl->_userEvent = this;
 };
 
 UserEvent::UserEvent(std::chrono::duration<int64_t, std::milli> ts,
@@ -20,8 +20,8 @@ UserEvent::UserEvent(std::chrono::duration<int64_t, std::milli> ts,
       _windowId(winId),
       _code(cde),
       _data(d1),
-      _userEventImpl{std::make_unique<UserEventImpl>(this)} {
-  _userEventImpl->_userEvent = this;
+      _impl{std::make_unique<UserEventImpl>(this)} {
+  _impl->_userEvent = this;
 };
 
 UserEvent::UserEvent(const UserEvent& other)
@@ -29,8 +29,8 @@ UserEvent::UserEvent(const UserEvent& other)
       _windowId(other._windowId),
       _code(other._code),
       _data(other._data),
-      _userEventImpl(std::make_unique<UserEventImpl>(*other._userEventImpl)) {
-  _userEventImpl->_userEvent = this;
+      _impl(std::make_unique<UserEventImpl>(*other._impl)) {
+  _impl->_userEvent = this;
 };
 
 UserEvent::UserEvent(UserEvent&& other) noexcept
@@ -38,8 +38,8 @@ UserEvent::UserEvent(UserEvent&& other) noexcept
       _windowId(other._windowId),
       _code(other._code),
       _data(other._data),
-      _userEventImpl(std::move(other._userEventImpl)) {
-  _userEventImpl->_userEvent = this;
+      _impl(std::move(other._impl)) {
+  _impl->_userEvent = this;
 };
 
 auto UserEvent::operator=(const UserEvent& userEvent) -> UserEvent& {
@@ -51,8 +51,8 @@ auto UserEvent::operator=(const UserEvent& userEvent) -> UserEvent& {
   _windowId = userEvent._windowId;
   _code = userEvent._code;
   _data = userEvent._data;
-  _userEventImpl = std::make_unique<UserEventImpl>(*userEvent._userEventImpl);
-  _userEventImpl->_userEvent = this;
+  _impl = std::make_unique<UserEventImpl>(*userEvent._impl);
+  _impl->_userEvent = this;
 
   return *this;
 }
@@ -65,8 +65,8 @@ auto UserEvent::operator=(UserEvent&& userEvent) noexcept -> UserEvent& {
   _windowId = userEvent._windowId;
   _code = userEvent._code;
   _data = userEvent._data;
-  _userEventImpl = std::move(userEvent._userEventImpl);
-  _userEventImpl->_userEvent = this;
+  _impl = std::move(userEvent._impl);
+  _impl->_userEvent = this;
   Event::operator=(std::move(userEvent));
 
   return *this;

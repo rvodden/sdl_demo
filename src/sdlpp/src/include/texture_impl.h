@@ -19,8 +19,11 @@ static constexpr auto sdlBlendModeMapData =
 static constexpr auto sdlBlendModeMap = vodden::Map(sdlBlendModeMapData);
 
 class TextureImpl {
-  friend Renderer;
+  friend RendererImpl;
   friend Texture;
+
+public:
+  [[nodiscard]] auto getSdlTexture() const -> SDL_Texture* { return _sdlTexture; }
 
  private:
   SDL_Texture* _sdlTexture = nullptr;

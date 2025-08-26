@@ -8,15 +8,18 @@
 
 namespace sdlpp::tools {
 
-class SpriteRenderer;
+class SpriteRendererImpl;
 
 class SpriteImpl {
   friend Sprite;
-  friend SpriteRenderer;
+  friend SpriteRendererImpl;
 
  public:
   SpriteImpl(std::shared_ptr<const Texture> texture, sdlpp::Rectangle<float> rectangle)
       : _spriteSheet{std::move(texture)}, _rectangle{std::move(rectangle)} {};
+
+  [[nodiscard]] auto getSpriteSheet() const -> const std::shared_ptr<const Texture>& { return _spriteSheet; }
+  [[nodiscard]] auto getRectangle() const -> const sdlpp::Rectangle<float>& { return _rectangle; }
 
  private:
   std::shared_ptr<const Texture> _spriteSheet;

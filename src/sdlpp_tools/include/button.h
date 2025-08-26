@@ -169,7 +169,7 @@ class SDLPP_TOOLS_EXPORT Button {
   void registerEventHandler(Handler&& handler);
 
  private:
-  std::unique_ptr<ButtonImpl> _buttonImpl;
+  std::unique_ptr<ButtonImpl> _impl;
 };
 
 }  // namespace sdlpp::tools
