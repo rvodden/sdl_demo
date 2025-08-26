@@ -37,7 +37,7 @@ TEST_F(RendererTest, testRendererMoveConstructor) {
   
   // Test that the moved-to renderer can still be used
   sdlpp::Color testColor(kMaxColorValue, 0, 0, kMaxColorValue);
-  ASSERT_NO_THROW(renderer2.setRenderDrawColour(testColor));
+  ASSERT_NO_THROW(renderer2.setDrawColour(testColor));
   ASSERT_NO_THROW(renderer2.clear());
   ASSERT_NO_THROW(renderer2.present());
 }
@@ -52,7 +52,7 @@ TEST_F(RendererTest, testRendererMoveAssignment) {
   
   // Test that the moved-to renderer can still be used
   sdlpp::Color testColor(0, kMaxColorValue, 0, kMaxColorValue);
-  ASSERT_NO_THROW(renderer2.setRenderDrawColour(testColor));
+  ASSERT_NO_THROW(renderer2.setDrawColour(testColor));
   ASSERT_NO_THROW(renderer2.clear());
   ASSERT_NO_THROW(renderer2.present());
 }
@@ -66,9 +66,9 @@ TEST_F(RendererTest, testSetRenderDrawColour) {
   sdlpp::Color blue(0, 0, kMaxColorValue, kMaxColorValue);
   
   // These should not throw
-  renderer.setRenderDrawColour(red);
-  renderer.setRenderDrawColour(green);
-  renderer.setRenderDrawColour(blue);
+  renderer.setDrawColour(red);
+  renderer.setDrawColour(green);
+  renderer.setDrawColour(blue);
 }
 
 TEST_F(RendererTest, testClearAndPresent) {
@@ -80,7 +80,7 @@ TEST_F(RendererTest, testClearAndPresent) {
   
   // Test with different colors
   sdlpp::Color testColor(kHalfColorValue, kHalfColorValue, kHalfColorValue, kMaxColorValue);
-  renderer.setRenderDrawColour(testColor);
+  renderer.setDrawColour(testColor);
   renderer.clear();
   renderer.present();
 }

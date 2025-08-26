@@ -40,7 +40,7 @@ class MyGame : public BaseApplication {
   auto iterate() -> bool override {
     // Render a blue screen
     Color blue(0, 0, 255, 255);
-    renderer_.setRenderDrawColour(blue);
+    renderer_.setDrawColour(blue);
     renderer_.clear();
     renderer_.present();
     

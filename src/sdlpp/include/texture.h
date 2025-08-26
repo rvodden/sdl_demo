@@ -187,6 +187,8 @@ class SDLPP_EXPORT Texture {
    */
   [[nodiscard]] auto getTextureBlendMode() -> BlendMode;
 
+  [[nodiscard]] auto getSize() -> Rectangle<float>;
+
   /** @brief No blending - source pixels replace destination pixels completely */
   static constexpr BlendMode kNone = 0;
   /** @brief Alpha blending - standard transparency using alpha channel */

@@ -67,10 +67,6 @@ void EventBus::setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> 
   _impl->setRouteCallback(std::move(callback));
 }
 
-auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
-    -> std::unique_ptr<QuitEvent> {
-  return std::make_unique<QuitEvent>(std::chrono::milliseconds(SDL_GetTicks()));
-}
 
 auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
     -> std::unique_ptr<MouseButtonEvent> {

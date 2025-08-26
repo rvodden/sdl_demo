@@ -7,6 +7,7 @@
 #include <application.h>
 
 #include <string_view>
+#include <assert.h>
 
 extern const std::array<const uint8_t, 6656> tiny_ttf;
 
@@ -21,14 +22,13 @@ const float kScale = 4.0;
 class HelloWorld : public BaseApplication {
  public:
   auto init() -> bool override {
-    auto sdl = SDL();
-    sdl.initSubSystem(SDL::kVideo);
-    sdl.initSubSystem(SDL::kEvents);
+    _sdl = std::make_unique<SDL>();
+    _ttf = std::make_unique<TTF>();
+    _sdl->initSubSystem(SDL::kVideo);
+    _sdl->initSubSystem(SDL::kEvents);
 
     _window = std::make_unique<Window>("Hello, World!", kScreenWidth, kScreenHeight, 0);
     _renderer = std::make_unique<Renderer>(*_window);
-
-    [[maybe_unused]] auto ttf = TTF();
 
     const float fontSize = 18.0F;
     auto font = Font(tiny_ttf.data(), tiny_ttf.size(), fontSize);
@@ -40,14 +40,29 @@ class HelloWorld : public BaseApplication {
 
   auto iterate() -> bool override { 
     auto outputSize = _renderer->getOutputSize();
-    _renderer.setScale(kScale);
-    auto textureSize = _texture.getSize():
+    _renderer->setScale(kScale, kScale);
+    auto textureSize = _texture->getSize();
+    _renderer->setDrawColour(NamedColor::kBlack);
+    _renderer->clear();
+
+    auto renderSize = Rectangle<float>{
+      (static_cast<float>(outputSize.getWidth()) / kScale - textureSize.getWidth()) / 2, 
+      (static_cast<float>(outputSize.getHeight()) / kScale - textureSize.getHeight()) / 2,
+      textureSize.getWidth(),
+      textureSize.getHeight()
+    };
+    _renderer->copy(*_texture, renderSize);
+
+    _renderer->present();
+
     return true; 
   }
 
   void quit() override {}
 
  private:
+  std::unique_ptr<SDL> _sdl = nullptr;
+  std::unique_ptr<TTF> _ttf = nullptr;
   std::unique_ptr<Window> _window  = nullptr;
   std::unique_ptr<Renderer> _renderer = nullptr;
   std::unique_ptr<Texture> _texture = nullptr;

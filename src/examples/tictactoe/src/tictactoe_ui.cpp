@@ -34,7 +34,7 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
 }
 
 void TicTacToeUI::render(const std::shared_ptr<TicTacToe>& ticTacToe) {
-  _renderer->setRenderDrawColour(sdlpp::NamedColor::kWhite);
+  _renderer->setDrawColour(sdlpp::NamedColor::kWhite);
   _renderer->clear();
 
   _spriteRenderer->render(_board, 0, 0);

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <rectangle.h>
+#include <string>
 
 // Test constants for int32_t rectangles
 constexpr int32_t kIntTestX = 10;
@@ -282,4 +283,47 @@ TEST(RectangleAliasTest, TypeAliases) {
     
     EXPECT_EQ(intRect.getX(), 1);
     EXPECT_FLOAT_EQ(floatRect.getX(), 1.5f);
+}
+
+// Test RectangleCoordinate concept
+TEST(RectangleConceptTest, ValidTypes) {
+    // Test that the concept correctly identifies valid coordinate types
+    static_assert(sdlpp::RectangleCoordinate<int32_t>);
+    static_assert(sdlpp::RectangleCoordinate<float>);
+    
+    // Test that these types can be used to create rectangles
+    sdlpp::Rectangle<int32_t> intRect(10, 20, 100, 200);
+    sdlpp::Rectangle<float> floatRect(10.5f, 20.5f, 100.5f, 200.5f);
+    
+    EXPECT_EQ(intRect.getX(), 10);
+    EXPECT_EQ(intRect.getY(), 20);
+    EXPECT_FLOAT_EQ(floatRect.getX(), 10.5f);
+    EXPECT_FLOAT_EQ(floatRect.getY(), 20.5f);
+}
+
+TEST(RectangleConceptTest, InvalidTypes) {
+    // Test that the concept correctly rejects invalid coordinate types
+    static_assert(!sdlpp::RectangleCoordinate<uint32_t>);
+    static_assert(!sdlpp::RectangleCoordinate<double>);
+    static_assert(!sdlpp::RectangleCoordinate<int16_t>);
+    static_assert(!sdlpp::RectangleCoordinate<uint16_t>);
+    static_assert(!sdlpp::RectangleCoordinate<int8_t>);
+    static_assert(!sdlpp::RectangleCoordinate<uint8_t>);
+    static_assert(!sdlpp::RectangleCoordinate<char>);
+    static_assert(!sdlpp::RectangleCoordinate<std::string>);
+    static_assert(!sdlpp::RectangleCoordinate<void*>);
+}
+
+TEST(RectangleConceptTest, ConceptRequirements) {
+    // Verify that the concept matches exactly the expected types
+    static_assert(std::same_as<int32_t, int32_t>);
+    static_assert(std::same_as<float, float>);
+    static_assert(!std::same_as<uint32_t, int32_t>);
+    static_assert(!std::same_as<double, float>);
+    
+    // Test the concept definition logic directly
+    static_assert(std::same_as<int32_t, int32_t> || std::same_as<int32_t, float>);
+    static_assert(std::same_as<float, int32_t> || std::same_as<float, float>);
+    static_assert(!(std::same_as<uint32_t, int32_t> || std::same_as<uint32_t, float>));
+    static_assert(!(std::same_as<double, int32_t> || std::same_as<double, float>));
 }

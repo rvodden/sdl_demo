@@ -7,7 +7,7 @@
 
 namespace sdlpp::ttf {
 
-Font::Font(const void* location, std::size_t data_size, float point_size) {
+Font::Font(const void* location, std::size_t data_size, float point_size) : _impl(std::make_unique<FontImpl>()) {
   if(location == nullptr || data_size == 0) {
     throw Exception("Invalid font data: null pointer or zero size");
   }
@@ -18,14 +18,17 @@ Font::Font(const void* location, std::size_t data_size, float point_size) {
   }
 
   _impl->_font = TTF_OpenFontIO(iostream, true, point_size);
+  if(_impl->_font == nullptr) {
+    throw Exception("TTF_OpenFontIO");
+  }
 }
 
-Font::Font(const Font& other) {
+Font::Font(const Font& other) : _impl(std::make_unique<FontImpl>()) {
   *this = other;
 }
 
 Font::Font(Font&& other) noexcept {
-  *this = other;
+  *this = std::move(other);
 }
 
 auto Font::operator=(const Font& other) -> Font& {
@@ -47,7 +50,9 @@ auto Font::operator=(Font&& other) noexcept -> Font& {
 
 
 Font::~Font() {
-  TTF_CloseFont(_impl->_font);
+  if(_impl && _impl->_font) {
+    TTF_CloseFont(_impl->_font);
+  }
 };
 
 }

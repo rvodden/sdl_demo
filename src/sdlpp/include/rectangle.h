@@ -4,13 +4,23 @@
 #include <cstdint>
 #include <memory>
 #include <type_traits>
+#include <concepts>
 
 #include "sdlpp_export.h"
 
 namespace sdlpp {
 
+/**
+ * @brief Concept to restrict Rectangle template to supported coordinate types.
+ * 
+ * Only int32_t and float are supported as they map directly to SDL3's
+ * SDL_Rect and SDL_FRect types respectively.
+ */
+template<typename T>
+concept RectangleCoordinate = std::same_as<T, int32_t> || std::same_as<T, float>;
+
 class Renderer;
-template<typename T> class RectangleImpl;
+template<RectangleCoordinate T> class RectangleImpl;
 
 /**
  * @brief Template-based rectangle class supporting both integer and floating-point coordinates.
@@ -41,10 +51,8 @@ template<typename T> class RectangleImpl;
  * bool contains = rect.contains(x, y);
  * @endcode
  */
-template<typename T>
+template<RectangleCoordinate T>
 class SDLPP_EXPORT Rectangle {
-    static_assert(std::is_same_v<T, int32_t> || std::is_same_v<T, float>, 
-                  "Rectangle only supports int32_t and float coordinate types");
     
     friend Renderer;
 

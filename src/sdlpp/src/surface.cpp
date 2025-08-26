@@ -247,6 +247,6 @@ void Surface::save(const std::filesystem::path& filePath) const {
   }
 }
 
-Surface::Surface() : _surfaceImpl(nullptr) {};
+Surface::Surface() : _surfaceImpl(std::make_unique<SurfaceImpl>()) {};
 
 }  // namespace sdlpp

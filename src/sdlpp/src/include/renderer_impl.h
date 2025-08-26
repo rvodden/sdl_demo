@@ -16,9 +16,9 @@ class RendererImpl {
  private:
   // This is ownned by the Window which was passed in - i.e. not us or the
   // Renderer
-  SDL_Window* _sdlWindow;
+  SDL_Window* _sdlWindow = nullptr;
   // Owning Renderer class owns the SDL_Renderer
-  SDL_Renderer* _sdlRenderer;
+  SDL_Renderer* _sdlRenderer = nullptr;
 };
 
 }  // namespace sdlpp

@@ -16,15 +16,19 @@
 
 namespace sdlpp {
 
-Renderer::Renderer(Window& window, const char* name)
+Renderer::Renderer(Window& window)
     : _rendererImpl{std::make_unique<RendererImpl>()} {
   _rendererImpl->_sdlWindow = window._windowImpl->_sdlWindow;
-
+  
+  if (_rendererImpl->_sdlWindow == nullptr) {
+    throw Exception("Attempting to create Renderer from null window.");
+  }
   _rendererImpl->_sdlRenderer =
-      SDL_CreateRenderer(_rendererImpl->_sdlWindow, name);
+      SDL_CreateRenderer(_rendererImpl->_sdlWindow, nullptr);
   if (_rendererImpl->_sdlRenderer == nullptr) {
     throw Exception("SDL_CreateRenderer");
   }
+  
 }
 
 Renderer::Renderer(Renderer&& other) noexcept
@@ -47,7 +51,7 @@ auto Renderer::operator=(Renderer&& other) noexcept -> Renderer& {
   return *this;
 }
 
-void Renderer::setRenderDrawColour(const Color& color) {
+void Renderer::setDrawColour(const Color& color) {
   auto retVal = SDL_SetRenderDrawColor(_rendererImpl->_sdlRenderer,
                                        color.getRed(), color.getGreen(),
                                        color.getBlue(), color.getAlpha());
@@ -73,6 +77,18 @@ void Renderer::copy(const Texture& texture, const Rectangle<float>& source,
   auto returnValue = SDL_RenderTexture(_rendererImpl->_sdlRenderer,
                                        texture._textureImpl->_sdlTexture,
                                        sourceRect, destRect);
+  if (!returnValue) {
+    throw Exception("SDL_RenderCopy");
+  }
+}
+
+void Renderer::copy(const Texture& texture, 
+                    const Rectangle<float>& destination) {
+  SDL_FRect* destRect = destination.impl_->getSDLRect();
+
+  auto returnValue = SDL_RenderTexture(_rendererImpl->_sdlRenderer,
+                                       texture._textureImpl->_sdlTexture,
+                                       nullptr, destRect);
   if (!returnValue) {
     throw Exception("SDL_RenderCopy");
   }
@@ -111,12 +127,18 @@ auto Renderer::readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t heigh
   return pixels;
 }
 
+void Renderer::setScale(float xScale, float yScale) {
+  auto success = SDL_SetRenderScale(_rendererImpl->_sdlRenderer, xScale, yScale);
+  if(!success) { throw Exception("SDL_SetRenderScale"); }
+}
+
 auto Renderer::getOutputSize() -> Rectangle<int> {
   int width = 0;
   int height = 0;
-  auto retVal = SDL_GetCurrentRenderOutputSize(_rendererImpl->_sdlRenderer, &width, &height);
+
+  auto retVal = SDL_GetRenderOutputSize(_rendererImpl->_sdlRenderer, &width, &height);
   if (!retVal) {
-    throw Exception("SDL_GetCurrentRenderOutputSize");
+    throw Exception("SDL_GetRenderOutputSize");
   }
   return { 0, 0, width, height };
 }

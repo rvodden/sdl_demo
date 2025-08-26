@@ -55,7 +55,7 @@ public:
         frameCount_++;
         
         // Render something simple
-        renderer_->setRenderDrawColour(sdlpp::Color(0, 0, 255, 255));  // Blue
+        renderer_->setDrawColour(sdlpp::Color(0, 0, 255, 255));  // Blue
         renderer_->clear();
         renderer_->present();
         

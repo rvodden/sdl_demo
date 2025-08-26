@@ -1,4 +1,5 @@
 #include <atomic>
+#include <chrono>
 #include <forward_list>
 #include <functional>
 #include <vector>
@@ -20,8 +21,10 @@ static constexpr vodden::Map<uint32_t, MouseButtonEvent::Button, 5>
         {SDL_BUTTON_X2, MouseButtonEvent::Button::kX2},
     }};
 
-auto createQuitEvent(const SDL_QuitEvent* sdlQuitEvent)
-    -> std::unique_ptr<QuitEvent>;
+auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
+    -> std::unique_ptr<QuitEvent> {
+  return std::make_unique<QuitEvent>(std::chrono::milliseconds(SDL_GetTicks()));
+}
 auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
     -> std::unique_ptr<MouseButtonEvent>;
 auto createUserEvent(const SDL_UserEvent* sdlUserEvent)

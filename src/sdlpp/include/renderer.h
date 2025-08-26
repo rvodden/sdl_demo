@@ -13,7 +13,6 @@
 
 namespace sdlpp {
 
-template<typename T> class Rectangle;
 class Texture;
 class Window;
 class RendererImpl;
@@ -48,7 +47,7 @@ class RendererImpl;
  * sdlpp::Renderer renderer(window);
  * 
  * // Set background color
- * renderer.setRenderDrawColour(sdlpp::NamedColor::kBlack);
+ * renderer.setDrawColour(sdlpp::NamedColor::kBlack);
  * 
  * // Render loop
  * while (running) {
@@ -67,7 +66,6 @@ class SDLPP_EXPORT Renderer {
   /**
    * @brief Create a rendering context for the specified window
    * @param window The window to create the renderer for (must remain valid)
-   * @param name Optional driver name (nullptr for automatic selection)
    * @throws sdlpp::Exception if renderer creation fails
    *
    * Creates a hardware-accelerated renderer when possible, falling back
@@ -77,7 +75,7 @@ class SDLPP_EXPORT Renderer {
    * @note The window must remain valid for the lifetime of this renderer
    * @note Automatic driver selection usually chooses the best available option
    */
-  Renderer(Window& window, const char* name = nullptr);
+  Renderer(Window& window);
   
   /**
    * @brief Move constructor - transfers ownership of the rendering context
@@ -125,7 +123,7 @@ class SDLPP_EXPORT Renderer {
    * @see Color for color specification
    * @see NamedColor for common color constants
    */
-  void setRenderDrawColour(const Color& color);
+  void setDrawColour(const Color& color);
 
   /**
    * @brief Draw a texture to the entire render target
@@ -142,6 +140,20 @@ class SDLPP_EXPORT Renderer {
   void copy(const Texture& texture);
 
   /**
+   * @brief Draw a texture to a specific region
+   * @param texture The texture to draw from (must be created from this renderer)
+   * @param destination The screen rectangle to draw to
+   *
+   * Copies the texture to a specific location
+   * on the render target.
+   *
+   * @note The texture must have been created from this renderer
+   * @note Destination coordinates are in screen space (0,0 = top-left of window)
+   * @note Drawing is not immediately visible until present() is called
+   */
+  void copy(const Texture& texture, const Rectangle<float>& destination);
+  
+            /**
    * @brief Draw a portion of a texture to a specific region
    * @param texture The texture to draw from (must be created from this renderer)
    * @param source The rectangle within the texture to copy from
@@ -162,11 +174,11 @@ class SDLPP_EXPORT Renderer {
   /**
    * @brief Clear the entire render target with the current draw color
    *
-   * Fills the entire render target with the color set by setRenderDrawColour().
+   * Fills the entire render target with the color set by setDrawColour().
    * This is typically the first operation in a render loop to provide a
    * clean background for drawing operations.
    *
-   * @note Uses the color set by setRenderDrawColour()
+   * @note Uses the color set by setDrawColour()
    * @note Changes are not visible until present() is called
    * @note This is usually the fastest way to fill the screen with a solid color
    */
@@ -206,6 +218,8 @@ class SDLPP_EXPORT Renderer {
   [[nodiscard]] auto readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const -> std::vector<uint8_t>;
 
   [[nodiscard]] auto getOutputSize() -> Rectangle<int>;
+
+  void setScale(float xScale, float yScale);
 
   /** @brief Software-only rendering (slowest, most compatible) */
   static constexpr RendererFlag kSoftware = 0;

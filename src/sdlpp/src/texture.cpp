@@ -76,7 +76,7 @@ Texture::Texture(const Renderer& renderer, uint32_t width, uint32_t height, cons
   }
 }
 
-Texture::Texture(const Renderer& renderer, const Surface& surface) {
+Texture::Texture(const Renderer& renderer, const Surface& surface) : _textureImpl(std::make_unique<TextureImpl>()) {
   _textureImpl->_sdlTexture = SDL_CreateTextureFromSurface(renderer._rendererImpl->_sdlRenderer, surface._surfaceImpl->_sdlSurface);
 }
 
@@ -106,6 +106,18 @@ void Texture::setTextureBlendMode(const BlendMode& blendMode) {
   if (!returnValue) {
     throw Exception("SDL_SetTextureBlendMode");
   }
+}
+
+auto Texture::getSize() -> Rectangle<float> {
+  float x;
+  float y;
+  auto success = SDL_GetTextureSize(_textureImpl->_sdlTexture, &x, &y);
+
+  if(!success) {
+    throw Exception("SDL_GetTextureSize");
+  }
+
+  return { 0, 0, x, y };
 }
 
 }  // namespace sdlpp

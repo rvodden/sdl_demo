@@ -23,7 +23,7 @@ class TextureImpl {
   friend Texture;
 
  private:
-  SDL_Texture* _sdlTexture;
+  SDL_Texture* _sdlTexture = nullptr;
 };
 
 }  // namespace sdlpp

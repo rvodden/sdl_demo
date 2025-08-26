@@ -3,6 +3,7 @@
 
 #include <SDL3/SDL.h>
 #include <cstdint>
+#include <concepts>
 
 #include "rectangle.h"
 
@@ -14,10 +15,8 @@ namespace sdlpp {
  * This template is specialized for supported coordinate types to provide
  * direct mapping to the appropriate SDL rectangle type without runtime overhead.
  */
-template<typename T>
+template<RectangleCoordinate T>
 class RectangleImpl {
-    static_assert(std::is_same_v<T, int32_t> || std::is_same_v<T, float>,
-                  "RectangleImpl only supports int32_t and float coordinate types");
 };
 
 /**

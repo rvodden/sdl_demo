@@ -5,8 +5,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "sdlpp_private_export.h"
-
 namespace sdlpp {
 
 auto constexpr createSDLColor(const Color& color) -> SDL_Color {
