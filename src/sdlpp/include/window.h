@@ -42,6 +42,7 @@ class WindowImpl;
  */
 class SDLPP_EXPORT Window {
   friend Renderer;
+  friend class MessageBoxImpl;
 
  public:
   /**

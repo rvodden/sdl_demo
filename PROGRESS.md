@@ -5,8 +5,8 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 ## Summary
 
 **Total SDL3 Functions Surveyed**: ~200+  
-**Implemented in sdlpp**: ~35  
-**Implementation Coverage**: ~17-20%
+**Implemented in sdlpp**: ~37  
+**Implementation Coverage**: ~18-20%
 
 ### Key Implementation Areas:
 - ✅ **Core initialization and cleanup** - Well covered
@@ -16,6 +16,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 - ✅ **Surface operations** - Comprehensive surface manipulation
 - ✅ **Event system** - Type-safe event handling architecture
 - ✅ **Color and rectangle utilities** - Basic implementations
+- ✅ **Message boxes** - Native dialog support with builder pattern
 
 ### Major Missing Areas:
 - ❌ **Advanced window management** (positioning, resizing, fullscreen, etc.)
@@ -170,6 +171,13 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 | `Uint32 SDL_RegisterEvents(int numevents)` | Not yet implemented |
 | `SDL_EventState SDL_GetEventState(Uint32 type)` | Not yet implemented |
 | `void SDL_SetEventEnabled(Uint32 type, bool enabled)` | Not yet implemented |
+
+## Message Boxes (CategoryMessagebox)
+
+| SDL3 Function | sdlpp Equivalent |
+|---------------|------------------|
+| `bool SDL_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)` | `MessageBox::show() -> MessageBox::Result` (fluent builder pattern) |
+| `bool SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags flags, const char *title, const char *message, SDL_Window *window)` | `MessageBox(title, message).setType(type).show()` (simplified via builder) |
 
 ## Time and Delays (CategoryTime/CategoryTimer)
 

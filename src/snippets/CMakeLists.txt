@@ -17,3 +17,4 @@ target_link_libraries(event_adaptor_example PRIVATE SDL3::SDL3 sdlpp sdlpp_tools
 target_link_libraries(lambda_event_handler_test PRIVATE sdlpp sdlpp_tools)
 target_link_libraries(sdl_driver_test PRIVATE SDL3::SDL3 sdlpp sdlpp_tools)
 target_link_libraries(test_sdl_app_event PRIVATE sdlpp_main)
+target_link_libraries(message_box_demo PRIVATE sdlpp)

@@ -14,18 +14,24 @@ A comprehensive, type-safe C++20 wrapper around SDL3 that provides RAII resource
 
 ## Architecture
 
-SDL++ follows a clean three-layer architecture:
+SDL++ follows a clean layered architecture with optional modules:
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                Applications                         │
 │  (TicTacToe, Snippets, Examples)                    │
 ├─────────────────────────────────────────────────────┤
-│                SDL++ Tools                          │
-│  (EventRouter, Sprite System, UI Components)        │
+│            Application Framework                    │
+│  (Service Registry, Lifecycle Management)           │
+├─────────────────────────────────────────────────────┤
+│        Extensions          │      SDL++ Tools       │
+│  (TTF Text Rendering)      │ (EventRouter, Sprites)  │
 ├─────────────────────────────────────────────────────┤
 │                Core SDL++ Wrapper                   │
 │  (Window, Renderer, Texture, Surface, Events)       │
+├─────────────────────────────────────────────────────┤
+│                  Utilities                          │
+│        (Constexpr Map, Thread-Safe Queue)           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -35,10 +41,19 @@ SDL++ follows a clean three-layer architecture:
 - **Resource Management**: RAII wrappers for Textures, Surfaces, and SDL objects
 - **Event System**: Type-safe event handling with visitor pattern support
 
+### Application Framework (`sdlpp_application`)
+- **Service Registry**: Dependency injection for optional services (TTF, future audio)
+- **Lifecycle Management**: Automatic initialization, main loop, and cleanup
+- **Cross-Platform Entry**: Unified application entry point with `REGISTER_APPLICATION`
+
 ### Tools Layer (`sdlpp_tools`)  
 - **EventRouter**: Centralized event distribution system with lambda support
 - **Sprite System**: Efficient sprite sheet management with batch rendering
 - **UI Components**: Interactive buttons with automatic event handling
+
+### Extensions
+- **TTF Text Rendering (`sdlpp_ttf`)**: Font loading, text rendering with service integration
+- **Future modules**: Audio, networking, physics integrations
 
 ### Utilities (`utils`)
 - **Constexpr Map**: Compile-time key-value mapping with automatic size deduction
@@ -70,40 +85,57 @@ ctest --preset ninja-mc-debug
 
 ### Basic Example
 
-```cpp
-#include <sdlpp/sdlpp.h>
+SDL++ provides an Application framework with automatic service management for clean, maintainable code:
 
-int main() {
-    // Initialize SDL
-    sdlpp::SDL sdl;
+```cpp
+#include <application.h>
+#include <window.h>
+#include <renderer.h>
+#include <texture.h>
+#include <ttf_service.h>  // Optional: auto-registers TTF service when linked
+
+using namespace sdlpp;
+
+class MyGame : public BaseApplication {
+ public:
+  auto init() -> bool override {
+    // Framework manages SDL lifecycle - no manual initialization
+    auto& sdl = requestSDL();
+    auto& ttf = requestService<TTF>();  // Optional services via registry
     
-    // Create window and renderer
-    sdlpp::Window window("SDL++ Demo", 800, 600);
-    sdlpp::Renderer renderer(window);
+    // Initialize only the subsystems you need
+    sdl.initSubSystem(SDL::kVideo | SDL::kEvents);
     
-    // Load and display texture
-    sdlpp::Texture sprite(renderer, "player.png");
+    // Create application resources
+    window_ = std::make_unique<Window>("SDL++ Demo", 800, 600);
+    renderer_ = std::make_unique<Renderer>(*window_);
+    sprite_ = std::make_unique<Texture>(*renderer_, "player.png");
     
-    // Game loop
-    bool running = true;
-    while (running) {
-        // Handle events
-        sdlpp::Event event;
-        while (sdlpp::pollEvent(event)) {
-            if (auto* quit = std::get_if<sdlpp::QuitEvent>(&event)) {
-                running = false;
-            }
-        }
-        
-        // Render
-        renderer.setDrawColor(sdlpp::NamedColor::kBlack);
-        renderer.clear();
-        renderer.copy(sprite);
-        renderer.present();
-    }
+    return true;
+  }
+
+  auto iterate() -> bool override {
+    // Render frame
+    renderer_->setDrawColour(NamedColor::kBlack);
+    renderer_->clear();
+    renderer_->copy(*sprite_);
+    renderer_->present();
     
-    return 0;
-}
+    return true;  // Continue running
+  }
+
+  auto quit() -> void override {
+    // Framework handles SDL cleanup automatically
+  }
+
+ private:
+  std::unique_ptr<Window> window_;
+  std::unique_ptr<Renderer> renderer_;
+  std::unique_ptr<Texture> sprite_;
+};
+
+// Register application with framework
+REGISTER_APPLICATION(MyGame)
 ```
 
 ## Advanced Features
@@ -156,6 +188,31 @@ playButton.registerEventHandler([](const MouseButtonEvent& e) {
         startGame();
     }
 });
+```
+
+### TTF Text Rendering with Service Management
+
+```cpp
+#include <ttf_service.h>  // Auto-registers TTF service
+
+class TextApp : public BaseApplication {
+  auto init() -> bool override {
+    auto& sdl = requestSDL();
+    auto& ttf = requestService<TTF>();  // TTF available via service registry
+    
+    window_ = std::make_unique<Window>("Text Demo", 800, 600);
+    renderer_ = std::make_unique<Renderer>(*window_);
+    
+    // Load font and render text
+    auto font = Font(fontData, fontSize, 24.0f);
+    auto textSurface = Text::renderBlended(font, "Hello, SDL++!", NamedColor::kWhite);
+    textTexture_ = std::make_unique<Texture>(*renderer_, textSurface);
+    
+    return true;
+  }
+  
+  // Application framework handles TTF cleanup automatically
+};
 ```
 
 ### Constexpr Utilities with CTAD

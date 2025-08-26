@@ -11,6 +11,7 @@ class Renderer;
 class WindowImpl {
   friend Window;
   friend Renderer;
+  friend class MessageBoxImpl;
 
  private:
   SDL_Window* _sdlWindow{nullptr};

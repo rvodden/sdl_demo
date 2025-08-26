@@ -89,3 +89,6 @@ static constexpr auto myMap = vodden::Map(dataArray);
 ## Testing
 
 Tests are located in `test/` subdirectories and use GoogleTest framework. The build system automatically creates test executables and registers them with CTest.
+
+- Add to memory "Keep PROGRESS.md up to date as new features are implemented"
+- Add to memory "Document significant structural approches in ADRs stored in docs/adr"
