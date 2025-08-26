@@ -26,6 +26,11 @@ auto main() -> int {
     ticTacToeUI->render(ticTacToe);
 
     eventRouter->registerEventHandler<ClickEvent>(
+      [=](const ClickEvent& clickEvent) -> void {
+        ticTacToe->play(clickEvent.x, clickEvent.y);
+      });
+
+    eventRouter->registerEventHandler<ClickEvent>(
       [=]([[maybe_unused]] const ClickEvent& clickEvent) -> void {
         ticTacToeUI->render(ticTacToe);
       });
@@ -49,11 +54,6 @@ auto main() -> int {
         }
       });
     
-    eventRouter->registerEventHandler<ClickEvent>(
-      [=](const ClickEvent& clickEvent) -> void {
-        ticTacToe->play(clickEvent.x, clickEvent.y);
-      });
-
 
     eventRouter->run();
   } catch (std::exception& e) {

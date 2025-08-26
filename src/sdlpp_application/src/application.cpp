@@ -3,6 +3,7 @@
 #include "event.h"
 #include "event_impl.h"
 #include "event_router.h"
+#include "sdl.h"
 
 #include <SDL3/SDL.h>
 #define SDL_MAIN_USE_CALLBACKS 1 //NOLINT(cppcoreguidelines-macro-usage)
@@ -73,6 +74,21 @@ auto ApplicationRunner::reset() -> void {
   _application.reset();
   _eventBus.reset();
   _eventRouter.reset();
+  _sdl.reset();
+  _services.clear();
+}
+
+// Service management implementation
+auto ApplicationRunner::getOrCreateSDL() -> SDL& {
+  if (!_sdl) {
+    _sdl = std::make_unique<SDL>();
+  }
+  return *_sdl;
+}
+
+// BaseApplication service request implementation
+auto BaseApplication::requestSDL() -> SDL& {
+  return ApplicationRunner::getInstance().getOrCreateSDL();
 }
 
 }  // namespace sdlpp

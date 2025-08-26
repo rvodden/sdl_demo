@@ -3,6 +3,7 @@
 #include <sdl.h>
 #include <text.h>
 #include <ttf.h>
+#include <ttf_service.h>  // Automatically registers TTF service
 #include <window.h>
 #include <application.h>
 
@@ -22,10 +23,11 @@ const float kScale = 4.0;
 class HelloWorld : public BaseApplication {
  public:
   auto init() -> bool override {
-    _sdl = std::make_unique<SDL>();
-    _ttf = std::make_unique<TTF>();
-    _sdl->initSubSystem(SDL::kVideo);
-    _sdl->initSubSystem(SDL::kEvents);
+    // Use service registry pattern - no manual object management
+    auto& sdl = requestSDL();
+    [[maybe_unused]] auto& ttf = requestService<TTF>();  // TTF registered automatically when linked
+    sdl.initSubSystem(SDL::kVideo);
+    sdl.initSubSystem(SDL::kEvents);
 
     _window = std::make_unique<Window>("Hello, World!", kScreenWidth, kScreenHeight, 0);
     _renderer = std::make_unique<Renderer>(*_window);
@@ -61,8 +63,7 @@ class HelloWorld : public BaseApplication {
   void quit() override {}
 
  private:
-  std::unique_ptr<SDL> _sdl = nullptr;
-  std::unique_ptr<TTF> _ttf = nullptr;
+  // SDL and TTF now managed by framework - only app-specific objects remain
   std::unique_ptr<Window> _window  = nullptr;
   std::unique_ptr<Renderer> _renderer = nullptr;
   std::unique_ptr<Texture> _texture = nullptr;
