@@ -8,7 +8,8 @@
       "Bash(nm:*)",
       "Bash(grep:*)",
       "Bash(./build/ninja-mc/bin/Debug/font_hello_world)",
-      "Bash(c++filt:*)"
+      "Bash(c++filt:*)",
+      "WebFetch(domain:wiki.libsdl.org)"
     ],
     "deny": [],
     "ask": []
