@@ -1,0 +1,19 @@
+[
+  # SDL3 mappings
+  { "include": ["<SDL3/SDL.h>", "private", "<SDL3/SDL.h>", "public"] },
+  { "include": ["<SDL3/SDL_image.h>", "private", "<SDL3/SDL_image.h>", "public"] },
+  { "include": ["<SDL3/SDL_ttf.h>", "private", "<SDL3/SDL_ttf.h>", "public"] },
+  
+  # Standard library mappings
+  { "include": ["<bits/std_abs.h>", "private", "<cmath>", "public"] },
+  { "include": ["<bits/stdint-intn.h>", "private", "<cstdint>", "public"] },
+  { "include": ["<bits/stdint-uintn.h>", "private", "<cstdint>", "public"] },
+  { "include": ["<bits/types.h>", "private", "<cstdint>", "public"] },
+  { "include": ["<__bit_reference>", "private", "<vector>", "public"] },
+  { "include": ["<__memory/unique_ptr.h>", "private", "<memory>", "public"] },
+  { "include": ["<__memory/shared_ptr.h>", "private", "<memory>", "public"] },
+  
+  # GoogleTest mappings
+  { "include": ["<gtest/gtest.h>", "private", "<gtest/gtest.h>", "public"] },
+  { "include": ["<gmock/gmock.h>", "private", "<gmock/gmock.h>", "public"] }
+]

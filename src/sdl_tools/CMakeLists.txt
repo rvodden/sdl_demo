@@ -38,7 +38,7 @@ if(NOT CMAKE_TESTING_ENABLED)
 endif()
     
 if(SDLCPP_USE_CLANG_TIDY)
-  set_target_properties(standard_compiler_options PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
+  set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
 endif()
 
 set( TEST_NAME "${PROJECT_NAME}_test" )
