@@ -46,12 +46,12 @@ jobs:
         
         # List generated files for debugging
         echo "Generated documentation files:"
-        find docs/output/html -name "*.html" | head -10
+        find build/ninja-mc/docs/output/html -name "*.html" | head -10
 
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: docs/output/html
+        path: build/ninja-mc/docs/output/html
 
   deploy:
     # Only deploy on main branch pushes
@@ -88,12 +88,12 @@ jobs:
         cmake --build --preset ninja-mc-debug --target docs
         
         # Check that HTML was generated
-        if [ ! -d "docs/output/html" ] || [ -z "$(ls -A docs/output/html)" ]; then
+        if [ ! -d "build/ninja-mc/docs/output/html" ] || [ -z "$(ls -A build/ninja-mc/docs/output/html)" ]; then
           echo "ERROR: No HTML documentation was generated"
           exit 1
         fi
         
         echo "Documentation build successful"
         echo "Generated files:"
-        find docs/output/html -name "*.html" | wc -l
+        find build/ninja-mc/docs/output/html -name "*.html" | wc -l
         echo "HTML files created"

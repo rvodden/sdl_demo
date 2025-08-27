@@ -9,7 +9,8 @@
       "Bash(grep:*)",
       "Bash(./build/ninja-mc/bin/Debug/font_hello_world)",
       "Bash(c++filt:*)",
-      "WebFetch(domain:wiki.libsdl.org)"
+      "WebFetch(domain:wiki.libsdl.org)",
+      "mcp__github__list_workflow_runs"
     ],
     "deny": [],
     "ask": []
