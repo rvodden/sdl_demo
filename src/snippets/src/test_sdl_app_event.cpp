@@ -6,10 +6,10 @@
 #include <iostream>
 #include <memory>
 
-class SDL_AppEventTestApp : public sdlpp::BaseApplication {
+class SDL_AppEventTestApp : public sdl::BaseApplication {
 private:
-    std::unique_ptr<sdlpp::Window> window_;
-    std::unique_ptr<sdlpp::Renderer> renderer_;
+    std::unique_ptr<sdl::Window> window_;
+    std::unique_ptr<sdl::Renderer> renderer_;
     int frameCount_ = 0;
     bool eventReceived_ = false;
     
@@ -19,27 +19,27 @@ public:
         
         // Create window and renderer
         try {
-            window_ = std::make_unique<sdlpp::Window>("SDL AppEvent Test", 400, 300, 0);
-            renderer_ = std::make_unique<sdlpp::Renderer>(*window_);
+            window_ = std::make_unique<sdl::Window>("SDL AppEvent Test", 400, 300, 0);
+            renderer_ = std::make_unique<sdl::Renderer>(*window_);
         } catch (const std::exception& e) {
             std::cout << "❌ FAILURE: Could not create window/renderer: " << e.what() << std::endl;
             return false;
         }
         
         // Register event handler to test that events from SDL_AppEvent reach EventRouter
-        auto& runner = sdlpp::ApplicationRunner::getInstance();
+        auto& runner = sdl::ApplicationRunner::getInstance();
         if (auto eventRouter = runner.getEventRouter()) {
             std::cout << "✅ SUCCESS: EventRouter accessible during init\n";
             
-            eventRouter->registerEventHandler<sdlpp::MouseButtonEvent>(
-                [this](const sdlpp::MouseButtonEvent& event) {
+            eventRouter->registerEventHandler<sdl::MouseButtonEvent>(
+                [this](const sdl::MouseButtonEvent& event) {
                     std::cout << "✅ SUCCESS: Received mouse event in application handler at (" 
                               << event.x << ", " << event.y << ")\n";
                     eventReceived_ = true;
                 });
                 
-            eventRouter->registerEventHandler<sdlpp::QuitEvent>(
-                [](const sdlpp::QuitEvent&) {
+            eventRouter->registerEventHandler<sdl::QuitEvent>(
+                [](const sdl::QuitEvent&) {
                     std::cout << "✅ SUCCESS: Received quit event in application handler\n";
                 });
         } else {
@@ -55,7 +55,7 @@ public:
         frameCount_++;
         
         // Render something simple
-        renderer_->setDrawColour(sdlpp::Color(0, 0, 255, 255));  // Blue
+        renderer_->setDrawColour(sdl::Color(0, 0, 255, 255));  // Blue
         renderer_->clear();
         renderer_->present();
         
@@ -88,10 +88,10 @@ int main() {
     std::cout << "Click in the window or press ESC to generate events.\n\n";
     
     // Register our test application
-    sdlpp::ApplicationRunner::registerApplication(std::make_unique<SDL_AppEventTestApp>());
+    sdl::ApplicationRunner::registerApplication(std::make_unique<SDL_AppEventTestApp>());
     
     // Run the application (this will initialize SDL internally and call callbacks)
-    auto result = sdlpp::ApplicationRunner::run();
+    auto result = sdl::ApplicationRunner::run();
     
     std::cout << "\nTest completed with result: " << result << std::endl;
     return result;

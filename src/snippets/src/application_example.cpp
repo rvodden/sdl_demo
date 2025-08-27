@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-using namespace sdlpp;
+using namespace sdl;
 
 class MyGame : public BaseApplication {
  public:

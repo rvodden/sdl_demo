@@ -19,12 +19,12 @@ We needed to decide how to structure a C++ wrapper that addresses these issues w
 
 We implemented a **three-layer architecture** with clear separation of concerns:
 
-### Layer 1: Core SDL Wrapper (`sdlpp` namespace)
+### Layer 1: Core SDL Wrapper (`sdl` namespace)
 - **Purpose**: Thin RAII wrappers around SDL3 C API
 - **Scope**: Window, Renderer, Surface, Texture, Event system
 - **Characteristics**:
   - Direct 1:1 mapping to SDL concepts
-  - Exception-based error handling via `sdlpp::Exception`
+  - Exception-based error handling via `sdl::Exception`
   - Automatic resource cleanup through destructors
   - Move-only semantics (no copying of expensive resources)
   - Pimpl pattern to hide SDL dependencies
@@ -36,13 +36,13 @@ SDL_Window* window = SDL_CreateWindow("Title", 800, 600, 0);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
 // ... manual cleanup required
 
-// sdlpp provides RAII
-sdlpp::Window window("Title", 800, 600, 0);
-sdlpp::Renderer renderer(window);
+// sdl provides RAII
+sdl::Window window("Title", 800, 600, 0);
+sdl::Renderer renderer(window);
 // Automatic cleanup on destruction
 ```
 
-### Layer 2: Game Development Tools (`sdlpp::tools` namespace)
+### Layer 2: Game Development Tools (`sdl::tools` namespace)
 - **Purpose**: Higher-level utilities built on Layer 1
 - **Scope**: EventRouter, Button, Sprite, SpriteRenderer
 - **Characteristics**:
@@ -135,8 +135,8 @@ button.registerEventHandler([](const MouseButtonEvent& e) {
 The architecture's effectiveness is demonstrated in our codebase:
 
 **Layer Separation**: source files cleanly organized:
-- `src/sdlpp/`: core SDL wrappers
-- `src/sdlpp_tools/`: game utilities  
+- `src/sdl/`: core SDL wrappers
+- `src/sdl_tools/`: game utilities  
 - `src/examples/`: real applications
 
 **Independent Testing**: Each layer has comprehensive test coverage:

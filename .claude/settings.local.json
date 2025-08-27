@@ -4,7 +4,7 @@
       "Bash(cmake:*)",
       "Bash(./build/ninja-mc/src/visitor_pattern_mockup/Debug/visitor_pattern_mockup)",
       "Bash(ctest:*)",
-      "Bash(./build/ninja-mc/bin/Debug/sdlpp_tools_test:*)",
+      "Bash(./build/ninja-mc/bin/Debug/sdl_tools_test:*)",
       "Bash(nm:*)",
       "Bash(grep:*)",
       "Bash(./build/ninja-mc/bin/Debug/font_hello_world)",

@@ -20,31 +20,31 @@
 
 class TicTacToeUI {
  public:
-  TicTacToeUI(std::shared_ptr<sdlpp::EventBus> bus,
-              std::shared_ptr<sdlpp::tools::EventRouter> router);
+  TicTacToeUI(std::shared_ptr<sdl::EventBus> bus,
+              std::shared_ptr<sdl::tools::EventRouter> router);
 
   void render(const std::shared_ptr<TicTacToe>& ticTacToe);
 
  private:
-  sdlpp::Window _window{"Tic Tac Toe", kInitialWindowWidth, kInitialWindowHeight, 0};
-  std::shared_ptr<sdlpp::EventBus> _eventBus;
-  std::shared_ptr<sdlpp::tools::EventRouter> _eventRouter;
+  sdl::Window _window{"Tic Tac Toe", kInitialWindowWidth, kInitialWindowHeight, 0};
+  std::shared_ptr<sdl::EventBus> _eventBus;
+  std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
 
-  std::shared_ptr<sdlpp::Renderer> _renderer = std::make_shared<sdlpp::Renderer>(_window);
-  std::shared_ptr<sdlpp::tools::SpriteRenderer> _spriteRenderer =
-      std::make_shared<sdlpp::tools::SpriteRenderer>(_renderer);
+  std::shared_ptr<sdl::Renderer> _renderer = std::make_shared<sdl::Renderer>(_window);
+  std::shared_ptr<sdl::tools::SpriteRenderer> _spriteRenderer =
+      std::make_shared<sdl::tools::SpriteRenderer>(_renderer);
 
-  std::shared_ptr<sdlpp::Texture> _spriteSheet = std::make_shared<sdlpp::Texture>(
+  std::shared_ptr<sdl::Texture> _spriteSheet = std::make_shared<sdl::Texture>(
       *_renderer, &_binary_tic_tac_toe_png_start, ticTacToeSize());
-  sdlpp::tools::Sprite _board{_spriteSheet,
+  sdl::tools::Sprite _board{_spriteSheet,
                 {0, 0, kCellWidth* kCellColumns, kCellHeight* kCellRows}};
-  sdlpp::tools::Sprite _letterO{
+  sdl::tools::Sprite _letterO{
       _spriteSheet,
       {kCellWidth * kCellColumns, kCellHeight, kCellWidth, kCellHeight}};
-  sdlpp::tools::Sprite _letterX{_spriteSheet,
+  sdl::tools::Sprite _letterX{_spriteSheet,
                   {kCellWidth * kCellColumns, 0, kCellWidth, kCellHeight}};
 
-  std::vector<std::unique_ptr<sdlpp::tools::Button>> _buttons;
+  std::vector<std::unique_ptr<sdl::tools::Button>> _buttons;
 
   static const uint8_t kCellWidth = 128;
   static const uint8_t kCellHeight = kCellWidth;

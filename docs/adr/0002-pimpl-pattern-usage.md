@@ -24,7 +24,7 @@ We implemented the **Pimpl (Pointer to Implementation) idiom** consistently acro
 - No SDL includes in any public header file
 - Clean, dependency-free API surface
 
-**Example (`src/sdlpp/include/surface.h`):**
+**Example (`src/sdl/include/surface.h`):**
 ```cpp
 #include <memory>
 #include <filesystem>
@@ -43,11 +43,11 @@ private:
 ```
 
 ### Implementation Header Structure  
-- Implementation details isolated in `src/sdlpp/src/include/*_impl.h` files
+- Implementation details isolated in `src/sdl/src/include/*_impl.h` files
 - SDL dependencies contained within implementation
 - Friend relationships contained at impl level only - no coupling exposed in public API
 
-**Example (`src/sdlpp/src/include/surface_impl.h`):**
+**Example (`src/sdl/src/include/surface_impl.h`):**
 ```cpp
 #include "surface.h"
 #include <SDL3/SDL.h>  // SDL dependency isolated here
@@ -145,9 +145,9 @@ The pattern's effectiveness is visible throughout our codebase:
 
 **Consistent Application**: All 14 major wrapper classes (`Window`, `Renderer`, `Surface`, `Texture`, `EventBus`, `Sprite`, `Button`, etc.) follow identical pimpl structure with standardized `_impl` naming.
 
-**Clean Public Headers**: Zero SDL includes in `src/sdlpp/include/` - only standard library and our own headers. No friend statements exposing internal coupling.
+**Clean Public Headers**: Zero SDL includes in `src/sdl/include/` - only standard library and our own headers. No friend statements exposing internal coupling.
 
-**Isolated Dependencies**: All SDL includes and friend relationships contained within `src/sdlpp/src/include/*_impl.h` files.
+**Isolated Dependencies**: All SDL includes and friend relationships contained within `src/sdl/src/include/*_impl.h` files.
 
 **User Experience**: TicTacToe example includes only `#include <sdl.h>` and compiles without any SDL configuration.
 

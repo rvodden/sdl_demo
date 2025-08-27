@@ -5,7 +5,7 @@
 
 ## Context
 
-The current `sdlpp::Application` framework requires users to manually create and manage SDL and TTF objects in their application's `init()` method. This leads to boilerplate code and inconsistent initialization patterns across applications:
+The current `sdl::Application` framework requires users to manually create and manage SDL and TTF objects in their application's `init()` method. This leads to boilerplate code and inconsistent initialization patterns across applications:
 
 - In `application_example.cpp:23-24`, users create SDL objects as direct members
 - In `font_hello_world.cpp:25-26`, users create SDL and TTF objects as unique_ptr members
@@ -16,7 +16,7 @@ Users need a way to declaratively specify which services (SDL, TTF) they require
 
 ## Decision
 
-Implement a **Service Registry Pattern** that allows applications to request services on-demand without creating hard dependencies between `sdlpp_application` and optional modules like `sdlpp_ttf`:
+Implement a **Service Registry Pattern** that allows applications to request services on-demand without creating hard dependencies between `sdl_application` and optional modules like `sdl_ttf`:
 
 ```cpp
 class BaseApplication {
@@ -38,8 +38,8 @@ public:
 ```
 
 **Key Design Principles:**
-1. **SDL Hard Dependency**: `sdlpp_application` depends directly on `sdlpp` (acceptable core dependency)
-2. **TTF Soft Dependency**: TTF services registered via factory pattern when `sdlpp_ttf` is linked
+1. **SDL Hard Dependency**: `sdl_application` depends directly on `sdl` (acceptable core dependency)
+2. **TTF Soft Dependency**: TTF services registered via factory pattern when `sdl_ttf` is linked
 3. **Extensibility**: Any service can register itself using the same pattern
 4. **Lazy Creation**: Services created only when first requested
 
@@ -69,8 +69,8 @@ class MyApp : public BaseApplication {
 ```
 
 **Key Implementation Files:**
-- `src/sdlpp_application/include/application.h`: Core service management
-- `src/sdlpp_ttf/include/ttf_service.h`: TTF service registration header
+- `src/sdl_application/include/application.h`: Core service management
+- `src/sdl_ttf/include/ttf_service.h`: TTF service registration header
 - Service registration happens transparently when optional service headers are included
 
 ## Consequences
@@ -78,7 +78,7 @@ class MyApp : public BaseApplication {
 ### What becomes easier:
 - **Reduced boilerplate**: Applications no longer need manual SDL/TTF object management
 - **Consistent initialization**: Framework ensures proper service initialization order
-- **Optional dependencies**: Modules like `sdlpp_ttf` can be linked optionally without breaking builds
+- **Optional dependencies**: Modules like `sdl_ttf` can be linked optionally without breaking builds
 - **Error handling**: Framework provides centralized error handling for service initialization
 - **Resource management**: Automatic cleanup of services during application shutdown
 - **Extensibility**: New services can integrate using the same registration pattern
@@ -105,7 +105,7 @@ protected:
   auto requestTTF() -> TTF&;  // Creates hard dependency
 };
 ```
-**Rejected**: Forces `sdlpp_application` to depend on `sdlpp_ttf`, breaking modularity and increasing build requirements.
+**Rejected**: Forces `sdl_application` to depend on `sdl_ttf`, breaking modularity and increasing build requirements.
 
 ### 2. Initialization Flags Pattern
 ```cpp

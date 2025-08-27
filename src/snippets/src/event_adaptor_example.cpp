@@ -2,7 +2,7 @@
  * @brief Example demonstrating the decoupled EventAdaptor architecture
  *
  * This example shows how the new template-based EventAdaptor system works:
- * 1. EventAdaptor converts platform events to sdlpp events (zero-cost abstraction)
+ * 1. EventAdaptor converts platform events to sdl events (zero-cost abstraction)
  * 2. TemplatedEventBus uses EventAdaptor and routes via callback
  * 3. EventRouter provides routeEvent method for callback-based usage
  * 4. Complete decoupling allows non-blocking event processing
@@ -16,8 +16,8 @@
 #include "event_router.h"
 #include "event_impl.h"
 
-using namespace sdlpp;
-using namespace sdlpp::tools;
+using namespace sdl;
+using namespace sdl::tools;
 
 /**
  * @brief Example event handler for demonstration
@@ -57,7 +57,7 @@ auto main() -> int {
     
     // 3. Create CRTP-based SDL event bus (zero virtual function overhead!)
     std::cout << "3. Creating CRTP-based SDLEventBus (zero-cost abstraction)...\n";
-    auto sdlEventBus = sdlpp::createSDLEventBus();
+    auto sdlEventBus = sdl::createSDLEventBus();
     
     // 4. Connect EventBus to EventRouter via callback
     std::cout << "4. Setting up callback-based routing...\n";

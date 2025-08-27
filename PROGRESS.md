@@ -1,11 +1,11 @@
-# SDL3 Implementation Progress in sdlpp
+# SDL3 Implementation Progress in SDL++
 
-This document tracks the implementation status of SDL3 functions in the sdlpp C++ wrapper library. Each table shows the SDL3 function signature and either the corresponding sdlpp equivalent or "Not yet implemented".
+This document tracks the implementation status of SDL3 functions in the SDL++ C++ wrapper library. Each table shows the SDL3 function signature and either the corresponding SDL++ equivalent or "Not yet implemented".
 
 ## Summary
 
 **Total SDL3 Functions Surveyed**: ~200+  
-**Implemented in sdlpp**: ~37  
+**Implemented in sdl**: ~37  
 **Implementation Coverage**: ~18-20%
 
 ### Key Implementation Areas:
@@ -30,17 +30,17 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 - ❌ **Hardware acceleration info (OpenGL, Vulkan, etc.)**
 
 ### Notes:
-- sdlpp follows modern C++ RAII principles with smart pointers and exception-based error handling
+- sdl follows modern C++ RAII principles with smart pointers and exception-based error handling
 - The implementation uses a pimpl pattern to hide SDL implementation details
 - Event system uses visitor pattern for type-safe polymorphic event handling
 - Rectangle class is templated to support both integer and float coordinates
-- Many SDL3 functions are replaced by constructor/destructor pairs in sdlpp's RAII design
+- Many SDL3 functions are replaced by constructor/destructor pairs in sdl's RAII design
 
 ---
 
 ## Initialization (CategoryInit)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_Init(SDL_InitFlags flags)` | `SDL::SDL()` (constructor handles initialization) |
 | `bool SDL_InitSubSystem(SDL_InitFlags flags)` | `SDL::initSubSystem(const SubSystem& subSystem)` |
@@ -55,7 +55,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Video/Window Management (CategoryVideo)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_Window * SDL_CreateWindow(const char *title, int w, int h, SDL_WindowFlags flags)` | `Window::Window(std::string title, uint16_t width, uint16_t height, uint32_t flags)` |
 | `void SDL_DestroyWindow(SDL_Window *window)` | `Window::~Window()` (destructor handles cleanup) |
@@ -84,7 +84,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Rendering (CategoryRender)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_Renderer * SDL_CreateRenderer(SDL_Window *window, const char *name)` | `Renderer::Renderer(Window& window)` |
 | `void SDL_DestroyRenderer(SDL_Renderer *renderer)` | `Renderer::~Renderer()` (destructor handles cleanup) |
@@ -115,7 +115,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Texture Management (Part of CategoryRender)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, SDL_PixelFormat format, SDL_TextureAccess access, int w, int h)` | Not yet implemented |
 | `SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface)` | `Texture::Texture(const Renderer& renderer, const Surface& surface)` |
@@ -133,7 +133,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Surface Operations (CategorySurface)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_Surface * SDL_CreateSurface(int width, int height, SDL_PixelFormat format)` | `Surface::Surface(uint32_t width, uint32_t height)` |
 | `SDL_Surface * SDL_CreateSurfaceFrom(int width, int height, SDL_PixelFormat format, void *pixels, int pitch)` | `Surface::Surface(uint32_t width, uint32_t height, const std::vector<uint8_t>& pixels)` |
@@ -152,7 +152,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Event Handling (CategoryEvents)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_PollEvent(SDL_Event *event)` | `EventBus::poll() -> std::optional<std::unique_ptr<BaseEvent>>` |
 | `bool SDL_WaitEvent(SDL_Event *event)` | `EventBus::wait() -> std::unique_ptr<BaseEvent>` |
@@ -174,16 +174,16 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Message Boxes (CategoryMessagebox)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)` | `MessageBox::show() -> MessageBox::Result` (fluent builder pattern) |
 | `bool SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags flags, const char *title, const char *message, SDL_Window *window)` | `MessageBox(title, message).setType(type).show()` (simplified via builder) |
 
 ## Time and Delays (CategoryTime/CategoryTimer)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
-| `void SDL_Delay(Uint32 ms)` | `sdlpp::delay_ms(uint32_t duration)` and `sdlpp::delay(std::chrono::duration<T>)` |
+| `void SDL_Delay(Uint32 ms)` | `sdl::delay_ms(uint32_t duration)` and `sdl::delay(std::chrono::duration<T>)` |
 | `Uint64 SDL_GetTicks()` | Not yet implemented |
 | `Uint64 SDL_GetTicksNS()` | Not yet implemented |
 | `Uint64 SDL_GetPerformanceCounter()` | Not yet implemented |
@@ -193,7 +193,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Error Handling (CategoryError)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_SetError(SDL_PRINTF_FORMAT_STRING const char *fmt, ...)` | Not yet implemented |
 | `const char * SDL_GetError()` | Not yet implemented (exceptions used instead) |
@@ -201,7 +201,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Rectangle Utilities (CategoryRect)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_GetRectIntersection(const SDL_Rect *A, const SDL_Rect *B, SDL_Rect *result)` | Not yet implemented |
 | `bool SDL_GetRectUnion(const SDL_Rect *A, const SDL_Rect *B, SDL_Rect *result)` | Not yet implemented |
@@ -213,7 +213,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Mouse Input (CategoryMouse)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `Uint32 SDL_GetMouseState(float *x, float *y)` | Not yet implemented |
 | `Uint32 SDL_GetGlobalMouseState(float *x, float *y)` | Not yet implemented |
@@ -231,7 +231,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Keyboard Input (CategoryKeyboard)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `const bool * SDL_GetKeyboardState(int *numkeys)` | Not yet implemented |
 | `SDL_Keymod SDL_GetModState()` | Not yet implemented |
@@ -251,7 +251,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Audio (CategoryAudio)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_AudioDeviceID * SDL_GetAudioOutputDevices(int *count)` | Not yet implemented |
 | `SDL_AudioDeviceID * SDL_GetAudioCaptureDevices(int *count)` | Not yet implemented |
@@ -268,7 +268,7 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## File I/O (CategoryIOStream/CategoryFilesystem)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_IOStream * SDL_IOFromFile(const char *file, const char *mode)` | Not yet implemented |
 | `SDL_IOStream * SDL_IOFromMem(void *mem, size_t size)` | Not yet implemented |
@@ -281,13 +281,13 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Platform Information (CategoryPlatform)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `const char * SDL_GetPlatform()` | Not yet implemented |
 
 ## CPU Information (CategoryCPU)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `int SDL_GetCPUCount()` | Not yet implemented |
 | `int SDL_GetCPUCacheLineSize()` | Not yet implemented |
@@ -310,13 +310,13 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Power Management (CategoryPower)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `SDL_PowerState SDL_GetPowerInfo(int *seconds, int *percent)` | Not yet implemented |
 
 ## Clipboard (CategoryClipboard)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `bool SDL_SetClipboardText(const char *text)` | Not yet implemented |
 | `char * SDL_GetClipboardText()` | Not yet implemented |
@@ -327,14 +327,14 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ## Version Information (CategoryVersion)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `void SDL_GetVersion(SDL_Version *ver)` | Not yet implemented |
 | `const char * SDL_GetRevision()` | Not yet implemented |
 
 ## Pixel Format Utilities (CategoryPixels)
 
-| SDL3 Function | sdlpp Equivalent |
+| SDL3 Function | SDL++ Equivalent |
 |---------------|------------------|
 | `const char * SDL_GetPixelFormatName(SDL_PixelFormat format)` | Not yet implemented |
 | `bool SDL_GetMasksForPixelFormat(SDL_PixelFormat format, int *bpp, Uint32 *Rmask, Uint32 *Gmask, Uint32 *Bmask, Uint32 *Amask)` | Not yet implemented |
@@ -349,9 +349,9 @@ This document tracks the implementation status of SDL3 functions in the sdlpp C+
 
 ---
 
-## Progressive Game Examples for sdlpp Development
+## Progressive Game Examples for SDL++ Development
 
-This section outlines a series of example games that can be implemented to gradually expand sdlpp's functionality. Each game builds upon previous capabilities while introducing new SDL3 features.
+This section outlines a series of example games that can be implemented to gradually expand sdl's functionality. Each game builds upon previous capabilities while introducing new SDL3 features.
 
 ### 1. Tic-Tac-Toe ✅ (Already Implemented)
 **Status**: Complete  
@@ -533,4 +533,4 @@ This section outlines a series of example games that can be implemented to gradu
 8. **Integration**: RPG for system integration
 9. **Advanced**: RTS for complex input and management
 
-Each game serves as both a demonstration of sdlpp capabilities and a driver for implementing new SDL3 functionality in a practical, tested context.
+Each game serves as both a demonstration of sdl capabilities and a driver for implementing new SDL3 functionality in a practical, tested context.

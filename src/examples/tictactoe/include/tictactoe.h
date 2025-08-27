@@ -14,7 +14,7 @@ class TicTacToe {
   enum class Player : std::uint8_t { kO,
                                      kX };
 
-  TicTacToe(std::shared_ptr<sdlpp::EventBus> eventBus);
+  TicTacToe(std::shared_ptr<sdl::EventBus> eventBus);
 
   [[nodiscard]] auto getCellState(const uint8_t& x, const uint8_t& y) const
       -> std::optional<Player>;
@@ -22,7 +22,7 @@ class TicTacToe {
   void play(uint8_t x, uint8_t y);
 
  private:
-  std::shared_ptr<sdlpp::EventBus> _eventBus;
+  std::shared_ptr<sdl::EventBus> _eventBus;
   std::array<std::optional<Player>,
              static_cast<std::size_t>(kCellColumns* kCellRows)>
       _cells{std::nullopt, std::nullopt, std::nullopt,

@@ -71,7 +71,7 @@ All SDL resource wrapper classes follow identical patterns:
 
 **Constructor Responsibilities:**
 - Create SDL resource using appropriate SDL function
-- Throw `sdlpp::Exception` on failure with descriptive message
+- Throw `sdl::Exception` on failure with descriptive message
 - Store resource in pimpl implementation
 - Ensure strong exception safety guarantee
 
@@ -160,7 +160,7 @@ Surface surface3 = std::move(surface1); // OK, but surface1 becomes invalid
 ```cpp
 try {
     Window window("Title", 800, 600, 0);
-} catch (const sdlpp::Exception& e) {
+} catch (const sdl::Exception& e) {
     // Handle resource creation failure
 }
 ```

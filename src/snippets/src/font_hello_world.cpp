@@ -12,8 +12,8 @@
 
 extern const std::array<const uint8_t, 6656> tiny_ttf;
 
-using namespace sdlpp;
-using namespace sdlpp::ttf;
+using namespace sdl;
+using namespace sdl::ttf;
 using namespace std::literals;
 
 const uint32_t kScreenWidth = 800;

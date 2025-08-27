@@ -7,7 +7,7 @@
 #include <chrono>
 #include <cstdint>
 
-class ClickEvent : public sdlpp::CustomUserEvent<ClickEvent> {
+class ClickEvent : public sdl::CustomUserEvent<ClickEvent> {
  public:
   ClickEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
              uint8_t xParam, uint8_t yParam)
@@ -17,7 +17,7 @@ class ClickEvent : public sdlpp::CustomUserEvent<ClickEvent> {
   uint8_t y;
 };
 
-class GameCompletedEvent : public sdlpp::CustomUserEvent<GameCompletedEvent> {
+class GameCompletedEvent : public sdl::CustomUserEvent<GameCompletedEvent> {
  public:
   GameCompletedEvent(const GameState& state)
       : CustomUserEvent(std::chrono::duration_cast<std::chrono::milliseconds>(

@@ -5,15 +5,15 @@
 int main() {
     try {
         // Initialize SDL for message box functionality
-        sdlpp::SDL sdl;
-        sdl.initSubSystem(sdlpp::SDL::kVideo);
+        sdl::SDL sdl;
+        sdl.initSubSystem(sdl::SDL::kVideo);
 
         std::cout << "Demonstrating MessageBox builder pattern...\n\n";
 
         // Example 1: Simple message box with default OK button
         std::cout << "1. Simple information message:\n";
-        auto result1 = sdlpp::MessageBox("Hello", "This is a simple message box!")
-            .setType(sdlpp::MessageBox::Type::Information)
+        auto result1 = sdl::MessageBox("Hello", "This is a simple message box!")
+            .setType(sdl::MessageBox::Type::Information)
             .show();
 
         if (result1.success) {
@@ -24,11 +24,11 @@ int main() {
 
         // Example 2: Warning with custom buttons
         std::cout << "\n2. Warning with custom buttons:\n";
-        auto result2 = sdlpp::MessageBox("Warning", "This action cannot be undone!")
+        auto result2 = sdl::MessageBox("Warning", "This action cannot be undone!")
             .addButton("Continue", 1)
             .addButton("Cancel", 0)
             .makeLastButtonCancel()
-            .setType(sdlpp::MessageBox::Type::Warning)
+            .setType(sdl::MessageBox::Type::Warning)
             .show();
 
         if (result2.success) {
@@ -44,11 +44,11 @@ int main() {
 
         // Example 3: Error dialog
         std::cout << "\n3. Error dialog:\n";
-        auto result3 = sdlpp::MessageBox("Critical Error", "A fatal error has occurred!")
+        auto result3 = sdl::MessageBox("Critical Error", "A fatal error has occurred!")
             .addButton("Restart", 2)
             .addButton("Exit", 1)
             .makeLastButtonDefault()
-            .setType(sdlpp::MessageBox::Type::Error)
+            .setType(sdl::MessageBox::Type::Error)
             .show();
 
         if (result3.success) {

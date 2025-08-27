@@ -22,9 +22,9 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 1. **sdl** - Low-level C++ wrapper around SDL3 C API
    - Provides RAII wrappers for SDL resources (Window, Renderer, Surface, Texture)
    - Event system with type-safe event handling
-   - Exception-based error handling via `sdlpp::Exception`
+   - Exception-based error handling via `sdl::Exception`
 
-2. **sdlpp_tools** - Higher-level game development utilities built on sdl layer
+2. **sdl_tools** - Higher-level game development utilities built on sdl layer
    - `EventRouter` - Event routing and handling system
    - `Sprite` and `SpriteRenderer` - 2D sprite management
    - `Button` - UI button component
@@ -48,7 +48,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 ### Code Organization
 - Implementation details are hidden in `*_impl.h` files (pimpl pattern)
 - Public headers expose clean interfaces without SDL dependencies
-- Namespaces follow directory structure (`sdlpp::`, `sdlpp::tools::`)
+- Namespaces follow directory structure (`sdl::`, `sdl::tools::`)
 - **Test/Debug code should be placed in the `snippets` project** - use this for temporary diagnostic tools, debugging utilities, and experimental code
 - **Tests must NEVER include `*_impl.h` headers** - tests should only interact with public interfaces
 
@@ -92,6 +92,6 @@ Tests are located in `test/` subdirectories and use GoogleTest framework. The bu
 
 ## Additional Points
 
-- Keep PROGRESS.md up to date as new features are implemented
+- Keep PROGRESS.md and README.md up to date as new features are implemented
 - Document significant structural approches in ADRs stored in docs/adr
-- remember to be consistent with the ADRs in docs/adr/
+- Be consistent with the ADRs in docs/adr/

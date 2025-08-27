@@ -29,6 +29,6 @@ if(NOT PROJECT_IS_TOP_LEVEL)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_data)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdlpp)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdlpp_tools)
+target_link_libraries(${PROJECT_NAME} PUBLIC sdl)
+target_link_libraries(${PROJECT_NAME} PUBLIC sdl_tools)
 

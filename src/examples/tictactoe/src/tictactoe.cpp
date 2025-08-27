@@ -3,7 +3,7 @@
 #include <exception>
 #include <format>
 
-TicTacToe::TicTacToe(std::shared_ptr<sdlpp::EventBus> eventBus)
+TicTacToe::TicTacToe(std::shared_ptr<sdl::EventBus> eventBus)
     : _eventBus(std::move(eventBus)) {}
 
 [[nodiscard]] auto TicTacToe::getCellState(const uint8_t& x, const uint8_t& y) const

@@ -35,24 +35,24 @@ SDL++ follows a clean layered architecture with optional modules:
 └─────────────────────────────────────────────────────┘
 ```
 
-### Core Layer (`sdlpp`)
+### Core Layer (`sdl`)
 - **Window Management**: Hardware-accelerated window creation with VSync support
 - **Rendering**: 2D hardware-accelerated rendering with blend modes and primitives
 - **Resource Management**: RAII wrappers for Textures, Surfaces, and SDL objects
 - **Event System**: Type-safe event handling with visitor pattern support
 
-### Application Framework (`sdlpp_application`)
+### Application Framework (`sdl_application`)
 - **Service Registry**: Dependency injection for optional services (TTF, future audio)
 - **Lifecycle Management**: Automatic initialization, main loop, and cleanup
 - **Cross-Platform Entry**: Unified application entry point with `REGISTER_APPLICATION`
 
-### Tools Layer (`sdlpp_tools`)  
+### Tools Layer (`sdl_tools`)  
 - **EventRouter**: Centralized event distribution system with lambda support
 - **Sprite System**: Efficient sprite sheet management with batch rendering
 - **UI Components**: Interactive buttons with automatic event handling
 
 ### Extensions
-- **TTF Text Rendering (`sdlpp_ttf`)**: Font loading, text rendering with service integration
+- **TTF Text Rendering (`sdl_ttf`)**: Font loading, text rendering with service integration
 - **Future modules**: Audio, networking, physics integrations
 
 ### Utilities (`utils`)
@@ -94,7 +94,7 @@ SDL++ provides an Application framework with automatic service management for cl
 #include <texture.h>
 #include <ttf_service.h>  // Optional: auto-registers TTF service when linked
 
-using namespace sdlpp;
+using namespace sdl;
 
 class MyGame : public BaseApplication {
  public:
@@ -143,8 +143,8 @@ REGISTER_APPLICATION(MyGame)
 ### Event System with Lambda Handlers
 
 ```cpp
-auto eventBus = std::make_shared<sdlpp::tools::EventBus>();
-auto eventRouter = std::make_shared<sdlpp::tools::EventRouter>(eventBus);
+auto eventBus = std::make_shared<sdl::tools::EventBus>();
+auto eventRouter = std::make_shared<sdl::tools::EventRouter>(eventBus);
 
 // Register lambda handlers
 eventRouter->registerEventHandler<MouseButtonEvent>([](const MouseButtonEvent& e) {
@@ -161,15 +161,15 @@ eventRouter->run();
 
 ```cpp
 // Load sprite sheet
-sdlpp::Texture spriteSheet(renderer, "characters.png");
-auto sharedTexture = std::make_shared<const sdlpp::Texture>(std::move(spriteSheet));
+sdl::Texture spriteSheet(renderer, "characters.png");
+auto sharedTexture = std::make_shared<const sdl::Texture>(std::move(spriteSheet));
 
 // Create sprites from different regions
-sdlpp::tools::Sprite player(sharedTexture, FloatRectangle(0, 0, 32, 48));
-sdlpp::tools::Sprite enemy(sharedTexture, FloatRectangle(32, 0, 32, 48));
+sdl::tools::Sprite player(sharedTexture, FloatRectangle(0, 0, 32, 48));
+sdl::tools::Sprite enemy(sharedTexture, FloatRectangle(32, 0, 32, 48));
 
 // Efficient batch rendering
-sdlpp::tools::SpriteRenderer spriteRenderer(renderer);
+sdl::tools::SpriteRenderer spriteRenderer(renderer);
 spriteRenderer.addSprite(player, 100, 200);
 spriteRenderer.addSprite(enemy, 200, 200);
 spriteRenderer.render(); // Single draw call for both sprites
@@ -180,7 +180,7 @@ spriteRenderer.render(); // Single draw call for both sprites
 ```cpp
 // Create interactive button
 FloatRectangle buttonBounds(100, 50, 200, 75);
-sdlpp::tools::Button playButton(eventRouter, buttonBounds);
+sdl::tools::Button playButton(eventRouter, buttonBounds);
 
 playButton.registerEventHandler([](const MouseButtonEvent& e) {
     if (e.down && e.button == MouseButtonEvent::Button::kLeft) {
@@ -220,9 +220,9 @@ class TextApp : public BaseApplication {
 ```cpp
 // Compile-time mapping with automatic size deduction
 static constexpr auto colorMap = vodden::Map(std::array{
-    std::pair{Key::kRed, sdlpp::NamedColor::kRed},
-    std::pair{Key::kBlue, sdlpp::NamedColor::kBlue},
-    std::pair{Key::kGreen, sdlpp::NamedColor::kGreen}
+    std::pair{Key::kRed, sdl::NamedColor::kRed},
+    std::pair{Key::kBlue, sdl::NamedColor::kBlue},
+    std::pair{Key::kGreen, sdl::NamedColor::kGreen}
 });
 
 auto color = colorMap.at(Key::kRed); // Compile-time lookup
@@ -249,8 +249,8 @@ All SDL resources are automatically managed through RAII, eliminating resource l
 
 ```cpp
 {
-    sdlpp::Window window("Title", 800, 600);
-    sdlpp::Renderer renderer(window);
+    sdl::Window window("Title", 800, 600);
+    sdl::Renderer renderer(window);
     // Resources automatically cleaned up on scope exit
 }
 ```
@@ -259,8 +259,8 @@ All SDL resources are automatically managed through RAII, eliminating resource l
 Expensive resources use move-only semantics for optimal performance:
 
 ```cpp
-sdlpp::Texture texture = loadTexture("sprite.png");
-sdlpp::Texture moved = std::move(texture); // Efficient transfer
+sdl::Texture texture = loadTexture("sprite.png");
+sdl::Texture moved = std::move(texture); // Efficient transfer
 // texture is now empty, moved owns the resource
 ```
 
@@ -268,7 +268,7 @@ sdlpp::Texture moved = std::move(texture); // Efficient transfer
 Events are type-safe variants, eliminating runtime casting errors:
 
 ```cpp
-void handleEvent(const sdlpp::Event& event) {
+void handleEvent(const sdl::Event& event) {
     std::visit([](const auto& e) {
         if constexpr (std::is_same_v<std::decay_t<decltype(e)>, MouseButtonEvent>) {
             handleMouseClick(e);

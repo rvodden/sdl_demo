@@ -72,7 +72,7 @@ class Rectangle {
 error: static assertion failed: Rectangle only supports int32_t and float coordinate types
 
 // After (concepts):
-error: template constraint failure for 'template<class T> requires RectangleCoordinate<T> class sdlpp::Rectangle'
+error: template constraint failure for 'template<class T> requires RectangleCoordinate<T> class sdl::Rectangle'
 note: constraints not satisfied
 note: no operand of the disjunction is satisfied
 concept RectangleCoordinate = std::same_as<T, int32_t> || std::same_as<T, float>;
