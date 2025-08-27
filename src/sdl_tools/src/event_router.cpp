@@ -1,4 +1,5 @@
 #include <memory>
+#include <typeindex>
 
 #include "event_router_impl.h"
 
@@ -26,9 +27,7 @@ void EventRouter::run() {
   while (!_impl->quitFlag) {
     try {
       event = _impl->_eventBus->wait();
-      for (const auto& handler : _impl->_eventHandlers) {
-        event->handle(handler);
-      }
+      _impl->dispatchEvent(*event);
     } catch ([[maybe_unused]] sdl::UnknownEventException&) {  // NOLINT(bugprone-empty-catch)
     }
     // TODO: unknown events are "fine" whilst we've not implemented
@@ -51,9 +50,7 @@ auto EventRouter::processNextEvent() -> bool {
   try {
     auto maybeEvent = _impl->_eventBus->poll();
     if (maybeEvent.has_value()) {
-      for (const auto& handler : _impl->_eventHandlers) {
-        maybeEvent.value()->handle(handler);
-      }
+      _impl->dispatchEvent(*maybeEvent.value());
       return true;
     }
     return false;
@@ -68,13 +65,15 @@ void EventRouter::routeEvent(std::unique_ptr<BaseEvent> event) {
     return;
   }
   
-  for (const auto& handler : _impl->_eventHandlers) {
-    event->handle(handler);
-  }
+  _impl->dispatchEvent(*event);
 }
 
 void EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) {
   _impl->_eventHandlers.push_back(std::ref(baseEventHandler));
+}
+
+void EventRouter::registerTypedEventHandlerImpl(std::type_index eventType, sdl::BaseEventHandler& handler) {
+  _impl->registerTypedEventHandlerByTypeIndex(eventType, handler);
 }
 
 EventRouterImpl::~EventRouterImpl() = default;
@@ -83,5 +82,12 @@ EventRouterImpl::EventRouterImpl(std::shared_ptr<BaseEventBus> eventBus)
   : _eventBus(std::move(eventBus)) {};
 
 void EventRouterImpl::quit() { quitFlag = true; };
+
+void EventRouterImpl::dispatchEvent(BaseEvent& event) {
+  // Use standard polymorphic dispatch for all handlers
+  for (const auto& handler : _eventHandlers) {
+    event.handle(handler);
+  }
+}
 
 }  // namespace sdl::tools

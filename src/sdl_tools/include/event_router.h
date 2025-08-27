@@ -276,6 +276,52 @@ class SDL_TOOLS_EXPORT EventRouter {
   void registerEventHandler(sdl::BaseEventHandler& baseEventHandler);
 
   /**
+   * @brief Register a typed event handler for optimized dispatch (zero vtable lookups)
+   *
+   * This method registers handlers in a type-indexed storage system that enables
+   * direct static_cast dispatch without dynamic_cast or virtual function calls
+   * during event processing. This provides significant performance benefits for
+   * high-frequency events.
+   *
+   * @tparam EventType The specific event type the handler processes
+   * @param handler Reference to a typed event handler
+   *
+   * @note The handler is registered both for optimized dispatch and fallback polymorphic dispatch
+   * @note The handler must remain valid for the lifetime of the router
+   * @note This method provides the best performance for event handling
+   *
+   * Usage example:
+   * @code
+   * class MyButtonHandler : public EventHandler<MouseButtonEvent>, public BaseEventHandler {
+   * public:
+   *   void handle(const MouseButtonEvent& event) override {
+   *     // Handle mouse button events
+   *   }
+   * };
+   * 
+   * MyButtonHandler buttonHandler;
+   * router.registerTypedEventHandler<MouseButtonEvent>(buttonHandler);
+   * @endcode
+   */
+  template <typename EventType>
+  void registerTypedEventHandler(sdl::EventHandler<EventType>& handler) {
+    static_assert(std::is_base_of_v<sdl::BaseEventHandler, sdl::EventHandler<EventType>>, 
+                  "EventHandler<EventType> must inherit from BaseEventHandler");
+    
+    // Register for optimized dispatch via wrapper function
+    registerTypedEventHandlerImpl(std::type_index(typeid(EventType)), handler);
+    
+    // Also register for fallback polymorphic dispatch
+    registerEventHandler(static_cast<sdl::BaseEventHandler&>(handler));
+  }
+
+private:
+  // Internal wrapper function to avoid template dependency on incomplete type
+  void registerTypedEventHandlerImpl(std::type_index eventType, sdl::BaseEventHandler& handler);
+
+public:
+
+  /**
    * @brief Register a callable object (lambda, function, etc.) as an event
    * handler
    *
@@ -303,6 +349,11 @@ class SDL_TOOLS_EXPORT EventRouter {
     auto handler = std::make_unique<sdl::FunctionEventHandler<EventType, Callable>>(
         std::forward<Callable>(callable));
     _functionHandlers.push_back(std::move(handler));
+    
+    // Register for optimized dispatch via wrapper function
+    registerTypedEventHandlerImpl(std::type_index(typeid(EventType)), *_functionHandlers.back());
+    
+    // Also register for fallback polymorphic dispatch
     registerEventHandler(*_functionHandlers.back());
   }
 

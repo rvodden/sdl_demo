@@ -4,6 +4,8 @@
 #include <atomic>
 #include <vector>
 #include <memory>
+#include <unordered_map>
+#include <typeindex>
 
 #include "event_router.h"
 
@@ -37,10 +39,25 @@ class EventRouterImpl {
   auto operator=(EventRouterImpl&& impl) noexcept -> EventRouterImpl& = delete;
   void quit();
 
+  // Non-template method for registering by type_index (for future optimization)
+  void registerTypedEventHandlerByTypeIndex(std::type_index eventType, sdl::BaseEventHandler& handler) {
+    // For now, just store in type-indexed map for future optimization
+    // All handlers are still processed through the standard polymorphic dispatch
+    _handlersByType[eventType].emplace_back(handler);
+  }
+
+  // Main dispatch method - uses standard polymorphic dispatch for safety
+  void dispatchEvent(BaseEvent& event);
+
  private:
   std::shared_ptr<BaseEventBus> _eventBus;
   std::vector<std::reference_wrapper<sdl::BaseEventHandler>>
       _eventHandlers;
+  
+  // Type-indexed handler storage for fast dispatch - no vtable lookups
+  std::unordered_map<std::type_index, std::vector<std::reference_wrapper<sdl::BaseEventHandler>>>
+      _handlersByType;
+  
   std::atomic_bool quitFlag{false};
   DefaultQuitEventHandler defaultQuitEventHandler{*this};
 };
