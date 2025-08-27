@@ -57,7 +57,7 @@ class EventRouterImpl;
  * Usage example:
  * @code
  * // Setup event system
- * auto eventBus = std::make_shared<EventBus>();
+ * auto eventBus = createSDLEventBus();
  * auto eventRouter = std::make_shared<EventRouter>(eventBus);
  * 
  * // Register lambda handler

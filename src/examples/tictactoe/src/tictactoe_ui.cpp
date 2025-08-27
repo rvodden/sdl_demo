@@ -5,7 +5,7 @@
 #include <chrono>
 #include <ranges>
 
-TicTacToeUI::TicTacToeUI(std::shared_ptr<sdl::EventBus> bus,
+TicTacToeUI::TicTacToeUI(std::shared_ptr<sdl::BaseEventBus> bus,
                          std::shared_ptr<sdl::tools::EventRouter> router)
     : _eventBus(std::move(bus)),
       _eventRouter(std::move(router)) {

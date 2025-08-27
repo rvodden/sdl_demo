@@ -56,7 +56,6 @@ SDL_EXPORT auto registerEventType() -> uint32_t;
  * @endcode
  */
 class SDL_EXPORT UserEvent : public Event {
-  friend EventBus;
   friend class SDLEventBus;
 
  public:

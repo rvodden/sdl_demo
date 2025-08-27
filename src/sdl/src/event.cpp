@@ -12,60 +12,6 @@
 
 namespace sdl {
 
-EventBus::EventBus() : _impl(std::make_unique<EventBusImpl>()) {}
-
-EventBus::~EventBus() = default;
-
-EventBus::EventBus(EventBus&&) noexcept = default;
-
-auto EventBus::operator=(EventBus&&) noexcept -> EventBus& = default;
-
-auto EventBus::wait() -> std::unique_ptr<BaseEvent> {
-  SDL_Event event;
-  SDL_WaitEvent(&event);
-  return _impl->processSDLEvent(event);
-}
-
-auto EventBus::poll() -> std::optional<std::unique_ptr<BaseEvent>> {
-  SDL_Event event;
-  if (SDL_PollEvent(&event)) {
-    return _impl->processSDLEvent(event);
-  }
-  return std::nullopt;
-}
-
-auto EventBusImpl::processSDLEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
-  switch (event.type) {
-    case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_DOWN:
-    case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_UP:
-      return createMouseButtonEvent(&event.button);
-    case SDL_EventType::SDL_EVENT_QUIT:
-      return createQuitEvent(&event.quit);
-    default:
-      // Check if this is a user event (SDL_EVENT_USER or registered custom
-      // event)
-      if (event.type >= SDL_EVENT_USER && event.type < SDL_EVENT_LAST) {
-        return createUserEvent(&event.user);
-      }
-      throw UnknownEventException("I don't know what this event is!");
-  }
-}
-
-void EventBus::publish(std::unique_ptr<UserEvent> userEvent) {
-  auto sdlEvent = userEvent->_impl->_createSDLUserEvent();
-
-  // Release ownership of the event - it will be reclaimed when SDL returns it
-  userEvent.release();  // NOLINT(bugprone-unused-return-value)
-
-  auto result = SDL_PushEvent(sdlEvent.get());
-  if (!result) {
-    throw Exception(SDL_GetError());
-  }
-}
-
-void EventBus::setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) {
-  _impl->setRouteCallback(std::move(callback));
-}
 
 
 auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
@@ -133,5 +79,20 @@ void SDLEventBus::publishImpl(std::unique_ptr<UserEvent> userEvent) {
     throw Exception(SDL_GetError());
   }
 }
+
+void SDLEventBus::injectEvent(const std::any& eventData, std::type_index eventTypeId) {
+  // SDLEventBus supports SDL_Event injection
+  if (eventTypeId == std::type_index(typeid(SDL_Event))) {
+    try {
+      const auto& sdlEvent = std::any_cast<const SDL_Event&>(eventData);
+      // Use the CRTP handlePlatformEvent for zero-cost abstraction
+      this->handlePlatformEvent(sdlEvent);
+    } catch (const std::bad_any_cast&) {
+      // Bad cast - ignore silently
+    }
+  }
+  // Other event types are silently ignored
+}
+
 
 }  // namespace sdl

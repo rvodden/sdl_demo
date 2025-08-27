@@ -225,7 +225,7 @@ The RAII strategy's effectiveness is demonstrated throughout our codebase:
 **Natural Usage**: TicTacToe example shows natural C++ code patterns:
 ```cpp
 SDL sdl;
-auto eventBus = std::make_shared<EventBus>();
+auto eventBus = createSDLEventBus();
 auto eventRouter = std::make_shared<EventRouter>(eventBus);
 // All cleanup happens automatically at scope exit
 ```

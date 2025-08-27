@@ -156,11 +156,8 @@ SDL_APPLICATION_EXPORT auto SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Ev
   // Route events through EventBus platform infrastructure
   auto& instance = sdl::ApplicationRunner::getInstance();
   if (auto eventBus = instance.getEventBus()) {
-    // Cast to SDLEventBus to access platform event infrastructure
-    if (auto sdlEventBus = std::dynamic_pointer_cast<sdl::SDLEventBus>(eventBus)) {
-      // Use the handlePlatformEvent method to convert and route via callback
-      sdlEventBus->handlePlatformEvent(*event);
-    }
+    // Use the type-safe injectEvent method - no casting needed!
+    eventBus->injectEvent(*event, std::type_index(typeid(SDL_Event)));
   }
   
   // Handle quit events directly

@@ -21,7 +21,7 @@ class TestEvent : public CustomUserEvent<TestEvent> {
 auto main() -> int {
   std::cout << "Testing lambda-based event handlers...\n";
 
-  auto eventBus = std::make_shared<EventBus>();
+  auto eventBus = createSDLEventBus();
   auto eventRouter = std::make_shared<EventRouter>(eventBus);
 
   int counter = 0;

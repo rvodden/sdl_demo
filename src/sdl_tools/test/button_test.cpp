@@ -21,7 +21,7 @@ private:
     std::vector<std::unique_ptr<UserEvent>> publishedEvents_;
 
 public:
-    void injectEvent(std::unique_ptr<BaseEvent> event) {
+    void pushEvent(std::unique_ptr<BaseEvent> event) {
         eventQueue_.push(std::move(event));
     }
     
@@ -68,6 +68,11 @@ public:
         routeCallback_ = std::move(callback);
     }
 
+    void injectEvent(const std::any&, std::type_index) override {
+        // Mock implementation - do nothing
+        // Real event injection happens via pushEvent method
+    }
+
 private:
     std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
 };
@@ -83,7 +88,7 @@ public:
     
     // Inject single event and trigger one processing cycle
     void injectAndProcess(std::unique_ptr<BaseEvent> event) {
-        mockBus->injectEvent(std::move(event));
+        mockBus->pushEvent(std::move(event));
         mockBus->injectQuitEvent(); // Ensure loop terminates
         eventRouter->run(); // Process the injected event
     }
@@ -91,7 +96,7 @@ public:
     // Inject multiple events and process them all
     void injectAndProcessMultiple(std::vector<std::unique_ptr<BaseEvent>> events) {
         for (auto& event : events) {
-            mockBus->injectEvent(std::move(event));
+            mockBus->pushEvent(std::move(event));
         }
         mockBus->injectQuitEvent(); // Ensure loop terminates
         eventRouter->run(); // Process all injected events

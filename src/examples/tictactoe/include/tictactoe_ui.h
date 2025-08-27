@@ -20,14 +20,14 @@
 
 class TicTacToeUI {
  public:
-  TicTacToeUI(std::shared_ptr<sdl::EventBus> bus,
+  TicTacToeUI(std::shared_ptr<sdl::BaseEventBus> bus,
               std::shared_ptr<sdl::tools::EventRouter> router);
 
   void render(const std::shared_ptr<TicTacToe>& ticTacToe);
 
  private:
   sdl::Window _window{"Tic Tac Toe", kInitialWindowWidth, kInitialWindowHeight, 0};
-  std::shared_ptr<sdl::EventBus> _eventBus;
+  std::shared_ptr<sdl::BaseEventBus> _eventBus;
   std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
 
   std::shared_ptr<sdl::Renderer> _renderer = std::make_shared<sdl::Renderer>(_window);

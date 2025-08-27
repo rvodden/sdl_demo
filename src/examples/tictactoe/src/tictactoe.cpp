@@ -3,7 +3,7 @@
 #include <exception>
 #include <format>
 
-TicTacToe::TicTacToe(std::shared_ptr<sdl::EventBus> eventBus)
+TicTacToe::TicTacToe(std::shared_ptr<sdl::BaseEventBus> eventBus)
     : _eventBus(std::move(eventBus)) {}
 
 [[nodiscard]] auto TicTacToe::getCellState(const uint8_t& x, const uint8_t& y) const
@@ -25,6 +25,10 @@ void TicTacToe::play(uint8_t x, uint8_t y) {
   }
   
   _turn = _turn == Player::kO ? Player::kX : Player::kO;
+}
+
+void TicTacToe::reset() {
+  _cells.fill(std::nullopt);
 }
 
 auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {

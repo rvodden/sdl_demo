@@ -1,7 +1,9 @@
+#include <any>
 #include <atomic>
 #include <chrono>
 #include <forward_list>
 #include <functional>
+#include <typeindex>
 #include <vector>
 
 #include <SDL3/SDL.h>
@@ -61,21 +63,6 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
   }
 };
 
-// EventBus pimpl implementation  
-class EventBusImpl {
- public:
-  EventBusImpl() = default;
-  ~EventBusImpl() = default;
-
-  auto processSDLEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent>;
-  
-  void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) {
-    _routeCallback = std::move(callback);
-  }
-
- private:
-  std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
-};
 
 /**
  * @brief Concrete SDL event bus implementation using both CRTP and virtual inheritance
@@ -109,6 +96,8 @@ class SDLEventBus : public TemplatedEventBus<SDLEventBus, SDL_Event>, public Bas
   void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
     TemplatedEventBus<SDLEventBus, SDL_Event>::setRouteCallback(std::move(callback));
   }
+
+  void injectEvent(const std::any& eventData, std::type_index eventTypeId) override;
 };
 
 /**

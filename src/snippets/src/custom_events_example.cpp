@@ -106,7 +106,7 @@ class GameEventLogger : public EventHandler<ScoreUpdateEvent>,
 /**
  * @brief Mock event producer for testing custom events
  */
-class MockEventBus : public EventBus {
+class MockEventBus : public BaseEventBus {
  public:
   MockEventBus() = default;
 
@@ -129,6 +129,22 @@ class MockEventBus : public EventBus {
       default:
         return std::make_unique<QuitEvent>(now);
     }
+  }
+
+  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
+    return wait();  // Mock implementation - same as wait
+  }
+
+  void publish(std::unique_ptr<UserEvent>) override {
+    // Mock implementation - do nothing
+  }
+
+  void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)>) override {
+    // Mock implementation - do nothing
+  }
+
+  void injectEvent(const std::any&, std::type_index) override {
+    // Mock implementation - do nothing
   }
 
  private:

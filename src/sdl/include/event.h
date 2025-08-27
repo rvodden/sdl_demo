@@ -10,12 +10,14 @@
 #ifndef SDL_EVENT_H
 #define SDL_EVENT_H
 
+#include <any>
 #include <chrono>
 #include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <typeindex>
 
 #include "sdl_export.h"
 
@@ -369,10 +371,19 @@ class SDL_EXPORT BaseEventBus {
    * @param callback Function to call when events are available for routing
    */
   virtual void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) = 0;
+
+  /**
+   * @brief Inject a platform event for processing
+   * @param eventData Type-erased platform event data
+   * @param eventTypeId Type identifier for the event
+   * 
+   * This method allows external code to inject platform events into the event bus
+   * without exposing platform-specific types in the public interface.
+   * Each concrete implementation handles its supported event types.
+   */
+  virtual void injectEvent(const std::any& eventData, std::type_index eventTypeId) = 0;
 };
 
-// Forward declaration for pimpl
-class EventBusImpl;
 
 /**
  * @brief CRTP template-based event bus for zero-cost platform-specific event handling
@@ -446,51 +457,6 @@ public:
   AdaptorType _adaptor;
   std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
 friend Derived;
-};
-
-/**
- * @brief Default event bus implementation
- *
- * This is the main event bus that interfaces with SDL to convert
- * SDL events into the type-safe event objects used by this system.
- */
-class SDL_EXPORT EventBus : public BaseEventBus {
- public:
-  EventBus();
-  EventBus(const EventBus&) = delete;
-  EventBus(EventBus&&) noexcept;
-
-  auto operator=(const EventBus&) -> EventBus& = delete;
-  auto operator=(EventBus&&) noexcept -> EventBus&;
-
-  ~EventBus() override;
-
-  /**
-   * @brief Wait for and return the next SDL event
-   * @return A unique pointer to the next available event from SDL
-   */
-  auto wait() -> std::unique_ptr<BaseEvent> override;
-
-  /**
-   * @brief Poll for the next SDL event without blocking
-   * @return A unique pointer to the next available event, or std::nullopt if no events available
-   */
-  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override;
-
-  /**
-   * @brief Publish a custom event to the SDL event stream
-   * @param event The event to publish
-   */
-  void publish(std::unique_ptr<UserEvent> event) override;
-
-  /**
-   * @brief Set the callback for routing converted events
-   * @param callback Function to call when events are available for routing
-   */
-  void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override;
-
- private:
-  std::unique_ptr<EventBusImpl> _impl;
 };
 
 /**

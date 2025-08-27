@@ -28,4 +28,10 @@ class GameCompletedEvent : public sdl::CustomUserEvent<GameCompletedEvent> {
   GameState _state;
 };
 
+class StartNewGameEvent : public sdl::CustomUserEvent<StartNewGameEvent> {
+ public:
+  StartNewGameEvent() : CustomUserEvent(std::chrono::duration_cast<std::chrono::milliseconds>(
+                  std::chrono::steady_clock::now().time_since_epoch()), 0) {};
+};
+
 #endif // TICTACTOE_EVENTS_H

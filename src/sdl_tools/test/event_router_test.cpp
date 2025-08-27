@@ -45,7 +45,7 @@ private:
     int maxThrows_ = 1;
 
 public:
-    void injectEvent(std::unique_ptr<BaseEvent> event) {
+    void pushEvent(std::unique_ptr<BaseEvent> event) {
         eventQueue_.push(std::move(event));
     }
     
@@ -101,6 +101,11 @@ public:
     void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
         // Mock implementation - store callback if needed for testing
         routeCallback_ = std::move(callback);
+    }
+
+    void injectEvent(const std::any&, std::type_index) override {
+        // Mock implementation - do nothing
+        // Real event injection happens via pushEvent method
     }
 
 private:
@@ -172,7 +177,7 @@ TEST_F(EventRouterTest, RegisterSingleEventHandler) {
     EXPECT_NO_THROW(router->registerEventHandler(handler));
     
     // Inject test event and verify it gets handled
-    mockBus->injectEvent(std::make_unique<TestEvent>(42));
+    mockBus->pushEvent(std::make_unique<TestEvent>(42));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -191,7 +196,7 @@ TEST_F(EventRouterTest, RegisterLambdaEventHandler) {
         handledValues.push_back(event.testValue);
     });
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(123));
+    mockBus->pushEvent(std::make_unique<TestEvent>(123));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -209,7 +214,7 @@ TEST_F(EventRouterTest, SingleEventToMultipleHandlers) {
     router->registerEventHandler(handler1);
     router->registerEventHandler(handler2);
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(99));
+    mockBus->pushEvent(std::make_unique<TestEvent>(99));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -228,9 +233,9 @@ TEST_F(EventRouterTest, MultipleEventsToAppropriateHandlers) {
     router->registerEventHandler(testHandler);
     router->registerEventHandler(anotherHandler);
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(10));
-    mockBus->injectEvent(std::make_unique<AnotherTestEvent>("hello"));
-    mockBus->injectEvent(std::make_unique<TestEvent>(20));
+    mockBus->pushEvent(std::make_unique<TestEvent>(10));
+    mockBus->pushEvent(std::make_unique<AnotherTestEvent>("hello"));
+    mockBus->pushEvent(std::make_unique<TestEvent>(20));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -264,7 +269,7 @@ TEST_F(EventRouterTest, HandlersExecuteInRegistrationOrder) {
         executionOrder.push_back(3);
     });
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(0));
+    mockBus->pushEvent(std::make_unique<TestEvent>(0));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -282,9 +287,9 @@ TEST_F(EventRouterTest, QuitEventStopsEventLoop) {
     router->registerEventHandler(handler);
     
     // Inject events before and after quit - only first should be processed
-    mockBus->injectEvent(std::make_unique<TestEvent>(1));
+    mockBus->pushEvent(std::make_unique<TestEvent>(1));
     mockBus->injectQuitEvent();
-    mockBus->injectEvent(std::make_unique<TestEvent>(2)); // Should not be processed
+    mockBus->pushEvent(std::make_unique<TestEvent>(2)); // Should not be processed
     
     router->run();
     
@@ -331,7 +336,7 @@ TEST_F(EventRouterTest, FunctionHandlersLifetimeManagedByRouter) {
         // Lambda goes out of scope, but router should keep it alive
     }
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(777));
+    mockBus->pushEvent(std::make_unique<TestEvent>(777));
     mockBus->injectQuitEvent();
     
     router->run();
@@ -352,7 +357,7 @@ TEST_F(EventRouterTest, HandlesManyEvents) {
     // Inject many events
     const int eventCount = 100;
     for (int i = 0; i < eventCount; ++i) {
-        mockBus->injectEvent(std::make_unique<TestEvent>(i));
+        mockBus->pushEvent(std::make_unique<TestEvent>(i));
     }
     mockBus->injectQuitEvent();
     
@@ -376,7 +381,7 @@ TEST_F(EventRouterTest, MixedHandlerTypesWorkTogether) {
         lambdaResults.push_back(event.testValue * 2);
     });
     
-    mockBus->injectEvent(std::make_unique<TestEvent>(5));
+    mockBus->pushEvent(std::make_unique<TestEvent>(5));
     mockBus->injectQuitEvent();
     
     router->run();

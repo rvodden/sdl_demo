@@ -1,6 +1,8 @@
 #include "tictactoe.h"
 #include "tictactoe_ui.h"
+#include <application.h>
 #include <event_router.h>
+#include <message_box.h>
 #include <sdl.h>
 
 #include <exception>
@@ -10,56 +12,98 @@
 using namespace sdl;
 using namespace sdl::tools;
 
-auto main() -> int {
-  try {
-    SDL sdl;
-    sdl.initSubSystem(SDL::kVideo);
-    sdl.initSubSystem(SDL::kEvents);
+class TicTacToeApp : public BaseApplication {
+public:
+  auto init() -> bool override {
+    try {
+      auto& sdl = requestSDL();
+      sdl.initSubSystem(SDL::kVideo);
+      sdl.initSubSystem(SDL::kEvents);
 
-    auto eventBus = std::make_shared<EventBus>();
-    auto eventRouter = std::make_shared<EventRouter>(std::static_pointer_cast<BaseEventBus>(eventBus));
+      auto eventBus = getEventBus();
+      auto eventRouter = getEventRouter();
+      
+      ticTacToe_ = std::make_shared<TicTacToe>(eventBus);
+      ticTacToeUI_ = std::make_shared<TicTacToeUI>(eventBus, eventRouter);
 
-    auto ticTacToe = std::make_shared<TicTacToe>(eventBus);
-    auto ticTacToeUI =
-        std::make_shared<TicTacToeUI>(eventBus, eventRouter);
+      setupEventHandlers();
+      ticTacToeUI_->render(ticTacToe_);
 
-    ticTacToeUI->render(ticTacToe);
+      std::cout << "TicTacToe initialized successfully\n";
+      return true;
+    } catch (const std::exception& e) {
+      std::cout << "Failed to initialize TicTacToe: " << e.what() << "\n";
+      return false;
+    }
+  }
+
+  auto iterate() -> bool override {
+    // The event loop is handled by the framework
+    // Game logic is driven by events
+    return true;
+  }
+
+  auto quit() -> void override {
+    std::cout << "TicTacToe::quit() called\n";
+  }
+
+private:
+  auto getEventBus() -> std::shared_ptr<BaseEventBus> {
+    return ApplicationRunner::getInstance().getEventBus();
+  }
+
+  auto getEventRouter() -> std::shared_ptr<EventRouter> {
+    return ApplicationRunner::getInstance().getEventRouter();
+  }
+
+  auto setupEventHandlers() -> void {
+    auto eventRouter = getEventRouter();
 
     eventRouter->registerEventHandler<ClickEvent>(
-      [=](const ClickEvent& clickEvent) -> void {
-        ticTacToe->play(clickEvent.x, clickEvent.y);
+      [this](const ClickEvent& clickEvent) -> void {
+        ticTacToe_->play(clickEvent.x, clickEvent.y);
       });
 
     eventRouter->registerEventHandler<ClickEvent>(
-      [=]([[maybe_unused]] const ClickEvent& clickEvent) -> void {
-        ticTacToeUI->render(ticTacToe);
+      [this]([[maybe_unused]] const ClickEvent& clickEvent) -> void {
+        ticTacToeUI_->render(ticTacToe_);
       });
 
     eventRouter->registerEventHandler<GameCompletedEvent>(
-      [=](const GameCompletedEvent& gCE) -> void {
+      [this](const GameCompletedEvent& gCE) -> void {
         using enum GameState;
+        std::string message;
         switch(gCE.getState()) {
           case kPlayerOWins:
-            std::cout << "O Wins!\n";
+            message = "O Wins!\n";
             break;
           case kPlayerXWins:
-            std::cout << "X Wins!\n";
+            message = "X Wins!\n";
             break;
           case kDraw:
-            std::cout << "It's a draw!\n";
+            message = "It's a draw!\n";
             break;
           case kPlaying:
-            std::cout << "The game isn't over!\n";
+            message = "The game isn't over!\n";
             break;
         }
+
+        // TODO: Blocking call in event handler feels bad
+        MessageBox("Game Over!", message).addButton("OK").show();
+
+        getEventBus()->publish(std::make_unique<StartNewGameEvent>());
       });
     
-
-    eventRouter->run();
-  } catch (std::exception& e) {
-    std::cout << "Some kind of error happened!\n";
-    std::cout << e.what() << "\n";
-    return -1;
+    eventRouter->registerEventHandler<StartNewGameEvent>(
+      [this]([[maybe_unused]]const StartNewGameEvent& sNGE) {
+        ticTacToe_->reset();
+        ticTacToeUI_->render(ticTacToe_);
+      }
+    );
   }
-  return 0;
-}
+
+  std::shared_ptr<TicTacToe> ticTacToe_;
+  std::shared_ptr<TicTacToeUI> ticTacToeUI_;
+};
+
+REGISTER_APPLICATION(TicTacToeApp)
