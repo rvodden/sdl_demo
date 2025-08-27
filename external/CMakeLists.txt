@@ -22,18 +22,19 @@ endif()
 
 ### Google Benchmark ###
 
-# option(SDLXX_USE_VENDORED_GBENCH "Download Google Benchmark from GitHub" ON)
-# FetchContent_Declare(
-#         googlebenchmark
-#         GIT_REPOSITORY https://github.com/google/benchmark.git
-#         GIT_TAG main # need main for benchmark::benchmark
-#         DOWNLOAD_EXTRACT_TIMESTAMP false
-#         SYSTEM
-# )
-# SET(BENCHMARK_DOWNLOAD_DEPENDENCIES on) # TODO: add this as a target property instead of a global
-# SET(HAVE_STD_REGEX ON)
-# SET(RUN_HAVE_STD_REGEX 1)
-# FetchContent_MakeAvailable(googletest googlebenchmark)
+option(SDLXX_USE_VENDORED_GBENCH "Download Google Benchmark from GitHub" ON)
+if(SDLXX_USE_VENDORED_GBENCH)
+SET(BENCHMARK_DOWNLOAD_DEPENDENCIES on) # TODO: add this as a target property instead of a global
+SET(HAVE_STD_REGEX ON)
+SET(RUN_HAVE_STD_REGEX 1)
+FetchContent_Declare(
+        googlebenchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG main # need main for benchmark::benchmark
+        DOWNLOAD_EXTRACT_TIMESTAMP false
+        SYSTEM
+)
+endif()
 
 
 option(SDLXX_USE_VENDORED_SDL3 "Download SDL3 from GitHub" ON)
@@ -79,6 +80,22 @@ endif()
 
 if(SDLXX_USE_VENDORED_GTEST)
         FetchContent_MakeAvailable(googletest)
+endif()
+
+if(SDLXX_USE_VENDORED_GBENCH)
+        # Set math library requirement before fetching
+        if(UNIX AND NOT APPLE)
+            set(BENCHMARK_ENABLE_GTEST_TESTS ON)
+            set(BENCHMARK_USE_BUNDLED_GTEST OFF)
+        endif()
+        FetchContent_MakeAvailable(googlebenchmark)
+        # Link math library to benchmark targets on Unix systems
+        if(UNIX AND NOT APPLE)
+            target_link_libraries(benchmark PUBLIC m)
+            if(TARGET benchmark_main)
+                target_link_libraries(benchmark_main PUBLIC m)
+            endif()
+        endif()
 endif()
 
 # Doxygen Awesome CSS theme for documentation

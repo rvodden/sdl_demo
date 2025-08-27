@@ -76,3 +76,8 @@ gtest_discover_tests( ${TEST_NAME}
     PROPERTIES ENVIRONMENT SDL_VIDEODRIVER=dummy
 )
 
+# Include benchmarks if enabled
+if(SDLXX_ENABLE_BENCHMARKS)
+    add_subdirectory(benchmark)
+endif()
+
