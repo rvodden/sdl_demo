@@ -36,9 +36,9 @@ jobs:
       id: pages
       uses: actions/configure-pages@v4
 
-    - name: Configure CMake
+    - name: Configure CMake for documentation only
       run: |
-        cmake --preset ninja-mc
+        cmake --preset ninja-mc -DSDLXX_DOCS_ONLY=ON
 
     - name: Generate documentation
       run: |
@@ -79,9 +79,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y doxygen graphviz cmake ninja-build
         
-    - name: Configure CMake
+    - name: Configure CMake for documentation only
       run: |
-        cmake --preset ninja-mc
+        cmake --preset ninja-mc -DSDLXX_DOCS_ONLY=ON
         
     - name: Test documentation build
       run: |

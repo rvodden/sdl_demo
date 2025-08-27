@@ -19,6 +19,9 @@
                 "Anthropic.claude-code"
             ]
 		}
-    }
+    },
+    "mounts": [
+        "source=${localEnv:HOME}/.config/Claude/,target=/home/ubuntu/.config/Claude/,type=bind,consistency=cached"
+    ]
 }
 

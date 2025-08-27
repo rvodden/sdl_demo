@@ -18,14 +18,20 @@ include(cmake/standard_build.cmake)
 include(cmake/ccache.cmake)
 include(cmake/doxygen.cmake)
 
-include(GoogleTest)
-enable_testing()
+# Add option to build documentation only
+option(SDLXX_DOCS_ONLY "Build documentation only, skip all other targets" OFF)
 
-add_subdirectory(external)
+if(NOT SDLXX_DOCS_ONLY)
+    include(GoogleTest)
+    enable_testing()
+    add_subdirectory(external)
+endif()
 
-# Setup documentation generation (after external dependencies are declared)
+# Setup documentation generation (doxygen-awesome is handled internally)
 setup_doxygen()
 
-add_subdirectory(src)
+if(NOT SDLXX_DOCS_ONLY)
+    add_subdirectory(src)
+endif()
 
 message("${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}-${GIT_SHORT_HASH}-${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
