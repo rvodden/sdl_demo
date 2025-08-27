@@ -34,34 +34,40 @@ if(IWYU_TOOL)
         endif()
     endfunction()
     
-    # Function to enable IWYU for all project targets (excludes system/imported targets)
+    # Function to enable IWYU for all project targets from specific known project modules
     function(enable_iwyu_for_project_targets)
         if(NOT IWYU_TOOL)
             message(WARNING "IWYU requested but include-what-you-use not found")
             return()
         endif()
         
-        # Get all targets in the current directory and subdirectories
-        get_property(all_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+        # List of known project target names (not external dependencies)
+        set(project_targets
+            utils
+            sdl sdl_private
+            sdl_tools sdl_tools_private  
+            sdl_ttf sdl_ttf_private
+            sdl_application sdl_application_private
+            sdl_main
+            tictactoe tictactoe_data
+            snippets
+            visitor_pattern_mockup visitor_pattern_mockup_private
+            # Test targets
+            utils_test
+            sdl_test
+            sdl_tools_test
+            sdl_ttf_test
+            sdl_application_test
+        )
         
-        foreach(target ${all_targets})
-            # Check if target exists and is not imported
+        foreach(target ${project_targets})
             if(TARGET ${target})
-                get_target_property(is_imported ${target} IMPORTED)
-                get_target_property(target_type ${target} TYPE)
-                
-                # Skip system/imported targets and interface libraries
-                if(NOT is_imported AND NOT target_type STREQUAL "INTERFACE_LIBRARY")
-                    enable_iwyu_for_target(${target})
-                endif()
+                enable_iwyu_for_target(${target})
             endif()
         endforeach()
     endfunction()
     
-    # Enable IWYU for project targets if option is set
-    if(SDLXX_USE_IWYU)
-        enable_iwyu_for_project_targets()
-    endif()
+    # Note: IWYU enablement moved to main CMakeLists.txt after subdirectories are processed
     
 else()
     message(STATUS "include-what-you-use not found, IWYU checking disabled")

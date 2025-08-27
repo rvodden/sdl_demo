@@ -82,7 +82,7 @@ if(SDLXX_USE_VENDORED_GTEST)
         FetchContent_MakeAvailable(googletest)
 endif()
 
-if(SDLXX_USE_VENDORED_GBENCH)
+if(SDLXX_USE_VENDORED_GBENCH AND SDLXX_ENABLE_BENCHMARKS)
         # Set math library requirement before fetching
         if(UNIX AND NOT APPLE)
             set(BENCHMARK_ENABLE_GTEST_TESTS ON)

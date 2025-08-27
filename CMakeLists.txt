@@ -26,6 +26,11 @@ if(NOT SDLXX_DOCS_ONLY)
     enable_testing()
     add_subdirectory(external)
     add_subdirectory(src)
+    
+    # Enable IWYU for all project targets after they've been defined
+    if(SDLXX_USE_IWYU)
+        enable_iwyu_for_project_targets()
+    endif()
 endif()
 
 # Setup documentation generation (doxygen-awesome is handled internally)
