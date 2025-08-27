@@ -1,3 +1,5 @@
+/*!\page adr_0002 ADR-0002: Pimpl Pattern for SDL Dependencies
+
 # ADR-0002: Pimpl Pattern for SDL Dependencies
 
 **Date:** 2024-08-25  

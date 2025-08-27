@@ -1,3 +1,5 @@
+/*!\page adr_0003 ADR-0003: Type-Safe Event System with Visitor Pattern
+
 # ADR-0003: Type-Safe Event System with Visitor Pattern
 
 **Date:** 2024-08-25  

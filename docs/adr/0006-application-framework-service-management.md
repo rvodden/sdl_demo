@@ -1,3 +1,5 @@
+/*!\page adr_0006 ADR-0006: Application Framework Service Management
+
 # ADR-0006: Application Framework Service Management
 
 **Date:** 2025-08-26  

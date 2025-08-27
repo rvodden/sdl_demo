@@ -14,50 +14,15 @@ A comprehensive, type-safe C++20 wrapper around SDL3 that provides RAII resource
 
 ## Architecture
 
-SDL++ follows a clean layered architecture with optional modules:
+SDL++ follows a clean layered architecture with optional modules that provides zero-overhead abstractions over SDL3.
 
-```
-┌─────────────────────────────────────────────────────┐
-│                Applications                         │
-│  (TicTacToe, Snippets, Examples)                    │
-├─────────────────────────────────────────────────────┤
-│            Application Framework                    │
-│  (Service Registry, Lifecycle Management)           │
-├─────────────────────────────────────────────────────┤
-│        Extensions          │      SDL++ Tools       │
-│  (TTF Text Rendering)      │ (EventRouter, Sprites)  │
-├─────────────────────────────────────────────────────┤
-│                Core SDL++ Wrapper                   │
-│  (Window, Renderer, Texture, Surface, Events)       │
-├─────────────────────────────────────────────────────┤
-│                  Utilities                          │
-│        (Constexpr Map, Thread-Safe Queue)           │
-└─────────────────────────────────────────────────────┘
-```
+📋 **[View Detailed Architecture Documentation](docs/pages/architecture.md)**
 
-### Core Layer (`sdl`)
-- **Window Management**: Hardware-accelerated window creation with VSync support
-- **Rendering**: 2D hardware-accelerated rendering with blend modes and primitives
-- **Resource Management**: RAII wrappers for Textures, Surfaces, and SDL objects
-- **Event System**: Type-safe event handling with visitor pattern support
-
-### Application Framework (`sdl_application`)
-- **Service Registry**: Dependency injection for optional services (TTF, future audio)
-- **Lifecycle Management**: Automatic initialization, main loop, and cleanup
-- **Cross-Platform Entry**: Unified application entry point with `REGISTER_APPLICATION`
-
-### Tools Layer (`sdl_tools`)  
-- **EventRouter**: Centralized event distribution system with lambda support
-- **Sprite System**: Efficient sprite sheet management with batch rendering
-- **UI Components**: Interactive buttons with automatic event handling
-
-### Extensions
-- **TTF Text Rendering (`sdl_ttf`)**: Font loading, text rendering with service integration
-- **Future modules**: Audio, networking, physics integrations
-
-### Utilities (`utils`)
-- **Constexpr Map**: Compile-time key-value mapping with automatic size deduction
-- **Thread-Safe Queue**: High-performance concurrent data structures
+Key architectural features:
+- **RAII Resource Management**: Automatic cleanup of all SDL resources
+- **Move-Only Semantics**: Optimal performance with clear ownership
+- **Type-Safe Events**: Compile-time event handling with std::variant
+- **Service Registry**: Dependency injection for modular features
 
 ## Quick Start
 
@@ -81,6 +46,9 @@ cmake --build --preset ninja-mc-release
 
 # Run tests
 ctest --preset ninja-mc-debug
+
+# Generate documentation (requires Doxygen)
+cmake --build --preset ninja-mc-debug --target docs
 ```
 
 ### Basic Example
@@ -138,158 +106,49 @@ class MyGame : public BaseApplication {
 REGISTER_APPLICATION(MyGame)
 ```
 
-## Advanced Features
+## Examples and Advanced Features
 
-### Event System with Lambda Handlers
+🎮 **[View Complete Examples and Tutorials](docs/pages/examples.md)**
 
-```cpp
-auto eventBus = std::make_shared<sdl::tools::EventBus>();
-auto eventRouter = std::make_shared<sdl::tools::EventRouter>(eventBus);
-
-// Register lambda handlers
-eventRouter->registerEventHandler<MouseButtonEvent>([](const MouseButtonEvent& e) {
-    if (e.down && e.button == MouseButtonEvent::Button::kLeft) {
-        std::cout << "Left click at " << e.x << ", " << e.y << std::endl;
-    }
-});
-
-// Run event loop
-eventRouter->run();
-```
-
-### Sprite System with Batch Rendering
-
-```cpp
-// Load sprite sheet
-sdl::Texture spriteSheet(renderer, "characters.png");
-auto sharedTexture = std::make_shared<const sdl::Texture>(std::move(spriteSheet));
-
-// Create sprites from different regions
-sdl::tools::Sprite player(sharedTexture, FloatRectangle(0, 0, 32, 48));
-sdl::tools::Sprite enemy(sharedTexture, FloatRectangle(32, 0, 32, 48));
-
-// Efficient batch rendering
-sdl::tools::SpriteRenderer spriteRenderer(renderer);
-spriteRenderer.addSprite(player, 100, 200);
-spriteRenderer.addSprite(enemy, 200, 200);
-spriteRenderer.render(); // Single draw call for both sprites
-```
-
-### Interactive UI Components
-
-```cpp
-// Create interactive button
-FloatRectangle buttonBounds(100, 50, 200, 75);
-sdl::tools::Button playButton(eventRouter, buttonBounds);
-
-playButton.registerEventHandler([](const MouseButtonEvent& e) {
-    if (e.down && e.button == MouseButtonEvent::Button::kLeft) {
-        std::cout << "Play button clicked!" << std::endl;
-        startGame();
-    }
-});
-```
-
-### TTF Text Rendering with Service Management
-
-```cpp
-#include <ttf_service.h>  // Auto-registers TTF service
-
-class TextApp : public BaseApplication {
-  auto init() -> bool override {
-    auto& sdl = requestSDL();
-    auto& ttf = requestService<TTF>();  // TTF available via service registry
-    
-    window_ = std::make_unique<Window>("Text Demo", 800, 600);
-    renderer_ = std::make_unique<Renderer>(*window_);
-    
-    // Load font and render text
-    auto font = Font(fontData, fontSize, 24.0f);
-    auto textSurface = Text::renderBlended(font, "Hello, SDL++!", NamedColor::kWhite);
-    textTexture_ = std::make_unique<Texture>(*renderer_, textSurface);
-    
-    return true;
-  }
-  
-  // Application framework handles TTF cleanup automatically
-};
-```
-
-### Constexpr Utilities with CTAD
-
-```cpp
-// Compile-time mapping with automatic size deduction
-static constexpr auto colorMap = vodden::Map(std::array{
-    std::pair{Key::kRed, sdl::NamedColor::kRed},
-    std::pair{Key::kBlue, sdl::NamedColor::kBlue},
-    std::pair{Key::kGreen, sdl::NamedColor::kGreen}
-});
-
-auto color = colorMap.at(Key::kRed); // Compile-time lookup
-```
-
-## Examples
-
-The repository includes several comprehensive examples:
-
-- **TicTacToe**: Complete interactive game demonstrating UI, events, and graphics
-- **Snippets**: Pattern demonstrations and debugging utilities  
-- **Visitor Pattern**: Advanced type-safe event handling examples
+The repository includes comprehensive examples and advanced usage patterns:
+- **TicTacToe Game**: Complete interactive game with UI, events, and graphics
+- **Event System**: Lambda-based event handling with type safety
+- **Sprite Rendering**: Efficient batch rendering with texture sharing
+- **UI Components**: Interactive buttons and form elements
+- **TTF Integration**: Text rendering with service management
 
 ## Documentation
 
-- **API Documentation**: Comprehensive Doxygen documentation for all public APIs
+### Generating Documentation
+
+SDL++ uses Doxygen for comprehensive API documentation:
+
+```bash
+# Generate HTML documentation (requires Doxygen)
+cmake --build --preset ninja-mc-debug --target docs
+
+# Open documentation in browser
+open docs/output/html/index.html  # macOS
+xdg-open docs/output/html/index.html  # Linux
+```
+
+The generated documentation includes:
+- **API Documentation**: Complete reference for all public APIs
+- **Architecture Overview**: System design with integrated ADRs
+- **Examples**: Code samples and usage patterns
+
+### Other Documentation
+
 - **Architecture Decision Records**: Design rationale and trade-offs in `docs/adr/`
 - **Build Instructions**: Detailed build configuration in `CLAUDE.md`
 
-## Design Principles
-
-### RAII Resource Management
-All SDL resources are automatically managed through RAII, eliminating resource leaks:
-
-```cpp
-{
-    sdl::Window window("Title", 800, 600);
-    sdl::Renderer renderer(window);
-    // Resources automatically cleaned up on scope exit
-}
-```
-
-### Move-Only Semantics
-Expensive resources use move-only semantics for optimal performance:
-
-```cpp
-sdl::Texture texture = loadTexture("sprite.png");
-sdl::Texture moved = std::move(texture); // Efficient transfer
-// texture is now empty, moved owns the resource
-```
-
-### Type-Safe Event Handling
-Events are type-safe variants, eliminating runtime casting errors:
-
-```cpp
-void handleEvent(const sdl::Event& event) {
-    std::visit([](const auto& e) {
-        if constexpr (std::is_same_v<std::decay_t<decltype(e)>, MouseButtonEvent>) {
-            handleMouseClick(e);
-        }
-    }, event);
-}
-```
-
-## Performance Characteristics
+## Key Features
 
 - **Zero-overhead abstractions**: No runtime cost over raw SDL
-- **Batch rendering**: Sprites sharing textures rendered in single draw calls
-- **Memory efficient**: Shared texture references eliminate duplication
-- **Compile-time optimizations**: Extensive use of `constexpr` and `[[nodiscard]]`
-
-## Security
-
-- **No raw pointers**: All memory managed through smart pointers
-- **Bounds checking**: Surface operations validate coordinates
-- **Exception safety**: Strong exception safety guarantees throughout
-- **No undefined behavior**: All SDL error conditions converted to exceptions
+- **RAII resource management**: Automatic cleanup eliminates resource leaks  
+- **Type-safe event handling**: Compile-time event dispatch with std::variant
+- **Exception safety**: All SDL errors converted to typed exceptions
+- **Modern C++20**: Concepts, constexpr, and CTAD throughout
 
 ## Contributing
 

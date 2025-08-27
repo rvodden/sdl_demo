@@ -1,0 +1,99 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz cmake ninja-build
+
+    - name: Setup Pages
+      id: pages
+      uses: actions/configure-pages@v4
+
+    - name: Configure CMake
+      run: |
+        cmake --preset ninja-mc
+
+    - name: Generate documentation
+      run: |
+        cmake --build --preset ninja-mc-debug --target docs
+        
+        # List generated files for debugging
+        echo "Generated documentation files:"
+        find docs/output/html -name "*.html" | head -10
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs/output/html
+
+  deploy:
+    # Only deploy on main branch pushes
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  # Build-only job for PRs
+  build-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz cmake ninja-build
+        
+    - name: Configure CMake
+      run: |
+        cmake --preset ninja-mc
+        
+    - name: Test documentation build
+      run: |
+        cmake --build --preset ninja-mc-debug --target docs
+        
+        # Check that HTML was generated
+        if [ ! -d "docs/output/html" ] || [ -z "$(ls -A docs/output/html)" ]; then
+          echo "ERROR: No HTML documentation was generated"
+          exit 1
+        fi
+        
+        echo "Documentation build successful"
+        echo "Generated files:"
+        find docs/output/html -name "*.html" | wc -l
+        echo "HTML files created"

@@ -1,3 +1,5 @@
+/*!\page adr_0004 ADR-0004: RAII Resource Management Strategy
+
 # ADR-0004: RAII Resource Management Strategy
 
 **Date:** 2024-08-25  

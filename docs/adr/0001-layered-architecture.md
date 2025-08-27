@@ -1,3 +1,5 @@
+/*!\page adr_0001 ADR-0001: Three-Layer Architecture for SDL3 C++ Wrapper
+
 # ADR-0001: Three-Layer Architecture for SDL3 C++ Wrapper
 
 **Date:** 2024-08-25  

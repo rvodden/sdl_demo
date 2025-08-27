@@ -81,6 +81,19 @@ if(SDLXX_USE_VENDORED_GTEST)
         FetchContent_MakeAvailable(googletest)
 endif()
 
+# Doxygen Awesome CSS theme for documentation
+option(SDLXX_USE_VENDORED_DOXYGEN_AWESOME "Download Doxygen Awesome CSS from GitHub" ON)
+if(SDLXX_USE_VENDORED_DOXYGEN_AWESOME)
+    FetchContent_Declare(
+        doxygen_awesome
+        GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
+        GIT_TAG v2.3.4
+        DOWNLOAD_EXTRACT_TIMESTAMP false
+        SYSTEM
+    )
+    # Don't call MakeAvailable here - let the doxygen setup handle it
+endif()
+
 if(SDLXX_USE_VENDORED_SDL3)
         FetchContent_MakeAvailable(SDL3)
         FetchContent_MakeAvailable(SDL3_image)
