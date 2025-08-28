@@ -1,4 +1,11 @@
-project(sdl LANGUAGES CXX)
+project(sdl LANGUAGES CXX VERSION ${PROJECT_VERSION})
+
+if(NOT APPLE)
+    set(CMAKE_INSTALL_RPATH $ORIGIN)
+endif()
+
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
+find_package(SDL3_image REQUIRED)
 
 add_library(${PROJECT_NAME}_private INTERFACE)
 target_include_directories(${PROJECT_NAME}_private INTERFACE 
@@ -6,6 +13,12 @@ target_include_directories(${PROJECT_NAME}_private INTERFACE
 )
 
 add_library(${PROJECT_NAME} SHARED)
+add_library(sdl::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME}) # public export header
@@ -41,6 +54,17 @@ endif()
 if(SDLCPP_USE_CLANG_TIDY)
   set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
 endif()
+
+
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME} EXPORT ${TARGET_EXPORT_NAME}
+    FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}_Development
+    FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}_Development
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${PROJECT_NAME}_Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${PROJECT_NAME}_Runtime NAMELINK_COMPONENT ${PROJECT_NAME}_Development
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${PROJECT_NAME}_Development
+)
+
 
 if(NOT CMAKE_TESTING_ENABLED)
     include(GoogleTest)

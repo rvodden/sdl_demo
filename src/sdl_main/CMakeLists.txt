@@ -1,6 +1,10 @@
-project(sdl_main LANGUAGES CXX)
+project(sdl_main LANGUAGES CXX VERSION ${PROJECT_VERSION})
 
 add_library(${PROJECT_NAME} SHARED)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})

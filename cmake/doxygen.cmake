@@ -62,7 +62,7 @@ function(setup_doxygen)
         endif()
 
         message(STATUS "Doxygen found: ${DOXYGEN_EXECUTABLE}")
-        message(STATUS "Documentation target 'docs' available - run 'cmake --build . --target docs'")
+        message(STATUS "Documentation target 'docs' available - run 'cmake --build --preset <PRESET> --target docs'")
     else()
         message(STATUS "Doxygen not found, documentation target not available")
     endif()

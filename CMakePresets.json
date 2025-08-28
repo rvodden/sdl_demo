@@ -46,11 +46,7 @@
             "description": "Debug build with coverage instrumentation for HTML reports.",
             "generator": "Ninja Multi-Config",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
                 "SDLXX_ENABLE_COVERAGE": "ON"
-            },
-            "environment": {
-                "CMAKE_CONFIGURATION_TYPES": "Debug"
             },
             "inherits": [
                 "base_configuration"

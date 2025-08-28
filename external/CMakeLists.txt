@@ -39,7 +39,16 @@ endif()
 
 
 option(SDLXX_USE_VENDORED_SDL3 "Download SDL3 from GitHub" ON)
-if(SDLXX_USE_VENDORED_SDL3)
+option(SDLXX_USE_SYSTEM_SDL3 "Use system SDL3 instead of fetching" OFF)
+
+if(SDLXX_USE_SYSTEM_SDL3)
+        # Use system-provided SDL3
+        find_package(SDL3 REQUIRED)
+        find_package(SDL3_image REQUIRED)
+        find_package(SDL3_ttf REQUIRED)
+elseif(SDLXX_USE_VENDORED_SDL3)
+        # Disable installation of vendored SDL3 to avoid export conflicts
+        set(SDL_INSTALL ON)
         set(SDL_VULKAN OFF)
         if(CCACHE_PROGRAM)
                 set(SDL_CCACHE ON)
@@ -60,7 +69,7 @@ if(SDLXX_USE_VENDORED_SDL3)
         set(SDLIMAGE_AOM OFF)
         set(SDLIMAGE_TIF OFF)
         set(SDLIMAGE_WEBP OFF)
-        set(SDL3IMAGE_INSTALL OFF)
+        set(SDLIMAGE_INSTALL ON)
         FetchContent_Declare(
                 SDL3_image
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
@@ -72,6 +81,7 @@ if(SDLXX_USE_VENDORED_SDL3)
         )
 
         set(SDLTTF_VENDORED ON)
+        set(SDLTTF_INSTALL ON)
         FetchContent_Declare(
                 SDL3_ttf
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf
@@ -115,7 +125,7 @@ if(SDLXX_USE_VENDORED_DOXYGEN_AWESOME)
     # Don't call MakeAvailable here - let the doxygen setup handle it
 endif()
 
-if(SDLXX_USE_VENDORED_SDL3)
+if(SDLXX_USE_VENDORED_SDL3 AND NOT SDLXX_USE_SYSTEM_SDL3)
         FetchContent_MakeAvailable(SDL3)
         FetchContent_MakeAvailable(SDL3_image)
         FetchContent_MakeAvailable(SDL3_ttf)
