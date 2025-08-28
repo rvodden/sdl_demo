@@ -16,7 +16,8 @@
 			"extensions": [
                 "ms-vscode.cpptools-extension-pack",
                 "EditorConfig.EditorConfig",
-                "Anthropic.claude-code"
+                "Anthropic.claude-code",
+                "github.vscode-github-actions"
             ]
 		}
     },

@@ -32,6 +32,7 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/google/benchmark.git
         GIT_TAG main # need main for benchmark::benchmark
         DOWNLOAD_EXTRACT_TIMESTAMP false
+        GIT_SHALLOW ON
         SYSTEM
 )
 endif()
@@ -48,6 +49,7 @@ if(SDLXX_USE_VENDORED_SDL3)
                 SDL3
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL
                 GIT_TAG release-3.2.20
+                GIT_SHALLOW ON
                 DOWNLOAD_EXTRACT_TIMESTAMP false
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
@@ -55,6 +57,7 @@ if(SDLXX_USE_VENDORED_SDL3)
        
         set(SDLIMAGE_AVIF OFF)
         set(SDLIMAGE_DAV1D OFF)
+        set(SDLIMAGE_AOM OFF)
         set(SDLIMAGE_TIF OFF)
         set(SDLIMAGE_WEBP OFF)
         set(SDL3IMAGE_INSTALL OFF)
@@ -62,6 +65,7 @@ if(SDLXX_USE_VENDORED_SDL3)
                 SDL3_image
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
                 GIT_TAG release-3.2.4
+                GIT_SHALLOW ON
                 DOWNLOAD_EXTRACT_TIMESTAMP false
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM

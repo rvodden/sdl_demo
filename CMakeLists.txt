@@ -18,6 +18,10 @@ include(cmake/standard_build.cmake)
 include(cmake/ccache.cmake)
 include(cmake/doxygen.cmake)
 include(cmake/iwyu.cmake)
+include(cmake/coverage.cmake)
+
+# Setup code coverage first (must be before targets are defined)
+setup_coverage()
 
 # Add option to build documentation only
 
@@ -30,6 +34,11 @@ if(NOT SDLXX_DOCS_ONLY)
     # Enable IWYU for all project targets after they've been defined
     if(SDLXX_USE_IWYU)
         enable_iwyu_for_project_targets()
+    endif()
+    
+    # Enable coverage for all project targets after they've been defined
+    if(SDLXX_ENABLE_COVERAGE)
+        enable_coverage_for_project_targets()
     endif()
 endif()
 

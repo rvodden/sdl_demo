@@ -1,4 +1,4 @@
-name: Build and Deploy Documentation
+name: Build and Deploy Documentation with Coverage
 
 on:
   push:
@@ -30,28 +30,38 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y doxygen graphviz cmake ninja-build
+        sudo apt-get install -y doxygen graphviz cmake ninja-build gcovr
 
     - name: Setup Pages
       id: pages
       uses: actions/configure-pages@v4
 
-    - name: Configure CMake for documentation only
+    - name: Configure CMake with coverage
       run: |
-        cmake --preset ninja-mc -DSDLXX_DOCS_ONLY=ON
+        cmake --preset ninja-mc-coverage -DSDL_UNIX_CONSOLE_BUILD=ON
 
-    - name: Generate documentation
+    - name: Build project with coverage
       run: |
-        cmake --build --preset ninja-mc-debug --target docs
+        cmake --build --preset ninja-mc-coverage
+
+    - name: Run tests and generate coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage --target coverage
+
+    - name: Generate documentation with coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage --target docs
         
         # List generated files for debugging
         echo "Generated documentation files:"
-        find build/ninja-mc/docs/output/html -name "*.html" | head -10
+        find build/ninja-mc-coverage/docs/output/html -name "*.html" | head -10
+        echo "Generated coverage files:"
+        find build/ninja-mc-coverage/docs/output/html/coverage -name "*.html" | head -5
 
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: build/ninja-mc/docs/output/html
+        path: build/ninja-mc-coverage/docs/output/html
 
   deploy:
     # Only deploy on main branch pushes
@@ -77,23 +87,37 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y doxygen graphviz cmake ninja-build
+        sudo apt-get install -y doxygen graphviz cmake ninja-build gcovr
         
-    - name: Configure CMake for documentation only
+    - name: Configure CMake with coverage (PR test)
       run: |
-        cmake --preset ninja-mc -DSDLXX_DOCS_ONLY=ON
+        cmake --preset ninja-mc-coverage
         
-    - name: Test documentation build
+    - name: Test documentation and coverage build
       run: |
-        cmake --build --preset ninja-mc-debug --target docs
+        # Build project
+        cmake --build --preset ninja-mc-coverage
+        
+        # Run tests and generate coverage
+        cmake --build --preset ninja-mc-coverage --target coverage
+        
+        # Generate documentation
+        cmake --build --preset ninja-mc-coverage --target docs
         
         # Check that HTML was generated
-        if [ ! -d "build/ninja-mc/docs/output/html" ] || [ -z "$(ls -A build/ninja-mc/docs/output/html)" ]; then
+        if [ ! -d "build/ninja-mc-coverage/docs/output/html" ] || [ -z "$(ls -A build/ninja-mc-coverage/docs/output/html)" ]; then
           echo "ERROR: No HTML documentation was generated"
           exit 1
         fi
         
-        echo "Documentation build successful"
-        echo "Generated files:"
-        find build/ninja-mc/docs/output/html -name "*.html" | wc -l
-        echo "HTML files created"
+        # Check that coverage was generated
+        if [ ! -d "build/ninja-mc-coverage/docs/output/html/coverage" ] || [ -z "$(ls -A build/ninja-mc-coverage/docs/output/html/coverage)" ]; then
+          echo "ERROR: No HTML coverage was generated"
+          exit 1
+        fi
+        
+        echo "Documentation and coverage build successful"
+        echo "Generated documentation files:"
+        find build/ninja-mc-coverage/docs/output/html -name "*.html" | wc -l
+        echo "Generated coverage files:"
+        find build/ninja-mc-coverage/docs/output/html/coverage -name "*.html" | wc -l

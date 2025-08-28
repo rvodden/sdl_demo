@@ -39,6 +39,22 @@
             "inherits": [
                 "base_configuration"
             ]
+        },
+        {
+            "displayName": "Coverage Analysis",
+            "name": "ninja-mc-coverage",
+            "description": "Debug build with coverage instrumentation for HTML reports.",
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "SDLXX_ENABLE_COVERAGE": "ON"
+            },
+            "environment": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug"
+            },
+            "inherits": [
+                "base_configuration"
+            ]
         }
     ],
     "buildPresets": [
@@ -77,6 +93,12 @@
                 "lhs": "${hostSystemName}",
                 "rhs": "Windows"
             }
+        },
+        {
+            "name": "ninja-mc-coverage",
+            "displayName": "Coverage",
+            "configuration": "Debug",
+            "configurePreset": "ninja-mc-coverage"
         }
     ],
     "testPresets": [
@@ -140,6 +162,19 @@
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Windows"
+            }
+        },
+        {
+            "name": "ninja-mc-coverage",
+            "displayName": "Coverage Tests",
+            "configurePreset": "ninja-mc-coverage",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
             }
         }
     ]

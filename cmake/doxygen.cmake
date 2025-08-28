@@ -51,6 +51,15 @@ function(setup_doxygen)
             ${CMAKE_CURRENT_SOURCE_DIR}/docs/adr
             COMMENT "Generating API documentation with Doxygen"
         )
+        
+        # If coverage is enabled, add coverage generation to docs target
+        if(SDLXX_ENABLE_COVERAGE)
+            # Check if coverage targets exist (they're created in coverage.cmake)
+            if(TARGET coverage-html)
+                add_dependencies(docs coverage-html)
+                message(STATUS "Coverage reports will be integrated with documentation")
+            endif()
+        endif()
 
         message(STATUS "Doxygen found: ${DOXYGEN_EXECUTABLE}")
         message(STATUS "Documentation target 'docs' available - run 'cmake --build . --target docs'")

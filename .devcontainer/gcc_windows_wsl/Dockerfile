@@ -23,7 +23,7 @@ RUN apt update && \
     libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
     libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
     libpipewire-0.3-dev libwayland-dev libdecor-0-dev ccache mold doxygen graphviz iwyu \
-    language-pack-en-base locales && \
+    language-pack-en-base locales gcovr && \
     rm -rf /var/lib/apt/lists/*
 
 # Add cmake repository and install cmake
