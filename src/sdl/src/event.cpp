@@ -12,8 +12,6 @@
 
 namespace sdl {
 
-
-
 auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
     -> std::unique_ptr<MouseButtonEvent> {
   return std::make_unique<MouseButtonEvent>(

@@ -46,7 +46,7 @@ auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
    * @param event The SDL event to convert
    * @return Converted sdl event, or nullptr if conversion not supported
    */
-  static auto convertEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
+  auto convertEvent(const SDL_Event& event) -> std::unique_ptr<BaseEvent> {
     switch (event.type) {
       case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_DOWN:
       case SDL_EventType::SDL_EVENT_MOUSE_BUTTON_UP:

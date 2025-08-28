@@ -142,3 +142,4 @@ Tests are located in `test/` subdirectories and use GoogleTest framework. The bu
 - Keep PROGRESS.md and README.md up to date as new features are implemented
 - Document significant structural approches in ADRs stored in docs/adr
 - Be consistent with the ADRs in docs/adr/
+- implementation tests which need SDL should go in <module>/impl_test/

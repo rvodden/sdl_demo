@@ -1,0 +1,678 @@
+#include <gtest/gtest.h>
+#include <sdl.h>
+#include <event.h>
+#include <user_event.h>
+
+#include <chrono>
+#include <memory>
+#include <vector>
+#include <string>
+#include <any>
+#include <typeindex>
+
+using namespace sdl;
+
+// Test event types for isolated testing
+class TestEvent : public Event {
+public:
+    TestEvent(int value) : Event(std::chrono::milliseconds(100)), testValue(value) {}
+    
+    void handle(BaseEventHandler& baseEventHandler) override {
+        castHandler(*this, baseEventHandler);
+    }
+    
+    int testValue;
+};
+
+class AnotherTestEvent : public Event {
+public:
+    AnotherTestEvent(std::string data) : Event(std::chrono::milliseconds(200)), testData(std::move(data)) {}
+    
+    void handle(BaseEventHandler& baseEventHandler) override {
+        castHandler(*this, baseEventHandler);
+    }
+    
+    std::string testData;
+};
+
+// Custom user event for testing
+class CustomTestEvent : public CustomUserEvent<CustomTestEvent> {
+public:
+    CustomTestEvent(int data) : customData(data) {}
+    int customData;
+};
+
+// Test event handlers
+class TestEventHandler : public EventHandler<TestEvent>, public BaseEventHandler {
+public:
+    void handle(const TestEvent& event) override {
+        handledEvents.push_back(event.testValue);
+        callCount++;
+    }
+    
+    std::vector<int> handledEvents;
+    int callCount = 0;
+};
+
+class AnotherTestEventHandler : public EventHandler<AnotherTestEvent>, public BaseEventHandler {
+public:
+    void handle(const AnotherTestEvent& event) override {
+        handledData.push_back(event.testData);
+        callCount++;
+    }
+    
+    std::vector<std::string> handledData;
+    int callCount = 0;
+};
+
+class CustomTestEventHandler : public EventHandler<CustomTestEvent>, public BaseEventHandler {
+public:
+    void handle(const CustomTestEvent& event) override {
+        handledCustomData.push_back(event.customData);
+        callCount++;
+    }
+    
+    std::vector<int> handledCustomData;
+    int callCount = 0;
+};
+
+class MultiEventHandler : public EventHandler<TestEvent>, public EventHandler<AnotherTestEvent>, public BaseEventHandler {
+public:
+    void handle(const TestEvent& event) override {
+        testEventCalls++;
+        testValues.push_back(event.testValue);
+    }
+    
+    void handle(const AnotherTestEvent& event) override {
+        anotherEventCalls++;
+        anotherValues.push_back(event.testData);
+    }
+    
+    int testEventCalls = 0;
+    int anotherEventCalls = 0;
+    std::vector<int> testValues;
+    std::vector<std::string> anotherValues;
+};
+
+// Mock event bus for testing polymorphic operations
+class MockEventBus : public BaseEventBus {
+private:
+    std::vector<std::unique_ptr<BaseEvent>> storedEvents_;
+    std::vector<std::unique_ptr<UserEvent>> publishedUserEvents_;
+    std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
+    bool shouldReturnNullOnWait_ = false;
+    bool shouldReturnEmptyOnPoll_ = true;
+
+public:
+    void addEvent(std::unique_ptr<BaseEvent> event) {
+        storedEvents_.push_back(std::move(event));
+    }
+    
+    void setShouldReturnNullOnWait(bool shouldReturn) {
+        shouldReturnNullOnWait_ = shouldReturn;
+    }
+    
+    void setShouldReturnEmptyOnPoll(bool shouldReturn) {
+        shouldReturnEmptyOnPoll_ = shouldReturn;
+    }
+    
+    size_t getPublishedUserEventCount() const {
+        return publishedUserEvents_.size();
+    }
+    
+    const auto& getStoredEvents() const {
+        return storedEvents_;
+    }
+
+    auto wait() -> std::unique_ptr<BaseEvent> override {
+        if (shouldReturnNullOnWait_ || storedEvents_.empty()) {
+            return std::make_unique<QuitEvent>(std::chrono::milliseconds(0));
+        }
+        auto event = std::move(storedEvents_.front());
+        storedEvents_.erase(storedEvents_.begin());
+        return event;
+    }
+    
+    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
+        if (shouldReturnEmptyOnPoll_ || storedEvents_.empty()) {
+            return std::nullopt;
+        }
+        auto event = std::move(storedEvents_.front());
+        storedEvents_.erase(storedEvents_.begin());
+        return event;
+    }
+    
+    void publish(std::unique_ptr<UserEvent> event) override {
+        publishedUserEvents_.push_back(std::move(event));
+    }
+    
+    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
+        routeCallback_ = std::move(callback);
+    }
+    
+    void injectEvent(const std::any& eventData, std::type_index eventTypeId) override {
+        // Mock implementation - store for verification if needed
+        (void)eventData;
+        (void)eventTypeId;
+    }
+};
+
+// BaseEvent Tests
+TEST(BaseEventTest, DefaultConstructionAndPolymorphism) {
+    auto testEvent = std::make_unique<TestEvent>(42);
+    
+    // Test polymorphic behavior
+    BaseEvent* basePtr = testEvent.get();
+    EXPECT_NE(basePtr, nullptr);
+    
+    // Test that polymorphic call works
+    TestEventHandler handler;
+    EXPECT_NO_THROW(basePtr->handle(handler));
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledEvents[0], 42);
+}
+
+TEST(BaseEventTest, MoveConstructorAndAssignment) {
+    TestEvent originalEvent(123);
+    
+    // Test move constructor
+    TestEvent movedEvent(std::move(originalEvent));
+    EXPECT_EQ(movedEvent.testValue, 123);
+    
+    // Test move assignment
+    TestEvent anotherEvent(456);
+    anotherEvent = TestEvent(789);
+    EXPECT_EQ(anotherEvent.testValue, 789);
+}
+
+TEST(BaseEventTest, CopyConstructorAndAssignment) {
+    TestEvent originalEvent(999);
+    
+    // Test copy constructor
+    TestEvent copiedEvent(originalEvent);
+    EXPECT_EQ(copiedEvent.testValue, 999);
+    EXPECT_EQ(originalEvent.testValue, 999); // Original should be unchanged
+    
+    // Test copy assignment
+    TestEvent assignedEvent(111);
+    assignedEvent = originalEvent;
+    EXPECT_EQ(assignedEvent.testValue, 999);
+    EXPECT_EQ(originalEvent.testValue, 999); // Original should be unchanged
+}
+
+// Event class tests
+TEST(EventTest, TimestampInitialization) {
+    auto timestamp = std::chrono::milliseconds(1234);
+    Event event(timestamp);
+    
+    EXPECT_EQ(event.timestamp, timestamp);
+}
+
+TEST(EventTest, PolymorphicHandling) {
+    TestEvent testEvent(555);
+    TestEventHandler handler;
+    
+    // Cast to base Event class and ensure handling still works
+    Event& eventRef = testEvent;
+    eventRef.handle(handler);
+    
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledEvents[0], 555);
+}
+
+// QuitEvent Tests
+TEST(QuitEventTest, BasicFunctionality) {
+    auto timestamp = std::chrono::milliseconds(5000);
+    QuitEvent quitEvent(timestamp);
+    
+    EXPECT_EQ(quitEvent.timestamp, timestamp);
+    
+    // QuitEvents typically don't have specific handlers, but test polymorphic handling
+    TestEventHandler handler; // Won't handle QuitEvent, but shouldn't crash
+    EXPECT_NO_THROW(quitEvent.handle(handler));
+    EXPECT_EQ(handler.callCount, 0); // Should not handle QuitEvent
+}
+
+TEST(QuitEventTest, PolymorphicUsage) {
+    auto quitEvent = std::make_unique<QuitEvent>(std::chrono::milliseconds(1000));
+    
+    // Test through BaseEvent interface
+    BaseEvent* basePtr = quitEvent.get();
+    EXPECT_NE(basePtr, nullptr);
+    
+    TestEventHandler handler;
+    EXPECT_NO_THROW(basePtr->handle(handler));
+}
+
+// MouseEvent Tests
+TEST(MouseEventTest, BasicConstruction) {
+    auto timestamp = std::chrono::milliseconds(2000);
+    uint32_t windowId = 12345;
+    uint32_t mouseId = 1;
+    
+    MouseEvent mouseEvent(timestamp, windowId, mouseId);
+    
+    EXPECT_EQ(mouseEvent.timestamp, timestamp);
+    EXPECT_EQ(mouseEvent.windowId, windowId);
+    EXPECT_EQ(mouseEvent.which, mouseId);
+}
+
+TEST(MouseEventTest, PolymorphicHandling) {
+    MouseEvent mouseEvent(std::chrono::milliseconds(1500), 100, 1);
+    TestEventHandler handler; // Won't handle MouseEvent specifically
+    
+    EXPECT_NO_THROW(mouseEvent.handle(handler));
+    EXPECT_EQ(handler.callCount, 0); // Should not handle MouseEvent
+}
+
+// MousePositionEvent Tests
+TEST(MousePositionEventTest, BasicConstruction) {
+    auto timestamp = std::chrono::milliseconds(3000);
+    uint32_t windowId = 54321;
+    uint32_t mouseId = 2;
+    float x = 123.5f;
+    float y = 456.7f;
+    
+    MousePositionEvent posEvent(timestamp, windowId, mouseId, x, y);
+    
+    EXPECT_EQ(posEvent.timestamp, timestamp);
+    EXPECT_EQ(posEvent.windowId, windowId);
+    EXPECT_EQ(posEvent.which, mouseId);
+    EXPECT_FLOAT_EQ(posEvent.x, x);
+    EXPECT_FLOAT_EQ(posEvent.y, y);
+}
+
+// MouseButtonEvent Tests
+TEST(MouseButtonEventTest, BasicConstruction) {
+    auto timestamp = std::chrono::milliseconds(4000);
+    uint32_t windowId = 11111;
+    uint32_t mouseId = 3;
+    float x = 200.0f;
+    float y = 300.0f;
+    auto button = MouseButtonEvent::Button::kLeft;
+    bool down = true;
+    uint8_t clicks = 2;
+    
+    MouseButtonEvent buttonEvent(timestamp, windowId, mouseId, x, y, button, down, clicks);
+    
+    EXPECT_EQ(buttonEvent.timestamp, timestamp);
+    EXPECT_EQ(buttonEvent.windowId, windowId);
+    EXPECT_EQ(buttonEvent.which, mouseId);
+    EXPECT_FLOAT_EQ(buttonEvent.x, x);
+    EXPECT_FLOAT_EQ(buttonEvent.y, y);
+    EXPECT_EQ(buttonEvent.button, button);
+    EXPECT_EQ(buttonEvent.down, down);
+    EXPECT_EQ(buttonEvent.clicks, clicks);
+}
+
+TEST(MouseButtonEventTest, AllButtonTypes) {
+    auto timestamp = std::chrono::milliseconds(0);
+    
+    // Test all button types
+    std::vector<MouseButtonEvent::Button> buttons = {
+        MouseButtonEvent::Button::kLeft,
+        MouseButtonEvent::Button::kMiddle,
+        MouseButtonEvent::Button::kRight,
+        MouseButtonEvent::Button::kX1,
+        MouseButtonEvent::Button::kX2
+    };
+    
+    for (auto button : buttons) {
+        MouseButtonEvent buttonEvent(timestamp, 0, 0, 0.0f, 0.0f, button, true, 1);
+        EXPECT_EQ(buttonEvent.button, button);
+    }
+}
+
+// BaseEventHandler Tests
+TEST(BaseEventHandlerTest, DefaultConstruction) {
+    BaseEventHandler handler;
+    // Basic construction should work - this is mostly testing compilation
+    EXPECT_NO_THROW(BaseEventHandler{});
+}
+
+// EventHandler template tests
+TEST(EventHandlerTest, TypedHandlerFunctionality) {
+    TestEventHandler handler;
+    TestEvent event(777);
+    
+    handler.handle(event);
+    
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledEvents.size(), 1);
+    EXPECT_EQ(handler.handledEvents[0], 777);
+}
+
+TEST(EventHandlerTest, MultipleEventTypes) {
+    MultiEventHandler handler;
+    
+    TestEvent testEvent(88);
+    AnotherTestEvent anotherEvent("test");
+    
+    handler.handle(testEvent);
+    handler.handle(anotherEvent);
+    
+    EXPECT_EQ(handler.testEventCalls, 1);
+    EXPECT_EQ(handler.anotherEventCalls, 1);
+    EXPECT_EQ(handler.testValues[0], 88);
+    EXPECT_EQ(handler.anotherValues[0], "test");
+}
+
+// castHandler function tests
+TEST(CastHandlerTest, SuccessfulCast) {
+    TestEvent event(321);
+    TestEventHandler handler;
+    
+    // Direct call to castHandler
+    castHandler(event, handler);
+    
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledEvents[0], 321);
+}
+
+TEST(CastHandlerTest, UnsuccessfulCast) {
+    TestEvent event(654);
+    AnotherTestEventHandler handler; // Wrong handler type
+    
+    // Should not crash, but should not call handler
+    EXPECT_NO_THROW(castHandler(event, handler));
+    EXPECT_EQ(handler.callCount, 0);
+}
+
+TEST(CastHandlerTest, PolymorphicCast) {
+    TestEvent event(987);
+    TestEventHandler specificHandler;
+    
+    // Cast to BaseEventHandler and ensure it still works
+    BaseEventHandler& baseHandler = specificHandler;
+    castHandler(event, baseHandler);
+    
+    EXPECT_EQ(specificHandler.callCount, 1);
+    EXPECT_EQ(specificHandler.handledEvents[0], 987);
+}
+
+// FunctionEventHandler tests
+TEST(FunctionEventHandlerTest, LambdaHandler) {
+    std::vector<int> capturedValues;
+    int callCount = 0;
+    
+    auto lambda = [&](const TestEvent& event) {
+        capturedValues.push_back(event.testValue);
+        callCount++;
+    };
+    
+    FunctionEventHandler<TestEvent, decltype(lambda)> handler(std::move(lambda));
+    TestEvent event(444);
+    
+    handler.handle(event);
+    
+    EXPECT_EQ(callCount, 1);
+    EXPECT_EQ(capturedValues.size(), 1);
+    EXPECT_EQ(capturedValues[0], 444);
+}
+
+TEST(FunctionEventHandlerTest, FunctionObjectHandler) {
+    struct EventProcessor {
+        std::vector<std::string>& results;
+        explicit EventProcessor(std::vector<std::string>& r) : results(r) {}
+        
+        void operator()(const AnotherTestEvent& event) {
+            results.push_back(event.testData);
+        }
+    };
+    
+    std::vector<std::string> results;
+    EventProcessor processor(results);
+    
+    FunctionEventHandler<AnotherTestEvent, EventProcessor> handler(std::move(processor));
+    AnotherTestEvent event("function_object");
+    
+    handler.handle(event);
+    
+    EXPECT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0], "function_object");
+}
+
+// UnknownEventException tests
+TEST(UnknownEventExceptionTest, Construction) {
+    const std::string message = "Test exception message";
+    
+    UnknownEventException exception(message);
+    EXPECT_EQ(exception.what(), message);
+}
+
+TEST(UnknownEventExceptionTest, ThrowAndCatch) {
+    EXPECT_THROW({
+        throw UnknownEventException("Test throw");
+    }, UnknownEventException);
+    
+    try {
+        throw UnknownEventException("Catch test");
+    } catch (const UnknownEventException& e) {
+        EXPECT_EQ(std::string(e.what()), "Catch test");
+    } catch (...) {
+        FAIL() << "Should have caught UnknownEventException";
+    }
+}
+
+// UserEvent tests
+TEST(UserEventTest, DefaultConstruction) {
+    UserEvent userEvent;
+    
+    // Test default values and basic functionality
+    EXPECT_EQ(userEvent.getWindowId(), 0);
+    EXPECT_EQ(userEvent.getCode(), 0);
+    EXPECT_EQ(userEvent.getData(), nullptr);
+}
+
+TEST(UserEventTest, ParameterizedConstruction) {
+    auto timestamp = std::chrono::milliseconds(6000);
+    uint32_t windowId = 99999;
+    int32_t code = 42;
+    int testData = 123;
+    void* data = &testData;
+    
+    UserEvent userEvent(timestamp, windowId, code, data);
+    
+    EXPECT_EQ(userEvent.timestamp, timestamp);
+    EXPECT_EQ(userEvent.getWindowId(), windowId);
+    EXPECT_EQ(userEvent.getCode(), code);
+    EXPECT_EQ(userEvent.getData(), data);
+}
+
+TEST(UserEventTest, SettersAndGetters) {
+    UserEvent userEvent;
+    
+    userEvent.setWindowId(12345);
+    userEvent.setCode(67);
+    
+    int testValue = 789;
+    userEvent.setData(&testValue);
+    
+    EXPECT_EQ(userEvent.getWindowId(), 12345);
+    EXPECT_EQ(userEvent.getCode(), 67);
+    EXPECT_EQ(userEvent.getData(), &testValue);
+}
+
+TEST(UserEventTest, CopyConstructorAndAssignment) {
+    UserEvent original;
+    original.setWindowId(1111);
+    original.setCode(2222);
+    
+    int data = 3333;
+    original.setData(&data);
+    
+    // Copy constructor
+    UserEvent copied(original);
+    EXPECT_EQ(copied.getWindowId(), original.getWindowId());
+    EXPECT_EQ(copied.getCode(), original.getCode());
+    EXPECT_EQ(copied.getData(), original.getData());
+    
+    // Copy assignment
+    UserEvent assigned;
+    assigned = original;
+    EXPECT_EQ(assigned.getWindowId(), original.getWindowId());
+    EXPECT_EQ(assigned.getCode(), original.getCode());
+    EXPECT_EQ(assigned.getData(), original.getData());
+}
+
+TEST(UserEventTest, MoveConstructorAndAssignment) {
+    UserEvent original;
+    original.setWindowId(4444);
+    original.setCode(5555);
+    
+    uint32_t originalWindowId = original.getWindowId();
+    int32_t originalCode = original.getCode();
+    
+    // Move constructor
+    UserEvent moved(std::move(original));
+    EXPECT_EQ(moved.getWindowId(), originalWindowId);
+    EXPECT_EQ(moved.getCode(), originalCode);
+    
+    // Move assignment
+    UserEvent assigned;
+    assigned = std::move(moved);
+    EXPECT_EQ(assigned.getWindowId(), originalWindowId);
+    EXPECT_EQ(assigned.getCode(), originalCode);
+}
+
+// CustomUserEvent template tests
+TEST(CustomUserEventTest, TypeSafetyAndHandling) {
+    CustomTestEvent customEvent(555);
+    CustomTestEventHandler handler;
+    
+    customEvent.handle(handler);
+    
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledCustomData[0], 555);
+}
+
+TEST(CustomUserEventTest, PolymorphicUsage) {
+    auto customEvent = std::make_unique<CustomTestEvent>(777);
+    CustomTestEventHandler handler;
+    
+    // Test through BaseEvent interface
+    BaseEvent* basePtr = customEvent.get();
+    basePtr->handle(handler);
+    
+    EXPECT_EQ(handler.callCount, 1);
+    EXPECT_EQ(handler.handledCustomData[0], 777);
+}
+
+TEST(CustomUserEventTest, EventTypeRegistration) {
+    // Each CustomUserEvent type should get its own unique event type
+    uint32_t type1 = CustomTestEvent::getEventType();
+    uint32_t type2 = CustomTestEvent::getEventType(); // Should be same as type1
+    
+    EXPECT_EQ(type1, type2);
+    EXPECT_GT(type1, 0); // Should be a valid event type
+}
+
+// BaseEventBus interface tests
+TEST(BaseEventBusTest, MockEventBusBasicFunctionality) {
+    MockEventBus mockBus;
+    
+    // Test adding and retrieving events
+    mockBus.addEvent(std::make_unique<TestEvent>(123));
+    mockBus.setShouldReturnEmptyOnPoll(false);
+    
+    auto polledEvent = mockBus.poll();
+    EXPECT_TRUE(polledEvent.has_value());
+    
+    // Test user event publishing
+    auto userEvent = std::make_unique<UserEvent>();
+    mockBus.publish(std::move(userEvent));
+    EXPECT_EQ(mockBus.getPublishedUserEventCount(), 1);
+}
+
+TEST(BaseEventBusTest, MockEventBusWaitFunctionality) {
+    MockEventBus mockBus;
+    
+    mockBus.addEvent(std::make_unique<TestEvent>(456));
+    
+    auto event = mockBus.wait();
+    EXPECT_NE(event, nullptr);
+    
+    // When no events, should return QuitEvent
+    mockBus.setShouldReturnNullOnWait(true);
+    auto quitEvent = mockBus.wait();
+    EXPECT_NE(quitEvent, nullptr);
+}
+
+TEST(BaseEventBusTest, RouteCallback) {
+    MockEventBus mockBus;
+    bool callbackCalled = false;
+    std::unique_ptr<BaseEvent> receivedEvent;
+    
+    mockBus.setRouteCallback([&](std::unique_ptr<BaseEvent> event) {
+        callbackCalled = true;
+        receivedEvent = std::move(event);
+    });
+    
+    // The callback is set, but MockEventBus doesn't automatically call it
+    // This test just verifies the interface works
+    EXPECT_FALSE(callbackCalled); // Callback not called until an event is routed
+}
+
+// Integration tests
+TEST(EventSystemIntegrationTest, CompleteEventFlow) {
+    // Test a complete flow: create events, handlers, and process them
+    std::vector<int> processedTestValues;
+    std::vector<std::string> processedStringValues;
+    
+    // Create handlers
+    auto testHandler = std::make_unique<TestEventHandler>();
+    auto anotherHandler = std::make_unique<AnotherTestEventHandler>();
+    
+    // Create events
+    std::vector<std::unique_ptr<BaseEvent>> events;
+    events.push_back(std::make_unique<TestEvent>(100));
+    events.push_back(std::make_unique<AnotherTestEvent>("first"));
+    events.push_back(std::make_unique<TestEvent>(200));
+    events.push_back(std::make_unique<AnotherTestEvent>("second"));
+    
+    // Process events
+    for (auto& event : events) {
+        event->handle(*testHandler);
+        event->handle(*anotherHandler);
+    }
+    
+    // Verify results
+    EXPECT_EQ(testHandler->callCount, 2);
+    EXPECT_EQ(testHandler->handledEvents.size(), 2);
+    EXPECT_EQ(testHandler->handledEvents[0], 100);
+    EXPECT_EQ(testHandler->handledEvents[1], 200);
+    
+    EXPECT_EQ(anotherHandler->callCount, 2);
+    EXPECT_EQ(anotherHandler->handledData.size(), 2);
+    EXPECT_EQ(anotherHandler->handledData[0], "first");
+    EXPECT_EQ(anotherHandler->handledData[1], "second");
+}
+
+TEST(EventSystemIntegrationTest, MixedHandlerTypes) {
+    // Test mixing class-based and lambda-based handlers
+    TestEventHandler classHandler;
+    
+    int lambdaCalls = 0;
+    std::vector<int> lambdaValues;
+    
+    auto lambda = [&](const TestEvent& event) {
+        lambdaCalls++;
+        lambdaValues.push_back(event.testValue * 2);
+    };
+    
+    FunctionEventHandler<TestEvent, decltype(lambda)> lambdaHandler(std::move(lambda));
+    
+    TestEvent event(50);
+    
+    // Handle with class handler
+    event.handle(classHandler);
+    
+    // Handle with lambda handler
+    event.handle(lambdaHandler);
+    
+    EXPECT_EQ(classHandler.callCount, 1);
+    EXPECT_EQ(classHandler.handledEvents[0], 50);
+    
+    EXPECT_EQ(lambdaCalls, 1);
+    EXPECT_EQ(lambdaValues[0], 100);
+}
