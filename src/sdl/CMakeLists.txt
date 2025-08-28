@@ -28,7 +28,6 @@ target_sources(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_private)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3_image::SDL3_image)
-target_link_libraries(${PROJECT_NAME} PRIVATE utils)
 
 if(NOT MSVC)
     target_link_libraries(${PROJECT_NAME} PUBLIC m)

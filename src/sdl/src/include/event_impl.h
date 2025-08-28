@@ -8,13 +8,13 @@
 
 #include <SDL3/SDL.h>
 
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 #include "event.h"
 #include "user_event.h"
 
 namespace sdl {
 
-static constexpr vodden::Map<uint32_t, MouseButtonEvent::Button, 5>
+static constexpr sdl::Map<uint32_t, MouseButtonEvent::Button, 5>
     kSdlMouseButtonEventButtonMap{{
         {SDL_BUTTON_LEFT, MouseButtonEvent::Button::kLeft},
         {SDL_BUTTON_MIDDLE, MouseButtonEvent::Button::kMiddle},

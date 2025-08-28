@@ -1,13 +1,19 @@
-#include "tictactoe.h"
-#include "tictactoe_ui.h"
-#include <application.h>
-#include <event_router.h>
-#include <message_box.h>
-#include <sdl.h>
-
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <string>
+
+#include "application.h"
+#include "event.h"
+#include "events.h"
+#include "event_router.h"
+#include "game_constants.h"
+#include "tictactoe.h"
+#include "tictactoe_ui.h"
+#include "message_box.h"
+#include "sdl.h"
+#include "user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;
@@ -23,11 +29,10 @@ public:
       auto eventBus = getEventBus();
       auto eventRouter = getEventRouter();
       
-      ticTacToe_ = std::make_shared<TicTacToe>(eventBus);
-      ticTacToeUI_ = std::make_shared<TicTacToeUI>(eventBus, eventRouter);
+      _ticTacToe = std::make_shared<TicTacToe>(eventBus);
+      _ticTacToeUI = std::make_shared<TicTacToeUI>(eventBus, eventRouter);
 
       setupEventHandlers();
-      ticTacToeUI_->render(ticTacToe_);
 
       std::cout << "TicTacToe initialized successfully\n";
       return true;
@@ -38,8 +43,7 @@ public:
   }
 
   auto iterate() -> bool override {
-    // The event loop is handled by the framework
-    // Game logic is driven by events
+    _ticTacToeUI->render(_ticTacToe);
     return true;
   }
 
@@ -61,16 +65,24 @@ private:
 
     eventRouter->registerEventHandler<ClickEvent>(
       [this](const ClickEvent& clickEvent) -> void {
-        ticTacToe_->play(clickEvent.x, clickEvent.y);
+        _ticTacToe->play(clickEvent.x, clickEvent.y);
       });
 
-    eventRouter->registerEventHandler<ClickEvent>(
-      [this]([[maybe_unused]] const ClickEvent& clickEvent) -> void {
-        ticTacToeUI_->render(ticTacToe_);
+    eventRouter->registerEventHandler<PlayerOTurnEvent>(
+      []([[maybe_unused]] const PlayerOTurnEvent&) -> void {
+        std::cout << "O's Turn\n";
+      });
+    
+      eventRouter->registerEventHandler<PlayerXTurnEvent>(
+      []([[maybe_unused]] const PlayerXTurnEvent&) -> void {
+        std::cout << "X's Turn\n";
       });
 
     eventRouter->registerEventHandler<GameCompletedEvent>(
       [this](const GameCompletedEvent& gCE) -> void {
+        //not sure why we need to reder here...
+        _ticTacToeUI->render(_ticTacToe);
+        
         using enum GameState;
         std::string message;
         switch(gCE.getState()) {
@@ -96,14 +108,13 @@ private:
     
     eventRouter->registerEventHandler<StartNewGameEvent>(
       [this]([[maybe_unused]]const StartNewGameEvent& sNGE) {
-        ticTacToe_->reset();
-        ticTacToeUI_->render(ticTacToe_);
+        _ticTacToe->reset();
       }
     );
   }
 
-  std::shared_ptr<TicTacToe> ticTacToe_;
-  std::shared_ptr<TicTacToeUI> ticTacToeUI_;
+  std::shared_ptr<TicTacToe> _ticTacToe;
+  std::shared_ptr<TicTacToeUI> _ticTacToeUI;
 };
 
 REGISTER_APPLICATION(TicTacToeApp)

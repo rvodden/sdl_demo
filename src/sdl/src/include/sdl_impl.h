@@ -3,12 +3,12 @@
 
 #include <unordered_set>
 
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 #include "sdl.h"
 
 namespace sdl {
 
-static constexpr vodden::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap{
+static constexpr sdl::Map<SDL::SubSystem, uint32_t, 6> sdlSubSystemMap{
     {{SDL::kAudio, SDL_INIT_AUDIO},
      {SDL::kEvents, SDL_INIT_EVENTS},
      {SDL::kGameController, SDL_INIT_GAMEPAD},

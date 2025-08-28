@@ -1,18 +1,18 @@
 #ifndef TICTACTOE_TICTACTOE_H
 #define TICTACTOE_TICTACTOE_H
 
-#include "events.h"
-#include "game_constants.h"
-#include <event.h>
-
 #include <array>
+#include <cinttypes>
+#include <cstddef>
 #include <memory>
 #include <optional>
 
+#include "game_constants.h"
+
+namespace sdl { class BaseEventBus; }
+
 class TicTacToe {
  public:
-  enum class Player : std::uint8_t { kO,
-                                     kX };
 
   TicTacToe(std::shared_ptr<sdl::BaseEventBus> eventBus);
 
@@ -32,6 +32,7 @@ class TicTacToe {
   Player _turn{Player::kO};
 
   static auto _index(uint8_t x, uint8_t y) -> uint8_t;
+  void _publishTurnEvent() const;
   [[nodiscard]] auto _checkWinCondition() const -> GameState;
   [[nodiscard]] auto _checkRows() const -> GameState;
   [[nodiscard]] auto _checkColumns() const -> GameState;

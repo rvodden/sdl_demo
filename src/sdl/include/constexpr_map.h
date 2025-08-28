@@ -1,5 +1,5 @@
-#ifndef CONSTEXPR_MAP_H
-#define CONSTEXPR_MAP_H
+#ifndef SDL_CONSTEXPR_MAP_H
+#define SDL_CONSTEXPR_MAP_H
 
 #include <algorithm>
 #include <array>
@@ -7,9 +7,8 @@
 #include <stdexcept>
 #include <tuple>
 
-namespace vodden {
+namespace sdl {
 
-//! @brief A simple map class capable of being used as a constexpr
 template <class Key, class Value, std::size_t Size>
 struct Map {
   constexpr Map(std::initializer_list<std::pair<Key, Value>> initList) {
@@ -29,8 +28,6 @@ struct Map {
   std::array<std::pair<Key, Value>, Size> _data;
 };
 
-//! @brief Helper function to create a Map from initializer list with
-//! automatic size deduction
 template <class Key, class Value, class... Pairs>
 constexpr auto makeMap(Pairs&&... pairs) -> Map<Key, Value, sizeof...(pairs)> {
   return Map<Key, Value, sizeof...(pairs)>(
@@ -57,14 +54,12 @@ Map(const std::array<std::pair<Key, Value>, N>&) -> Map<Key, Value, N>;
 template <class Key, class Value, std::size_t N>
 Map(std::array<std::pair<Key, Value>, N>&&) -> Map<Key, Value, N>;
 
-//! @brief Convenient alias for creating maps with automatic size deduction
-//! from arrays
 template <class Key, class Value, std::size_t N>
 constexpr auto makeConstexprMap(
     const std::array<std::pair<Key, Value>, N>& data) -> Map<Key, Value, N> {
   return Map<Key, Value, N>(data);
 }
 
-}  // namespace vodden
+}  // namespace sdl
 
-#endif
+#endif  // SDL_CONSTEXPR_MAP_H

@@ -1,11 +1,9 @@
-#include <functional>
-#include <iostream>
 #include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
+#include "legacy_sdk.h"
+#include "visitor_pattern_legacy_sdk.h"
 #include "visitor_pattern_legacy_sdk_impl.h"
+
 
 // NOLINTBEGIN This is a demo legacy API, it does all kinds of things with raw
 // pointers deliberate

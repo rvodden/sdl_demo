@@ -24,7 +24,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sdl)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl_tools)
 target_link_libraries(${PROJECT_NAME} PRIVATE sdl_private)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
-target_link_libraries(${PROJECT_NAME} PRIVATE utils)
 
 if(NOT MSVC)
     target_link_libraries(${PROJECT_NAME} PUBLIC m)

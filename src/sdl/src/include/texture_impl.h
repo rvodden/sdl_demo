@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 #include "renderer.h"
 #include "texture.h"
 
@@ -16,7 +16,7 @@ static constexpr auto sdlBlendModeMapData =
                std::pair{Texture::kMod, SDL_BLENDMODE_MOD},
                std::pair{Texture::kMul, SDL_BLENDMODE_MUL}};
 
-static constexpr auto sdlBlendModeMap = vodden::Map(sdlBlendModeMapData);
+static constexpr auto sdlBlendModeMap = sdl::Map(sdlBlendModeMapData);
 
 class TextureImpl {
   friend RendererImpl;

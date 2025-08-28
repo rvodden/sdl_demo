@@ -1,8 +1,16 @@
+#include <cstdint>
+#include <exception>
 #include <functional>
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
-#include "legacy_sdk.h"
 #include "visitor_pattern_legacy_sdk.h"
+
+class CustomEventImpl;
 
 class ConcreteCustomEvent : public CustomEvent {
  public:

@@ -11,4 +11,6 @@ enum class GameState : std::uint8_t { kPlaying,
                                  kPlayerXWins,
                                  kDraw };
 
+enum class Player : std::uint8_t { kO, kX };
+
 #endif // TICTACTOE_GAME_CONSTANTS_H

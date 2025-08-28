@@ -1,8 +1,9 @@
 #ifndef VISITOR_PATTERN_LEGACY_SDK_H
 #define VISITOR_PATTERN_LEGACY_SDK_H
 
-#include <iostream>
+#include <cstdint>
 #include <memory>
+#include <stdexcept>
 #include <typeinfo>
 
 // NOLINTBEGIN This is a demo legacy API, it does all kinds of things with raw

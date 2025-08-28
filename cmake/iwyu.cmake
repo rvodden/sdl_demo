@@ -26,7 +26,7 @@ if(IWYU_TOOL)
             # Set IWYU as the C++ include checker
             set_property(TARGET ${target_name} 
                 PROPERTY CXX_INCLUDE_WHAT_YOU_USE 
-                "${IWYU_TOOL};--std=c++20;--mapping_file=${CMAKE_SOURCE_DIR}/cmake/iwyu.imp"
+                "${IWYU_TOOL};-Xiwyu;--mapping_file=${CMAKE_SOURCE_DIR}/cmake/iwyu.imp;--std=c++20"
             )
             message(STATUS "IWYU enabled for target: ${target_name}")
         else()

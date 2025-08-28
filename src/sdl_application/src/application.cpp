@@ -1,5 +1,5 @@
 #include "application.h"
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 #include "event.h"
 #include "event_impl.h"
 #include "event_router.h"
@@ -21,14 +21,14 @@ namespace {
       std::pair{AppResult::kSuccess, SDL_APP_SUCCESS},
       std::pair{AppResult::kFailure, SDL_APP_FAILURE}
   };
-  constexpr auto kAppResultMap = vodden::Map(kAppResultArray);
+  constexpr auto kAppResultMap = sdl::Map(kAppResultArray);
 
   constexpr auto kSdlResultArray = std::array{
       std::pair{SDL_APP_CONTINUE, AppResult::kContinue},
       std::pair{SDL_APP_SUCCESS, AppResult::kSuccess},
       std::pair{SDL_APP_FAILURE, AppResult::kFailure}
   };
-  constexpr auto kSdlResultMap = vodden::Map(kSdlResultArray);
+  constexpr auto kSdlResultMap = sdl::Map(kSdlResultArray);
 }  // namespace
 
 // ApplicationRunner implementation

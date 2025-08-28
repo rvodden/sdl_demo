@@ -34,4 +34,14 @@ class StartNewGameEvent : public sdl::CustomUserEvent<StartNewGameEvent> {
                   std::chrono::steady_clock::now().time_since_epoch()), 0) {};
 };
 
+template<Player player>
+class TurnEvent : public sdl::CustomUserEvent<TurnEvent<player>> {
+  public:  
+    TurnEvent() : sdl::CustomUserEvent<TurnEvent<player>>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                  std::chrono::steady_clock::now().time_since_epoch()), 0) {};
+};
+
+using PlayerXTurnEvent = TurnEvent<Player::kX>;
+using PlayerOTurnEvent = TurnEvent<Player::kO>;
+
 #endif // TICTACTOE_EVENTS_H

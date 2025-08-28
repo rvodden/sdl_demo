@@ -47,7 +47,7 @@ void TicTacToeUI::render(const std::shared_ptr<TicTacToe>& ticTacToe) {
         continue;
       }
       _spriteRenderer->render(
-          cellState.value() == TicTacToe::Player::kO ? _letterO : _letterX,
+          cellState.value() == Player::kO ? _letterO : _letterX,
           static_cast<float>(x) * kCellWidth,
           static_cast<float>(y) * kCellHeight);
     }

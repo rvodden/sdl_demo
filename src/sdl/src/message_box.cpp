@@ -3,7 +3,7 @@
 #include "include/window_impl.h"
 #include "window.h"
 #include "exception.h"
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 
 #include <SDL3/SDL_messagebox.h>
 #include <algorithm>
@@ -28,7 +28,7 @@ constexpr auto MessageBoxImpl::getTypeToFlagsMap() {
         std::pair{MessageBox::Type::Warning, SDL_MESSAGEBOX_WARNING},
         std::pair{MessageBox::Type::Error, SDL_MESSAGEBOX_ERROR}
     };
-    return vodden::Map(typeToFlags);
+    return sdl::Map(typeToFlags);
 }
 
 auto MessageBoxImpl::convertTypeToFlags(MessageBox::Type messageType) const -> uint32_t {

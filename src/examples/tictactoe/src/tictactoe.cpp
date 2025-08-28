@@ -1,7 +1,11 @@
-#include "tictactoe.h"
-
-#include <exception>
 #include <format>
+#include <stdexcept>
+#include <utility>
+
+#include "tictactoe.h"
+#include "event.h"
+#include "events.h"
+#include "user_event.h"
 
 TicTacToe::TicTacToe(std::shared_ptr<sdl::BaseEventBus> eventBus)
     : _eventBus(std::move(eventBus)) {}
@@ -18,17 +22,20 @@ void TicTacToe::play(uint8_t x, uint8_t y) {
   }
 
   _cells.at(index) = {_turn};
+  _turn = _turn == Player::kO ? Player::kX : Player::kO;
   
   const auto state = _checkWinCondition();
   if(state != GameState::kPlaying) {
     _eventBus->publish(std::make_unique<GameCompletedEvent>(state));
+    return;
   }
   
-  _turn = _turn == Player::kO ? Player::kX : Player::kO;
+  _publishTurnEvent();
 }
 
 void TicTacToe::reset() {
   _cells.fill(std::nullopt);
+  _publishTurnEvent();
 }
 
 auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
@@ -37,6 +44,17 @@ auto TicTacToe::_index(uint8_t x, uint8_t y) -> uint8_t {
         std::format("Cell coordinates are out of bounds: ({},{})", x, y));
   }
   return x + static_cast<uint8_t>(y * 3);
+}
+
+void TicTacToe::_publishTurnEvent() const {
+  switch(_turn) {
+    case Player::kO:
+      _eventBus->publish(std::make_unique<PlayerOTurnEvent>());
+      break; 
+    case Player::kX:
+      _eventBus->publish(std::make_unique<PlayerXTurnEvent>());
+      break; 
+  }
 }
 
 [[nodiscard]] auto TicTacToe::_checkWinCondition() const -> GameState {

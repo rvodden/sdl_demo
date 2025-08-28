@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "constexpr_map.h"
+#include <constexpr_map.h>
 #include "renderer.h"
 #include "texture.h"
 
