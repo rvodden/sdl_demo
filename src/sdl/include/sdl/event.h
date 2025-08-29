@@ -312,6 +312,54 @@ class SDL_EXPORT MouseButtonEvent : public MousePositionEvent {
 };
 
 /**
+ * @brief Keyboard event base class
+ *
+ */
+
+class SDL_EXPORT KeyboardEvent : public Event {
+ public:
+  #include "sdl/scancodes.h"
+  #include "sdl/keycodes.h"
+  #include "sdl/keymodifiers.h"
+
+  /**
+   * @brief Construct a keyboard event
+   * @param ts Timestamp when the event occurred
+   * @param winId ID of the window with keyboard focus
+   * @param keyboardId ID of the keyboard device that generated the event
+   * @param sc The scancode (physical key location)
+   * @param kc The keycode (key that changed state)
+   * @param keyDown True if the key was pressed, false if released
+   * @param repeat True if this is a repeat event due to key being held down
+   * @param keyMod Current key modifiers
+   */
+  KeyboardEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
+                uint32_t keyboardId, ScanCode sc, KeyCode kc, bool keyDown, bool repeat, KeyModifier keyMod)
+      : Event(ts),
+        windowId{winId},
+        which{keyboardId},
+        scancode{sc},
+        keycode{kc},
+        keymod{keyMod},
+        down{keyDown},
+        isRepeat{repeat} {};
+  
+  void handle(BaseEventHandler& baseEventHandler) override {
+    castHandler(*this, baseEventHandler);
+  };
+  
+  std::string getKeyName() const;
+
+  uint32_t windowId;   /**< ID of the window with keyboard focus, if any */
+  uint32_t which;      /**< ID of the keyboard device that generated this event */
+  ScanCode scancode;   /**< Physical key location */
+  KeyCode  keycode;    /**< The key that changed state */
+  KeyModifier keymod;  /**< Current key modifiers */
+  bool down;           /**< True if the key was pressed, false if released */
+  bool isRepeat;       /**< True if this is a repeat event due to key being held down */
+};
+
+/**
  * @brief Template-based event adaptor for converting platform events to sdl events
  *
  * EventAdaptors use template specialization to provide zero-cost conversion

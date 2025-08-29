@@ -15,11 +15,23 @@ namespace sdl {
 auto createMouseButtonEvent(const SDL_MouseButtonEvent* sdlMouseButtonEvent)
     -> std::unique_ptr<MouseButtonEvent> {
   return std::make_unique<MouseButtonEvent>(
-      std::chrono::milliseconds(SDL_GetTicks()), sdlMouseButtonEvent->windowID,
+      std::chrono::milliseconds(sdlMouseButtonEvent->timestamp), sdlMouseButtonEvent->windowID,
       sdlMouseButtonEvent->which, sdlMouseButtonEvent->x,
       sdlMouseButtonEvent->y,
       kSdlMouseButtonEventButtonMap[sdlMouseButtonEvent->button],
       sdlMouseButtonEvent->down, sdlMouseButtonEvent->clicks);
+}
+
+auto createKeyboardEvent(const SDL_KeyboardEvent* sdlKeyboardEvent)
+    -> std::unique_ptr<KeyboardEvent> {
+  return std::make_unique<KeyboardEvent>(
+      std::chrono::milliseconds(sdlKeyboardEvent->timestamp), sdlKeyboardEvent->windowID,
+      sdlKeyboardEvent->which,
+      kSdlScancodeMap[sdlKeyboardEvent->scancode],
+      kSdlKeycodeMap[sdlKeyboardEvent->key],
+      sdlKeyboardEvent->down,
+      (sdlKeyboardEvent->repeat != 0),
+      kSdlKeyModifierMap[sdlKeyboardEvent->mod]);
 }
 
 auto createUserEvent(const SDL_UserEvent* sdlUserEvent)
@@ -92,5 +104,14 @@ void SDLEventBus::injectEvent(const std::any& eventData, std::type_index eventTy
   // Other event types are silently ignored
 }
 
+std::string KeyboardEvent::getKeyName() const {
+  try {
+    SDL_Keycode sdlKeycode = kKeycodeToSdlMap[keycode];
+    const char* name = SDL_GetKeyName(sdlKeycode);
+    return name ? std::string(name) : "Unknown";
+  } catch (const std::range_error&) {
+    return "Unknown";
+  }
+}
 
 }  // namespace sdl
