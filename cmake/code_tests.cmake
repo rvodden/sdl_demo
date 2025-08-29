@@ -85,15 +85,79 @@ function(install_components)
                 -E remove_directory ${${COMPONENT_UPPER}_INSTALL_DIR}
         )
         set_tests_properties(remove_${COMPONENT} PROPERTIES FIXTURES_CLEANUP ${COMPONENT}_installed)
-
-        set_property(
-            TEST
-                install_${COMPONENT}
-                remove_${COMPONENT}
-            APPEND PROPERTY
-                LABELS host
-        )
     endforeach()
+endfunction()
+
+function(install_package)
+    set(options "")
+    set(oneValueArgs NAME DIRECTORY)
+    set(multiValueArgs COMPONENTS)
+    cmake_parse_arguments(PARSE_ARGV 0 INSTALL_PACKAGE "${options}" "${oneValueArgs}" "${multiValueArgs}")
+    if(DEFINED INSTALL_PACKAGE_COMPONENTS)
+        message(VERBOSE "Registering a fixture to install project as a package named ${INSTALL_PACKAGE_NAME} consisting of components: ${INSTALL_PACKAGE_COMPONENTS}")
+    else()
+        message(VERBOSE "Registering a fixture to install project as a package named ${INSTALL_PACKAGE_NAME}.")
+    endif()
+
+    if(NOT DEFINED INSTALL_PACKAGE_DIRECTORY)
+        set(INSTALL_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_PACKAGE_NAME}")
+        message(DEBUG "DIRECTORY not specified. Falling back on default of ${INSTALL_PACKAGE_DIRECTORY}")
+    endif()
+
+    string(TOUPPER ${INSTALL_PACKAGE_NAME} PACKAGE_UPPER)
+    set(${PACKAGE_UPPER}_INSTALL_DIR "${INSTALL_PACKAGE_DIRECTORY}")
+    set(${PACKAGE_UPPER}_INSTALL_DIR "${INSTALL_PACKAGE_DIRECTORY}" PARENT_SCOPE)
+    
+    # if components is not defined, then just install the entire project
+    if(NOT DEFINED INSTALL_PACKAGE_COMPONENTS)
+        # Define a fixture to install the package
+        message(DEBUG "Registering a fixture to install ${INSTALL_PACKAGE_NAME} to ${${PACKAGE_UPPER}_INSTALL_DIR}")
+        add_test(
+            NAME CodeTest.install_${INSTALL_PACKAGE_NAME}
+            COMMAND ${CMAKE_COMMAND}
+            --install .
+            --prefix ${${PACKAGE_UPPER}_INSTALL_DIR}
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            COMMAND_EXPAND_LISTS
+        )
+        set_tests_properties(CodeTest.install_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_SETUP CodeTest.${INSTALL_PACKAGE_NAME}_installed)
+
+        # Define a fixture to uninstall the package
+        message(DEBUG "Registering a fixture to delete the ${${PACKAGE_UPPER}_INSTALL_DIR} directory")
+        add_test(
+            NAME CodeTest.remove_${INSTALL_PACKAGE_NAME}
+            COMMAND ${CMAKE_COMMAND}
+                -E remove_directory ${${PACKAGE_UPPER}_INSTALL_DIR}
+        )
+        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP CodeTest.${INSTALL_COMPONENT_NAME}_installed)
+    else()
+        foreach(COMPONENT ${INSTALL_PACKAGE_COMPONENTS})
+            # defin a fixture to install the component
+            message(DEBUG "Registering a fixture to install ${COMPONENT} to ${${PACKAGE_UPPER}_INSTALL_DIR}")
+            add_test(
+                NAME CodeTest.install_${COMPONENT}
+                COMMAND ${CMAKE_COMMAND}
+                --install .
+                --prefix ${${PACKAGE_UPPER}_INSTALL_DIR}
+                --component ${COMPONENT}
+                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+                COMMAND_EXPAND_LISTS
+            )
+            set_tests_properties(CodeTest.install_${COMPONENT} PROPERTIES FIXTURES_SETUP CodeTest.${INSTALL_PACKAGE_NAME}_installed)
+            
+        endforeach()
+        
+        # Define a fixture to uninstall the package
+        message(DEBUG "Registering a fixture to delete the ${${PACKAGE_UPPER}_INSTALL_DIR} directory")
+        add_test(
+            NAME CodeTest.remove_${INSTALL_PACKAGE_NAME}
+            COMMAND ${CMAKE_COMMAND}
+                -E remove_directory ${${PACKAGE_UPPER}_INSTALL_DIR}
+        )
+        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP ${INSTALL_PACKAGE_NAME}_installed)
+
+    endif()
+
 endfunction()
 
 #[[
@@ -118,7 +182,7 @@ endfunction()
 function(register_code_test)
     set(options "")
     set(oneValueArgs NAME SOURCE_DIRECTORY BUILD_DIRECTORY)
-    set(multiValueArgs COMPONENTS)
+    set(multiValueArgs COMPONENTS USE_FETCHED_DEPENDENCIES)
     cmake_parse_arguments(PARSE_ARGV 0 REGISTER_CODE_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
     message(VERBOSE "Registering code test: ${REGISTER_CODE_TEST_NAME}")
 
@@ -132,17 +196,25 @@ function(register_code_test)
 
     # Define a fixture to create the build directory for the code test
     add_test(
-        NAME create_code_test_${REGISTER_CODE_TEST_NAME}_directory
+        NAME CodeTest.create_${REGISTER_CODE_TEST_NAME}_directory
         COMMAND ${CMAKE_COMMAND} -E make_directory ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
     )
-    set_tests_properties(create_code_test_${REGISTER_CODE_TEST_NAME}_directory PROPERTIES FIXTURES_SETUP ${REGISTER_CODE_TEST_NAME}_directory)
+    set_tests_properties(CodeTest.create_${REGISTER_CODE_TEST_NAME}_directory PROPERTIES FIXTURES_SETUP CodeTest.${REGISTER_CODE_TEST_NAME}_directory)
 
     # Define a fixture to remove the build directory for the code test
     add_test(
-        NAME remove_code_test_${REGISTER_CODE_TEST_NAME}_directory
+        NAME CodeTest.remove_${REGISTER_CODE_TEST_NAME}_directory
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
     )
-    set_tests_properties(remove_code_test_${REGISTER_CODE_TEST_NAME}_directory PROPERTIES FIXTURES_CLEANUP ${REGISTER_CODE_TEST_NAME}_directory)
+    set_tests_properties(CodeTest.remove_${REGISTER_CODE_TEST_NAME}_directory PROPERTIES FIXTURES_CLEANUP CodeTest.${REGISTER_CODE_TEST_NAME}_directory)
+
+    foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
+        message(VERBOSE "Associating ${DEPENDENCY} with ${REGISTER_CODE_TEST_NAME}")
+        if(NOT DEFINED ${DEPENDENCY}_BINARY_DIR)
+            message(FATAL_ERROR "Do not know where to find source for dependency ${DEPENDENCY}, required by CodeTest.${REGISTER_CODE_TEST_NAME}.")
+        endif()
+        list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_BINARY_DIR}")
+    endforeach()
 
     foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
         message(VERBOSE "Associating ${COMPONENT} with ${REGISTER_CODE_TEST_NAME}")
@@ -151,7 +223,7 @@ function(register_code_test)
             message(FATAL_ERROR "Do not know where ${COMPONENT} is installed, required by ${REGISTER_CODE_TEST_NAME}.")
         endif()
         list(APPEND COMPONENT_ARGUMENT_LIST "-D${COMPONENT_UPPER}_DIR=${${COMPONENT_UPPER}_INSTALL_DIR}/lib/cmake/${COMPONENT_UPPER}")
-        list(APPEND FIXTURES_REQUIRED "${COMPONENT}_installed")
+        list(APPEND FIXTURES_REQUIRED "CodeTest.${COMPONENT}_installed")
     endforeach()
     string(JOIN ";" FIXTURES_REQUIRED_STRING ${FIXTURES_REQUIRED})
 
@@ -161,12 +233,10 @@ function(register_code_test)
 
     # Create a test which runs `cmake` in configure mode
     add_test(
-        NAME test_code_test_${REGISTER_CODE_TEST_NAME}_configures
+        NAME CodeTest.test_${REGISTER_CODE_TEST_NAME}_configures
         COMMAND ${CMAKE_COMMAND}
             -G "${CMAKE_GENERATOR}"
-            -DCV_CHIP=${CV_CHIP}
             ${ARGUMENT_LIST}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake
             ${COMPONENT_ARGUMENT_LIST}
             ${REGISTER_CODE_TEST_SOURCE_DIRECTORY}
@@ -174,29 +244,19 @@ function(register_code_test)
         COMMAND_EXPAND_LISTS
     )
     # Configuration requires HDAS to be installed and requires the build directory
-    set_tests_properties(test_code_test_${REGISTER_CODE_TEST_NAME}_configures PROPERTIES FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};${REGISTER_CODE_TEST_NAME}_directory")
+    set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_configures PROPERTIES FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory")
     # Declare this test as a fixture so that compilation can be declared after it
-    set_tests_properties(test_code_test_${REGISTER_CODE_TEST_NAME}_configures PROPERTIES FIXTURES_SETUP ${REGISTER_CODE_TEST_NAME}_configured)
+    set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_configures PROPERTIES FIXTURES_SETUP CodeTest.${REGISTER_CODE_TEST_NAME}_configured)
 
     # Create a test which runs `cmake` in build mode
     add_test(
-        NAME test_code_test_${REGISTER_CODE_TEST_NAME}_compiles
+        NAME CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles
         COMMAND ${CMAKE_COMMAND}
             --build
             .
         WORKING_DIRECTORY ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
     )
     # Compilation requires HDAS to be installed, requires the build directory, and requires configuration to have happened.
-    set_tests_properties(test_code_test_${REGISTER_CODE_TEST_NAME}_compiles PROPERTIES FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};${REGISTER_CODE_TEST_NAME}_directory;${REGISTER_CODE_TEST_NAME}_configured")
+    set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles PROPERTIES FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured")
 
-    # Give both configuration and compilation tests the `host` label so they are run on the build machine not the test target
-    set_property(
-        TEST
-            create_code_test_${REGISTER_CODE_TEST_NAME}_directory
-            remove_code_test_${REGISTER_CODE_TEST_NAME}_directory
-            test_code_test_${REGISTER_CODE_TEST_NAME}_configures
-            test_code_test_${REGISTER_CODE_TEST_NAME}_compiles
-        APPEND PROPERTY
-            LABELS host
-    )
 endfunction()

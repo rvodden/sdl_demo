@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# SDL3 is required by consumers
+find_dependency(SDL3 REQUIRED)
+find_dependency(SDL3_image REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/SDLXXTargets.cmake")
+
+check_required_components(sdl)
