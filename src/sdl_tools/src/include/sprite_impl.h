@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "rectangle.h"
-#include "sprite.h"
+#include "sdl/rectangle.h"
+#include "sdl/sprite.h"
 
 namespace sdl::tools {
 

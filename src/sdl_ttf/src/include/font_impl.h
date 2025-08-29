@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <font.h>
+#include "sdl/font.h"
 
 #include <SDL3_ttf/SDL_ttf.h>
 

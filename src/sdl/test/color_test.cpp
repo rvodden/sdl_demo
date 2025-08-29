@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <color.h>
+
+#include <sdl/color.h>
 
 constexpr uint8_t kMaxColorValue = 255;
 constexpr uint8_t kHalfColorValue = 128;

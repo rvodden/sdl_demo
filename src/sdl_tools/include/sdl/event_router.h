@@ -15,7 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include "event.h"
+#include "sdl/event.h"
+
 #include "sdl_tools_export.h"
 
 namespace sdl::tools {

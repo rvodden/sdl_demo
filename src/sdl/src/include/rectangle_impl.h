@@ -1,11 +1,12 @@
 #ifndef SDL_RECTANGLE_IMPL_H
 #define SDL_RECTANGLE_IMPL_H
 
-#include <SDL3/SDL.h>
 #include <cstdint>
 #include <concepts>
 
-#include "rectangle.h"
+#include <SDL3/SDL.h>
+
+#include "sdl/rectangle.h"
 
 namespace sdl {
 

@@ -4,16 +4,17 @@
 #include <memory>
 #include <string>
 
-#include "application.h"
-#include "event.h"
+#include <sdl/application.h>
+#include <sdl/event.h>
+#include <sdl/event_router.h>
+#include <sdl/message_box.h>
+#include <sdl/sdl.h>
+#include <sdl/user_event.h>
+
 #include "events.h"
-#include "event_router.h"
 #include "game_constants.h"
 #include "tictactoe.h"
 #include "tictactoe_ui.h"
-#include "message_box.h"
-#include "sdl.h"
-#include "user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;

@@ -3,8 +3,8 @@
 
 #include <unordered_set>
 
-#include <constexpr_map.h>
-#include "sdl.h"
+#include "sdl/constexpr_map.h"
+#include "sdl/sdl.h"
 
 namespace sdl {
 

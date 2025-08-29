@@ -1,13 +1,15 @@
-#include "message_box.h"
-#include "include/message_box_impl.h"
-#include "include/window_impl.h"
-#include "window.h"
-#include "exception.h"
-#include <constexpr_map.h>
-
-#include <SDL3/SDL_messagebox.h>
 #include <algorithm>
 #include <array>
+
+#include <SDL3/SDL_messagebox.h>
+
+#include "sdl/constexpr_map.h"
+#include "sdl/exception.h"
+#include "sdl/message_box.h"
+#include "sdl/window.h"
+
+#include "message_box_impl.h"
+#include "window_impl.h"
 
 namespace sdl {
 

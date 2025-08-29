@@ -1,9 +1,10 @@
 #ifndef SDL_COLOR_IMPL_H 
 #define SDL_COLOR_IMPL_H
 
-#include <color.h>
-
 #include <SDL3/SDL.h>
+
+#include "sdl/color.h"
+
 
 namespace sdl {
 

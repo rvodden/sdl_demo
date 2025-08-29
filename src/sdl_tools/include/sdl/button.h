@@ -4,9 +4,10 @@
 #include <memory>
 #include <functional>
 
-#include "event.h"
-#include "event_router.h"
-#include "rectangle.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+#include "sdl/rectangle.h"
+
 #include "sdl_tools_export.h"
 
 namespace sdl::tools {

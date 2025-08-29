@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
-#include <ttf.h>
-#include <ttf_service.h>
-#include <application.h>
+
+#include <sdl/application.h>
+#include <sdl/ttf.h>
+#include <sdl/ttf_service.h>
 
 using namespace sdl;
 using namespace sdl::ttf;

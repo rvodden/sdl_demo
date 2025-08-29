@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
-#include <constexpr_map.h>
 #include <string_view>
+
+#include <gtest/gtest.h>
+
+#include <sdl/constexpr_map.h>
 
 namespace sdl {
 

@@ -1,5 +1,6 @@
-#include "rectangle.h"
-#include "include/rectangle_impl.h"
+#include "sdl/rectangle.h"
+
+#include "rectangle_impl.h"
 
 namespace sdl {
 

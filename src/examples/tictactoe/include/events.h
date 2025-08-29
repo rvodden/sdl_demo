@@ -1,11 +1,12 @@
 #ifndef TICTACTOE_EVENTS_H
 #define TICTACTOE_EVENTS_H
 
-#include "game_constants.h"
-#include <user_event.h>
-
 #include <chrono>
 #include <cstdint>
+
+#include <sdl/user_event.h>
+
+#include "game_constants.h"
 
 class ClickEvent : public sdl::CustomUserEvent<ClickEvent> {
  public:

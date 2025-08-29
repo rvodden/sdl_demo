@@ -11,7 +11,7 @@
 #ifndef SDL_USER_EVENT_H
 #define SDL_USER_EVENT_H
 
-#include "event.h"
+#include "sdl/event.h"
 #include "sdl_export.h"
 
 namespace sdl {

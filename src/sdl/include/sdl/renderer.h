@@ -6,10 +6,10 @@
 #include <unordered_set>
 #include <vector>
 
-#include "color.h"
-#include "rectangle.h"
+#include "sdl/color.h"
+#include "sdl/rectangle.h"
 #include "sdl_export.h"
-#include "texture.h"
+#include "sdl/texture.h"
 
 namespace sdl {
 

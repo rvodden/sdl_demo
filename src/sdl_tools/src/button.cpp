@@ -1,12 +1,16 @@
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "button.h"
+#include "sdl/button.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+#include "sdl/rectangle.h"
+
 #include "button_impl.h"
-#include "rectangle.h"
 
 namespace sdl::tools {
 

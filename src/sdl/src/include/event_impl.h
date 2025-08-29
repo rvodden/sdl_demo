@@ -8,9 +8,9 @@
 
 #include <SDL3/SDL.h>
 
-#include <constexpr_map.h>
-#include "event.h"
-#include "user_event.h"
+#include "sdl/constexpr_map.h"
+#include "sdl/event.h"
+#include "sdl/user_event.h"
 
 namespace sdl {
 

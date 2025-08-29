@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "color.h"
+#include "sdl/color.h"
 
 #include "sdl_export.h"
 

@@ -1,10 +1,10 @@
-#include "sdl.h"
+#include <memory>
 
 #include <SDL3/SDL.h>
 
-#include <memory>
+#include "sdl/sdl.h"
+#include "sdl/exception.h"
 
-#include "exception.h"
 #include "sdl_impl.h"
 
 namespace sdl {

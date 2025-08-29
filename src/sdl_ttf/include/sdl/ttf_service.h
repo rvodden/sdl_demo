@@ -2,12 +2,13 @@
 #define SDL_TTF_SERVICE_H
 
 #include <memory>
-#include "ttf.h"
+
+#include "sdl/application.h"
+#include "sdl/ttf.h"
 
 // Only include and register if application framework is available
 #ifdef __has_include
-  #if __has_include("application.h")
-    #include "application.h"
+  #if __has_include("sdl/application.h")
     constexpr bool kSDLApplicationAvailable = true;
   #else
     constexpr bool kSDLApplicationAvailable = false;

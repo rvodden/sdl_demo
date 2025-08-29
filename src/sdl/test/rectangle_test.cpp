@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
-#include <rectangle.h>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#include <sdl/rectangle.h>
 
 // Test constants for int32_t rectangles
 constexpr int32_t kIntTestX = 10;

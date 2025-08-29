@@ -1,13 +1,13 @@
-#include "event.h"
-
-#include <SDL3/SDL.h>
-#include <constexpr_map.h>
-
 #include <memory>
 
+#include <SDL3/SDL.h>
+
+#include "sdl/event.h"
+#include "sdl/constexpr_map.h"
+#include "sdl/exception.h"
+#include "sdl/user_event.h"
+
 #include "event_impl.h"
-#include "exception.h"
-#include "user_event.h"
 #include "user_event_impl.h"
 
 namespace sdl {

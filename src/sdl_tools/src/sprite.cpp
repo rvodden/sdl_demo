@@ -1,8 +1,9 @@
 #include <memory>
 #include <utility>
 
-#include "rectangle.h"
-#include "sprite.h"
+#include "sdl/rectangle.h"
+#include "sdl/sprite.h"
+
 #include "sprite_impl.h"
 
 namespace sdl::tools {

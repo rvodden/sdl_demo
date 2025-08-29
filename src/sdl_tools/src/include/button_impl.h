@@ -1,12 +1,11 @@
 #ifndef SDL_TOOLS_BUTTON_IMPL_H
 #define SDL_TOOLS_BUTTON_IMPL_H
 
-#include <event.h>
-#include <rectangle.h>
-
 #include <vector>
 
-#include "button.h"
+#include "sdl/button.h"
+#include "sdl/event.h"
+#include "sdl/rectangle.h"
 
 namespace sdl::tools {
 

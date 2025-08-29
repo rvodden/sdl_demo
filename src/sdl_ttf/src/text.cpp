@@ -1,11 +1,11 @@
-#include <text.h>
-#include <text_impl.h>
-#include <font_impl.h>
-
-#include "surface_impl.h"
-#include "color_impl.h"
-
 #include <SDL3_ttf/SDL_ttf.h>
+
+#include <sdl/text.h>
+
+#include "color_impl.h"
+#include "font_impl.h"
+#include "surface_impl.h"
+#include "text_impl.h"
 
 namespace sdl::ttf {
 

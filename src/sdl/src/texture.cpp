@@ -1,9 +1,9 @@
-#include "texture.h"
-
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
-#include "exception.h"
+#include "sdl/exception.h"
+#include "sdl/texture.h"
+
 #include "renderer_impl.h"
 #include "surface_impl.h"
 #include "texture_impl.h"

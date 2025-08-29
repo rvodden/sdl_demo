@@ -1,17 +1,17 @@
-#include "renderer.h"
-
-#include <SDL3/SDL.h>
-
 #include <algorithm>
 #include <cinttypes>
 #include <cstring>
 #include <memory>
 
-#include "exception.h"
+#include <SDL3/SDL.h>
+
+#include "sdl/renderer.h"
+#include "sdl/exception.h"
+#include "sdl/window.h"
+
 #include "rectangle_impl.h"
 #include "renderer_impl.h"
 #include "texture_impl.h"
-#include "window.h"
 #include "window_impl.h"
 
 namespace sdl {

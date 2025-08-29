@@ -1,9 +1,11 @@
-#include "sprite_renderer.h"
-
+#include <memory>
 #include <utility>
 
-#include "rectangle.h"
-#include "sprite.h"
+#include "sdl/renderer.h"
+#include "sdl/rectangle.h"
+#include "sdl/sprite.h"
+#include "sdl/sprite_renderer.h"
+
 #include "sprite_impl.h"
 #include "sprite_renderer_impl.h"
 

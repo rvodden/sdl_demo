@@ -5,12 +5,12 @@
 
 #include <gtest/gtest.h>
 
-#include "rectangle.h"
-#include "renderer.h"
-#include "sdl.h"
-#include "sprite.h"
-#include "texture.h"
-#include "window.h"
+#include "sdl/rectangle.h"
+#include "sdl/renderer.h"
+#include "sdl/sdl.h"
+#include "sdl/sprite.h"
+#include "sdl/texture.h"
+#include "sdl/window.h"
 
 constexpr uint16_t kTestWidth = 800;
 constexpr uint16_t kTestHeight = 600;

@@ -1,13 +1,13 @@
-#include "surface.h"
-
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-
 #include <algorithm>
 #include <cstring>
 #include <memory>
 
-#include "exception.h"
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+
+#include "sdl/surface.h"
+#include "sdl/exception.h"
+
 #include "surface_impl.h"
 
 namespace sdl {

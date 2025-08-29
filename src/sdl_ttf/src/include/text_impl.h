@@ -1,9 +1,9 @@
 #ifndef SDL_TTF_TEXT_IMPL_H  
 #define SDL_TTF_TEXT_IMPL_H   
 
-#include <text.h>
-
 #include <SDL3_ttf/SDL_ttf.h>
+
+#include "sdl/text.h"
 
 namespace sdl::ttf {
 

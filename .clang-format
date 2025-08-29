@@ -1,3 +1,28 @@
+---
+# clang-format configuration for SDL demo project
+# Based on Google style with custom include ordering
+
 BasedOnStyle: Google
-ColumnLimit:  0
-Standard:     c++20
+ColumnLimit: 0
+Standard: c++20
+
+# Include ordering configuration
+IncludeBlocks: Regroup
+SortIncludes: CaseSensitive
+IncludeCategories:
+  # Standard library includes (e.g., <iostream>, <vector>)
+  - Regex: '^<[^/]*>$'
+    Priority: 1
+    SortPriority: 1
+  # C standard library includes (e.g., <stdio.h>, <stdlib.h>)
+  - Regex: '^<[^/]*\.h>$'
+    Priority: 2
+    SortPriority: 2
+  # External library includes (e.g., <SDL3/SDL.h>, <gtest/gtest.h>)
+  - Regex: '^<.*>'
+    Priority: 3
+    SortPriority: 3
+  # Project includes (e.g., "my_header.h", "utils/constexpr_map.h")
+  - Regex: '".*"'
+    Priority: 4
+    SortPriority: 4

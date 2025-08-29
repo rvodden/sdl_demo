@@ -13,9 +13,9 @@
 
 #include <gtest/gtest.h>
 
-#include "event_router.h"
-#include "event.h"
-#include "user_event.h"
+#include "sdl/event_router.h"
+#include "sdl/event.h"
+#include "sdl/user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;

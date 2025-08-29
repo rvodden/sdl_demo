@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "message_box.h"
+
+#include "sdl/message_box.h"
 
 class MessageBoxTest : public ::testing::Test {
 protected:

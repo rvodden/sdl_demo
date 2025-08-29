@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
-#include <application.h>
 #include <memory>
+
+#include <gtest/gtest.h>
+
+#include <sdl/application.h>
 
 using namespace sdl;
 

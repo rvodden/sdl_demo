@@ -3,7 +3,8 @@
 
 #include <memory>
 
-#include "rectangle.h"
+#include "sdl/rectangle.h"
+
 #include "sdl_tools_export.h"
 
 namespace sdl {

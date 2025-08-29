@@ -1,11 +1,11 @@
-#include "window.h"
+#include <memory>
 
 #include <SDL3/SDL.h>
 
-#include <memory>
+#include "sdl/exception.h"
+#include "sdl/renderer.h"
+#include "sdl/window.h"
 
-#include "exception.h"
-#include "renderer.h"
 #include "window_impl.h"
 
 namespace sdl {

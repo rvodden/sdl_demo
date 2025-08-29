@@ -1,9 +1,9 @@
 #ifndef SURFACE_IMPL_H
 #define SURFACE_IMPL_H
 
-#include "surface.h"
-
 #include <SDL3/SDL.h>
+
+#include "sdl/surface.h"
 
 namespace sdl {
 

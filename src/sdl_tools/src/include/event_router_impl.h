@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <typeindex>
 
-#include "event_router.h"
+#include "sdl/event_router.h"
 
 namespace sdl::tools {
 

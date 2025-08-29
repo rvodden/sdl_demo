@@ -1,7 +1,7 @@
 #ifndef SDL_TOOLS_SPRITE_RENDERER_IMPL_H
 #define SDL_TOOLS_SPRITE_RENDERER_IMPL_H
 
-#include "sprite_renderer.h"
+#include "sdl/sprite_renderer.h"
 
 namespace sdl::tools {
 

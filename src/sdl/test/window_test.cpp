@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <sdl.h>
-#include <window.h>
+
+#include <sdl/sdl.h>
+#include <sdl/window.h>
 
 const uint8_t kWindowDimension = 100;
 

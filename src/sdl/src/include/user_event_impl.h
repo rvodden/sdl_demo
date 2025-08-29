@@ -1,11 +1,11 @@
 #ifndef SDL_USER_EVENT_IMPL_H
 #define SDL_USER_EVENT_IMPL_H
 
-#include <SDL3/SDL.h>
-
 #include <optional>
 
-#include "user_event.h"
+#include <SDL3/SDL.h>
+
+#include "sdl/user_event.h"
 
 namespace sdl {
 

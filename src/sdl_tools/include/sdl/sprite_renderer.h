@@ -3,9 +3,10 @@
 
 #include <memory>
 
-#include "renderer.h"
+#include "sdl/renderer.h"
+#include "sdl/sprite.h"
+
 #include "sdl_tools_export.h"
-#include "sprite.h"
 
 namespace sdl::tools {
 

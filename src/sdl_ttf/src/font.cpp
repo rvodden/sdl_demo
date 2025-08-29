@@ -1,9 +1,10 @@
-#include <exception.h>
-#include <font.h>
-#include <font_impl.h>
-
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
+
+#include "sdl/exception.h"
+#include "sdl/font.h"
+
+#include "font_impl.h"
 
 namespace sdl::ttf {
 

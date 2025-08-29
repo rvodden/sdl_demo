@@ -1,14 +1,15 @@
-#include <gtest/gtest.h>
-#include <sdl.h>
-#include <event.h>
-#include <user_event.h>
-
+#include <any>
 #include <chrono>
 #include <memory>
-#include <vector>
 #include <string>
-#include <any>
 #include <typeindex>
+#include <vector>
+
+#include <gtest/gtest.h>
+
+#include <sdl/event.h>
+#include <sdl/sdl.h>
+#include <sdl/user_event.h>
 
 using namespace sdl;
 

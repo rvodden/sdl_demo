@@ -3,9 +3,9 @@
 
 #include <SDL3/SDL.h>
 
-#include <constexpr_map.h>
-#include "renderer.h"
-#include "texture.h"
+#include "sdl/constexpr_map.h"
+#include "sdl/renderer.h"
+#include "sdl/texture.h"
 
 namespace sdl {
 

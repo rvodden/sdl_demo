@@ -1,10 +1,11 @@
-#include <gtest/gtest.h>
-#include <surface.h>
-#include <color.h>
-#include <exception.h>
-
 #include <vector>
 #include <filesystem>
+
+#include <gtest/gtest.h>
+
+#include <sdl/color.h>
+#include <sdl/exception.h>
+#include <sdl/surface.h>
 
 class SurfaceTest : public ::testing::Test {
  protected:

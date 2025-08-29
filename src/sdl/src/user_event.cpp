@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 
-#include "exception.h"
+#include "sdl/exception.h"
+
 #include "user_event_impl.h"
 
 namespace sdl {

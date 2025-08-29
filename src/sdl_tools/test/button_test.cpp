@@ -16,11 +16,11 @@
 
 #include <gtest/gtest.h>
 
-#include "button.h"
-#include "event.h"
-#include "event_router.h"
-#include "rectangle.h"
-#include "user_event.h"
+#include "sdl/button.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+#include "sdl/rectangle.h"
+#include "sdl/user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;

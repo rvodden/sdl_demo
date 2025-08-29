@@ -1,7 +1,8 @@
-#include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 
-#include "ttf.h"
+#include <SDL3_ttf/SDL_ttf.h>
+
+#include "sdl/ttf.h"
 
 // Service registration moved to header file for better dependency handling
 

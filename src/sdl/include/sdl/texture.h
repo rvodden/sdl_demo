@@ -3,8 +3,8 @@
 
 #include <filesystem>
 
-#include "renderer.h"
-#include "surface.h"
+#include "sdl/renderer.h"
+#include "sdl/surface.h"
 #include "sdl_export.h"
 
 namespace sdl {

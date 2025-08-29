@@ -1,9 +1,9 @@
-#include "tictactoe_ui.h"
-
-#include <event.h>
-
 #include <chrono>
 #include <ranges>
+
+#include <sdl/event.h>
+
+#include "tictactoe_ui.h"
 
 TicTacToeUI::TicTacToeUI(std::shared_ptr<sdl::BaseEventBus> bus,
                          std::shared_ptr<sdl::tools::EventRouter> router)

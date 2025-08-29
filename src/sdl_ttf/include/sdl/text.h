@@ -3,11 +3,11 @@
 
 #include <string_view>
 
-#include <sdl_ttf_export.h>
+#include "sdl/color.h"
+#include "sdl/font.h"
+#include "sdl/surface.h"
 
-#include "color.h"
-#include "font.h"
-#include "surface.h"
+#include "sdl_ttf_export.h"
 
 namespace sdl::ttf {
 

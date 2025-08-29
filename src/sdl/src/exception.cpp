@@ -1,6 +1,6 @@
-#include "exception.h"
-
 #include <SDL3/SDL.h>
+
+#include "sdl/exception.h"
 
 namespace sdl {
 

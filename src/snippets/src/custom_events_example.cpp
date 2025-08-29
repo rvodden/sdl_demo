@@ -6,13 +6,13 @@
  * UserEvent and register handlers for them using the event dispatcher system.
  */
 
-#include <event.h>
-#include <event_router.h>
-#include <user_event.h>
-
 #include <chrono>
 #include <iostream>
 #include <memory>
+
+#include <sdl/event.h>
+#include <sdl/event_router.h>
+#include <sdl/user_event.h>
 
 using namespace sdl;
 using namespace sdl::tools;

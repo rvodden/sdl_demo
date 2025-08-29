@@ -2,10 +2,11 @@
 #include <stdexcept>
 #include <utility>
 
-#include "tictactoe.h"
-#include "event.h"
+#include <sdl/event.h>
+#include <sdl/user_event.h>
+
 #include "events.h"
-#include "user_event.h"
+#include "tictactoe.h"
 
 TicTacToe::TicTacToe(std::shared_ptr<sdl::BaseEventBus> eventBus)
     : _eventBus(std::move(eventBus)) {}

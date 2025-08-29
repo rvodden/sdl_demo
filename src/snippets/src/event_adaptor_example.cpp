@@ -10,10 +10,12 @@
 
 #include <iostream>
 #include <memory>
+
 #include <SDL3/SDL.h>
 
-#include "event.h"
-#include "event_router.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+
 #include "event_impl.h"
 
 using namespace sdl;

@@ -6,8 +6,9 @@
 #include <utility>
 #include <vector>
 
-#include "event.h"
-#include "event_router.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+
 #include "event_router_impl.h"
 
 namespace sdl::tools {

@@ -1,22 +1,23 @@
 #ifndef TICTACTOE_TICTACTOE_UI_H
 #define TICTACTOE_TICTACTOE_UI_H
 
-#include "events.h"
-#include "game_constants.h"
-#include "tictactoe.h"
-#include <button.h>
-#include <color.h>
-#include <event_router.h>
-#include <rectangle.h>
-#include <images.h>
-#include <renderer.h>
-#include <sprite.h>
-#include <sprite_renderer.h>
-#include <texture.h>
-#include <window.h>
-
 #include <memory>
 #include <vector>
+
+#include <sdl/button.h>
+#include <sdl/color.h>
+#include <sdl/event_router.h>
+#include <sdl/rectangle.h>
+#include <sdl/renderer.h>
+#include <sdl/sprite.h>
+#include <sdl/sprite_renderer.h>
+#include <sdl/texture.h>
+#include <sdl/window.h>
+
+#include "events.h"
+#include "game_constants.h"
+#include "images.h"
+#include "tictactoe.h"
 
 class TicTacToeUI {
  public:

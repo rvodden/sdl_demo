@@ -1,14 +1,16 @@
-#include <font.h>
-#include <renderer.h>
-#include <sdl.h>
-#include <text.h>
-#include <ttf.h>
-#include <ttf_service.h>  // Automatically registers TTF service
-#include <window.h>
-#include <application.h>
-
 #include <string_view>
+
 #include <assert.h>
+
+#include <sdl/application.h>
+#include <sdl/font.h>
+#include <sdl/renderer.h>
+#include <sdl/sdl.h>
+#include <sdl/text.h>
+#include <sdl/ttf.h>
+#include <sdl/ttf_service.h>  // Automatically registers TTF service
+#include <sdl/window.h>
+
 
 extern const std::array<const uint8_t, 6656> tiny_ttf;
 

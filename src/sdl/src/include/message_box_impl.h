@@ -3,7 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "message_box.h"
+
+#include "sdl/message_box.h"
 
 struct SDL_Window;
 

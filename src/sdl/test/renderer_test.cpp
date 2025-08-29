@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
-#include <sdl.h>
-#include <window.h>
-#include <renderer.h>
-#include <color.h>
+
+#include <sdl/color.h>
+#include <sdl/renderer.h>
+#include <sdl/sdl.h>
+#include <sdl/window.h>
 
 constexpr uint16_t kTestWidth = 800;
 constexpr uint16_t kTestHeight = 600;

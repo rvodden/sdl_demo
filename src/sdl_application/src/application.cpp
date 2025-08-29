@@ -1,17 +1,18 @@
-#include "application.h"
-#include <constexpr_map.h>
-#include "event.h"
-#include "event_impl.h"
-#include "event_router.h"
-#include "sdl.h"
+#include <array>
+#include <utility>
 
 #include <SDL3/SDL.h>
 #define SDL_MAIN_USE_CALLBACKS 1 //NOLINT(cppcoreguidelines-macro-usage)
 #define SDL_MAIN_HANDLED 1 //NOLINT(cppcoreguidelines-macro-usage)
 #include <SDL3/SDL_main.h>
-#include <array>
-#include <utility>
 
+#include "sdl/application.h"
+#include "sdl/constexpr_map.h"
+#include "sdl/event.h"
+#include "sdl/event_router.h"
+#include "sdl/sdl.h"
+
+#include "event_impl.h"
 
 namespace sdl {
 
