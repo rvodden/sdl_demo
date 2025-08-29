@@ -14,20 +14,26 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ✅ **2D rendering** - Good coverage of basic operations
 - ✅ **Texture management** - Basic texture loading and rendering
 - ✅ **Surface operations** - Comprehensive surface manipulation
-- ✅ **Event system** - Type-safe event handling architecture
+- ✅ **Event system** - Type-safe event handling architecture with keyboard support
+- ✅ **Basic keyboard input** - KeyboardEvent handling with modifier key support
 - ✅ **Color and rectangle utilities** - Basic implementations
 - ✅ **Message boxes** - Native dialog support with builder pattern
 
 ### Major Missing Areas:
 - ❌ **Advanced window management** (positioning, resizing, fullscreen, etc.)
 - ❌ **Audio subsystem** - No audio support yet
-- ❌ **Input handling** (mouse, keyboard, gamepad)
+- ⚠️ **Input handling** (mouse events implemented, ~~keyboard events~~ ✅ now implemented, gamepad support missing)
 - ❌ **Advanced rendering** (primitives, viewports, render targets)
 - ❌ **File I/O abstraction**
 - ❌ **Threading utilities**
 - ❌ **Platform information and capabilities**
 - ❌ **Joystick and gamepad support**
 - ❌ **Hardware acceleration info (OpenGL, Vulkan, etc.)**
+
+### Recent Updates:
+- ✅ **Keyboard Event Handling** - Added comprehensive keyboard event support with `KeyboardEvent` class
+- ✅ **Modifier Key Support** - Fixed crash issue with modifier keys (Shift, Ctrl, Alt, etc.) in keycode mapping
+- ✅ **Key Name Resolution** - Implemented `KeyboardEvent::getKeyName()` for human-readable key names
 
 ### Notes:
 - sdl follows modern C++ RAII principles with smart pointers and exception-based error handling
@@ -240,7 +246,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 | `SDL_Scancode SDL_GetScancodeFromKey(SDL_Keycode key, SDL_Keymod *modstate)` | Not yet implemented |
 | `const char * SDL_GetScancodeName(SDL_Scancode scancode)` | Not yet implemented |
 | `SDL_Scancode SDL_GetScancodeFromName(const char *name)` | Not yet implemented |
-| `const char * SDL_GetKeyName(SDL_Keycode key)` | Not yet implemented |
+| `const char * SDL_GetKeyName(SDL_Keycode key)` | `KeyboardEvent::getKeyName() -> std::string` |
 | `SDL_Keycode SDL_GetKeyFromName(const char *name)` | Not yet implemented |
 | `bool SDL_StartTextInput(SDL_Window *window)` | Not yet implemented |
 | `bool SDL_StopTextInput(SDL_Window *window)` | Not yet implemented |

@@ -335,7 +335,16 @@ static constexpr auto kSdlKeycodeMapArray = std::array{
         std::pair{SDLK_FIND, KeyboardEvent::KeyCode::kFind},
         std::pair{SDLK_MUTE, KeyboardEvent::KeyCode::kMute},
         std::pair{SDLK_VOLUMEUP, KeyboardEvent::KeyCode::kVolumeUp},
-        std::pair{SDLK_VOLUMEDOWN, KeyboardEvent::KeyCode::kVolumeDown}
+        std::pair{SDLK_VOLUMEDOWN, KeyboardEvent::KeyCode::kVolumeDown},
+        // Modifier keys
+        std::pair{SDLK_LCTRL, KeyboardEvent::KeyCode::kLCtrl},
+        std::pair{SDLK_LSHIFT, KeyboardEvent::KeyCode::kLShift},
+        std::pair{SDLK_LALT, KeyboardEvent::KeyCode::kLAlt},
+        std::pair{SDLK_LGUI, KeyboardEvent::KeyCode::kLGui},
+        std::pair{SDLK_RCTRL, KeyboardEvent::KeyCode::kRCtrl},
+        std::pair{SDLK_RSHIFT, KeyboardEvent::KeyCode::kRShift},
+        std::pair{SDLK_RALT, KeyboardEvent::KeyCode::kRAlt},
+        std::pair{SDLK_RGUI, KeyboardEvent::KeyCode::kRGui}
 };
 static constexpr auto kSdlKeycodeMap = Map(kSdlKeycodeMapArray);
 
@@ -519,7 +528,16 @@ static constexpr auto kKeycodeToSdlMapArray = std::array{
     std::pair{KeyboardEvent::KeyCode::kFind, SDLK_FIND},
     std::pair{KeyboardEvent::KeyCode::kMute, SDLK_MUTE},
     std::pair{KeyboardEvent::KeyCode::kVolumeUp, SDLK_VOLUMEUP},
-    std::pair{KeyboardEvent::KeyCode::kVolumeDown, SDLK_VOLUMEDOWN}
+    std::pair{KeyboardEvent::KeyCode::kVolumeDown, SDLK_VOLUMEDOWN},
+    // Modifier keys
+    std::pair{KeyboardEvent::KeyCode::kLCtrl, SDLK_LCTRL},
+    std::pair{KeyboardEvent::KeyCode::kLShift, SDLK_LSHIFT},
+    std::pair{KeyboardEvent::KeyCode::kLAlt, SDLK_LALT},
+    std::pair{KeyboardEvent::KeyCode::kLGui, SDLK_LGUI},
+    std::pair{KeyboardEvent::KeyCode::kRCtrl, SDLK_RCTRL},
+    std::pair{KeyboardEvent::KeyCode::kRShift, SDLK_RSHIFT},
+    std::pair{KeyboardEvent::KeyCode::kRAlt, SDLK_RALT},
+    std::pair{KeyboardEvent::KeyCode::kRGui, SDLK_RGUI}
 };
 static constexpr auto kKeycodeToSdlMap = Map(kKeycodeToSdlMapArray);
 
