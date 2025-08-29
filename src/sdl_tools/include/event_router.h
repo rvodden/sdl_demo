@@ -11,6 +11,8 @@
 #define SDL_TOOLS_EVENT_ROUTER_H
 
 #include <memory>
+#include <typeindex>
+#include <utility>
 #include <vector>
 
 #include "event.h"

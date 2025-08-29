@@ -3,15 +3,16 @@
 
 #include <memory>
 
-#include "sdl_tools_export.h"
-#include "sprite_renderer.h"
-#include "texture.h"
 #include "rectangle.h"
+#include "sdl_tools_export.h"
+
+namespace sdl {
+  class Texture;
+}
 
 namespace sdl::tools {
 
 class SpriteImpl;
-class SpriteRenderer;
 
 /**
  * @brief A renderable sprite representing a rectangular region of a texture

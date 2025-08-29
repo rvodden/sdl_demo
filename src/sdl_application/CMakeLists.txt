@@ -1,6 +1,7 @@
 project(sdl_application LANGUAGES CXX VERSION ${PROJECT_VERSION})
 
 add_library(${PROJECT_NAME} SHARED)
+add_library(sdl::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
@@ -24,8 +25,8 @@ target_sources(${PROJECT_NAME}
             FILES ${CMAKE_CURRENT_BINARY_DIR}/sdl_application_export.h
     )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl_tools)
+target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl)
+target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
 target_link_libraries(${PROJECT_NAME} PRIVATE sdl_private)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 

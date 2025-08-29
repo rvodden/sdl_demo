@@ -1,15 +1,26 @@
-#include <gtest/gtest.h>
-#include <button.h>
-#include <event.h>
-#include <event_router.h>
-#include <rectangle.h>
-#include <user_event.h>
-
-#include <memory>
-#include <vector>
+#include <algorithm>
+#include <any>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <memory>
 #include <queue>
 #include <optional>
+#include <stdexcept>
+#include <string>
+#include <typeindex>
+#include <utility>
+#include <vector>
+
+#include <gtest/gtest.h>
+
+#include "button.h"
+#include "event.h"
+#include "event_router.h"
+#include "rectangle.h"
+#include "user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;

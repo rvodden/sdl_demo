@@ -1,6 +1,13 @@
+#include <iterator>
+#include <functional>
+#include <optional>
 #include <memory>
 #include <typeindex>
+#include <utility>
+#include <vector>
 
+#include "event.h"
+#include "event_router.h"
 #include "event_router_impl.h"
 
 namespace sdl::tools {

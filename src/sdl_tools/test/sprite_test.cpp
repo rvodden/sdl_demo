@@ -1,11 +1,16 @@
-#include <gtest/gtest.h>
-#include <sprite.h>
-#include <texture.h>
-#include <renderer.h>
-#include <window.h>
-#include <sdl.h>
-#include <rectangle.h>
+#include <cstdint>
+#include <string>
 #include <memory>
+#include <utility>
+
+#include <gtest/gtest.h>
+
+#include "rectangle.h"
+#include "renderer.h"
+#include "sdl.h"
+#include "sprite.h"
+#include "texture.h"
+#include "window.h"
 
 constexpr uint16_t kTestWidth = 800;
 constexpr uint16_t kTestHeight = 600;

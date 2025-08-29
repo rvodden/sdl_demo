@@ -1,13 +1,21 @@
-#include <gtest/gtest.h>
-#include <event_router.h>
-#include <event.h>
-#include <user_event.h>
-
-#include <queue>
-#include <vector>
-#include <memory>
+#include <algorithm>
+#include <any>
 #include <chrono>
+#include <cstddef>
+#include <functional>
+#include <memory>
 #include <optional>
+#include <queue>
+#include <string>
+#include <typeindex>
+#include <utility>
+#include <vector>
+
+#include <gtest/gtest.h>
+
+#include "event_router.h"
+#include "event.h"
+#include "user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;

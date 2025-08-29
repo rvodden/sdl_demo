@@ -10,8 +10,6 @@
 
 #include "visitor_pattern_legacy_sdk.h"
 
-class CustomEventImpl;
-
 class ConcreteCustomEvent : public CustomEvent {
  public:
   ConcreteCustomEvent() = default;

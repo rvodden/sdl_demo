@@ -6,6 +6,7 @@ target_include_directories(${PROJECT_NAME}_private INTERFACE
 )
 
 add_library(${PROJECT_NAME} SHARED)
+add_library(sdl::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
@@ -31,7 +32,7 @@ target_sources(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE sdl_ttf_private)
 target_link_libraries(${PROJECT_NAME} PRIVATE sdl_private)
-target_link_libraries(${PROJECT_NAME} PRIVATE sdl)
+target_link_libraries(${PROJECT_NAME} PRIVATE sdl::sdl)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3_ttf::SDL3_ttf)
 

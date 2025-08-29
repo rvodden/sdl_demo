@@ -9,7 +9,6 @@
 
 namespace sdl::tools {
 
-class Sprite;
 class SpriteRendererImpl;
 
 class SDL_TOOLS_EXPORT SpriteRenderer {

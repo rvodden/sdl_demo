@@ -1,12 +1,12 @@
 #ifndef SDL_TOOLS_BUTTON_H
 #define SDL_TOOLS_BUTTON_H
 
-#include <event.h>
-#include <event_router.h>
-#include <rectangle.h>
-
 #include <memory>
+#include <functional>
 
+#include "event.h"
+#include "event_router.h"
+#include "rectangle.h"
 #include "sdl_tools_export.h"
 
 namespace sdl::tools {

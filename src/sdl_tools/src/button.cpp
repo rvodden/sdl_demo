@@ -1,9 +1,12 @@
-#include "button.h"
-
-#include <iostream>
+#include <algorithm>
+#include <iterator>
 #include <memory>
+#include <utility>
+#include <vector>
 
+#include "button.h"
 #include "button_impl.h"
+#include "rectangle.h"
 
 namespace sdl::tools {
 

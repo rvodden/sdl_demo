@@ -1,7 +1,8 @@
 #include "sprite_renderer.h"
 
-#include <iostream>
+#include <utility>
 
+#include "rectangle.h"
 #include "sprite.h"
 #include "sprite_impl.h"
 #include "sprite_renderer_impl.h"
