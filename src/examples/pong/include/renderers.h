@@ -17,19 +17,10 @@ concept Rectangular = requires(T a) {
 };
 
 template<Rectangular T> 
-class RectangleRenderer {
- public:
-  RectangleRenderer(std::shared_ptr<const T> rectangle, std::shared_ptr<sdl::Renderer> renderer) 
-    : _rectangle(rectangle), _renderer(renderer) {};
-    
-  auto render() -> void {
-    const auto extent = _rectangle->getExtent();
-    _renderer->fillRect(extent);
-  }
- private:
-  std::shared_ptr<const T> _rectangle;
-  std::shared_ptr<sdl::Renderer> _renderer;
-};
+void renderRectangle(sdl::Renderer& renderer, const T& rectangle) {
+  const auto extent = rectangle.getExtent();
+  renderer.fillRect(extent);
+}
 
 class ScoreRenderer {
   public:
@@ -39,7 +30,10 @@ class ScoreRenderer {
     
     [[nodiscard]] auto getScore() const -> uint16_t { return _score; }
 
-    void setScore(uint16_t score) { 
+    void setScore(uint16_t score) {
+      if(score == _score) {
+        return;
+      }
       _score = score;
       _texture = _renderScore();
     }

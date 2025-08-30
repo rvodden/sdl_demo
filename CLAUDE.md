@@ -76,13 +76,9 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
    - `Sprite` and `SpriteRenderer` - 2D sprite management
    - `Button` - UI button component
 
-3. **utils** - General-purpose C++ utilities
-   - `constexpr_map` - Compile-time key-value mapping with automatic size deduction
-   - `thread_safe_queue` - Thread-safe queue implementation
-
 ### Sample Applications
 - **examples/tictactoe** - Interactive tic-tac-toe game demonstrating SDL3 graphics, event handling, and UI components
-- **snippets** - C++ pattern demonstrations and debugging utilities (visitor pattern, polymorphic collections, SDL diagnostics)
+- **snippets** - Demonstrations of individual features.
 - **visitor_pattern_mockup** - Advanced visitor pattern implementation
 
 ## Development Conventions
@@ -96,7 +92,7 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 - Implementation details are hidden in `*_impl.h` files (pimpl pattern)
 - Public headers expose clean interfaces without SDL dependencies
 - Namespaces follow directory structure (`sdl::`, `sdl::tools::`)
-- **Test/Debug code should be placed in the `snippets` project** - use this for temporary diagnostic tools, debugging utilities, and experimental code
+- **Tests of the public interfaces should be placed in the `test` folder; tests agains internal or SDL types should be placed in `impl_test`.** - use this for temporary diagnostic tools, debugging utilities, and experimental code
 - **Tests must NEVER include `*_impl.h` headers** - tests should only interact with public interfaces
 
 ### Dependencies

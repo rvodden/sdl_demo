@@ -8,7 +8,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} 
         -DURL=https://www.fontsquirrel.com/fonts/download/dejavu-sans-mono
         -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/dejavu-sans-mono.zip
-        -DEXPECTED_HASH=857e632b88b2240811d68d8615abc96d98de77f4f326b799de56151b4e0f2da1
+        -DEXPECTED_HASH=adada75ccc7cd9627de5b8f5259fdd49ceaba24bb2e58b5726ca9aef17fac47c
         -P ${CMAKE_CURRENT_LIST_DIR}/download_font.cmake
     COMMAND ${CMAKE_COMMAND} 
         -DINPUT=${CMAKE_CURRENT_BINARY_DIR}/dejavu-sans-mono.zip
