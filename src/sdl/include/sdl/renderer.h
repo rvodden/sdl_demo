@@ -65,6 +65,7 @@ class SDL_EXPORT Renderer {
   /**
    * @brief Create a rendering context for the specified window
    * @param window The window to create the renderer for (must remain valid)
+   * @param flags Optional renderer flags (default: hardware accelerated with VSync)
    * @throws sdl::Exception if renderer creation fails
    *
    * Creates a hardware-accelerated renderer when possible, falling back
@@ -74,7 +75,7 @@ class SDL_EXPORT Renderer {
    * @note The window must remain valid for the lifetime of this renderer
    * @note Automatic driver selection usually chooses the best available option
    */
-  Renderer(Window& window);
+  Renderer(Window& window, uint32_t flags = kAccelerated | kPresentVSync);
   
   /**
    * @brief Move constructor - transfers ownership of the rendering context
@@ -219,6 +220,10 @@ class SDL_EXPORT Renderer {
   [[nodiscard]] auto getOutputSize() -> Rectangle<int>;
 
   void setScale(float xScale, float yScale);
+
+  void drawLine(float x1, float y1, float x2, float y2);
+
+  void fillRect(const Rectangle<float>& rect);
 
   /**
    * @brief Get controlled access to implementation details

@@ -86,6 +86,28 @@ public:
     Rectangle(Rectangle&& other) noexcept;
 
     /**
+     * @brief Explicit conversion constructor.
+     * 
+     * Creates a rectangle by converting from a different coordinate type.
+     * Requires explicit conversion between Rectangle<int32_t> and Rectangle<float>.
+     * 
+     * @tparam U Source coordinate type (must be a valid RectangleCoordinate)
+     * @param other The rectangle to convert from
+     * 
+     * @par Usage Examples:
+     * @code
+     * Rectangle<int32_t> intRect(10, 20, 100, 50);
+     * Rectangle<float> floatRect(intRect);  // Explicit conversion
+     * 
+     * Rectangle<float> floatRect2(10.5f, 20.25f, 100.0f, 50.0f);
+     * Rectangle<int32_t> intRect2(floatRect2);  // Explicit conversion (truncates)
+     * @endcode
+     */
+    template<RectangleCoordinate U>
+    requires (!std::same_as<T, U>)
+    explicit Rectangle(const Rectangle<U>& other);
+
+    /**
      * @brief Destructor.
      */
     ~Rectangle();
@@ -154,6 +176,27 @@ public:
      * @note For floating-point rectangles, the same logic applies with floating-point arithmetic
      */
     [[nodiscard]] auto contains(T x, T y) const -> bool;
+
+    /**
+     * @brief Tests whether this rectangle intersects with another rectangle.
+     * 
+     * Two rectangles intersect if they share any area in common.
+     * 
+     * @param other The other rectangle to test intersection with
+     * @return true if the rectangles intersect, false otherwise
+     */
+    [[nodiscard]] auto hasIntersection(const Rectangle<T>& other) const -> bool;
+
+    /**
+     * @brief Computes the intersection of this rectangle with another rectangle.
+     * 
+     * If the rectangles intersect, returns a new rectangle representing the overlapping area.
+     * If they do not intersect, returns a rectangle with zero width and height at (0,0).
+     * 
+     * @param other The other rectangle to compute intersection with
+     * @return A new rectangle representing the intersection area, or a zero-area rectangle if no intersection
+     */
+    [[nodiscard]] auto getIntersection(const Rectangle<T>& other) const -> Rectangle<T>;
 
     /**
      * @brief Sets the X-coordinate of the rectangle's top-left corner.

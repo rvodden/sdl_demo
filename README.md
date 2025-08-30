@@ -140,6 +140,7 @@ The event system easily handles **50+ million events per second**, making it sui
 
 The repository includes comprehensive examples and advanced usage patterns:
 - **TicTacToe Game**: Complete interactive game with UI, events, and graphics
+- **Pong Game**: Real-time collision detection, keyboard input, and primitive drawing
 - **Event System**: Lambda-based event handling with type safety
 - **Sprite Rendering**: Efficient batch rendering with texture sharing
 - **UI Components**: Interactive buttons and form elements
@@ -175,6 +176,8 @@ The generated documentation includes:
 - **Zero-overhead abstractions**: No runtime cost over raw SDL
 - **RAII resource management**: Automatic cleanup eliminates resource leaks  
 - **Type-safe event handling**: Compile-time event dispatch with std::variant
+- **Collision detection**: Built-in Rectangle intersection and containment methods
+- **Primitive drawing**: Line and shape rendering with hardware acceleration
 - **Exception safety**: All SDL errors converted to typed exceptions
 - **Modern C++20**: Concepts, constexpr, and CTAD throughout
 

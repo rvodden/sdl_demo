@@ -21,6 +21,7 @@ include(ccache)
 include(doxygen)
 include(iwyu)
 include(coverage)
+include(wrap_cmake_find_package)
 
 set(TARGET_EXPORT_NAME ${PROJECT_NAME}Targets)
 set(DEVELOPMENT_COMPONENT_NAME ${PROJECT_NAME}_Development)

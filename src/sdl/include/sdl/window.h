@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "sdl/rectangle.h"
+
 #include "sdl_export.h"
 
 namespace sdl {
@@ -76,7 +78,6 @@ class SDL_EXPORT Window {
   
   /**
    * @brief Destructor - automatically destroys the system window
-   * @note Guaranteed not to throw exceptions for safe RAII cleanup
    */
   ~Window();
 
@@ -93,6 +94,8 @@ class SDL_EXPORT Window {
    * @note The moved-from window should not be used except for destruction
    */
   auto operator=(Window&& other) noexcept -> Window&;
+
+  [[nodiscard]] Rectangle<int32_t> getSize() const;
 
   /**
    * @brief Get the current title of the window

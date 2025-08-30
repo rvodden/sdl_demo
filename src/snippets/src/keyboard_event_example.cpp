@@ -36,20 +36,14 @@ public:
         sdl.initSubSystem(SDL::kEvents);
         
         // Create window and renderer
-        try {
-            window_ = std::make_unique<Window>("Keyboard Event Example", kScreenWidth, kScreenHeight, 0);
-            renderer_ = std::make_unique<Renderer>(*window_);
-        } catch (const std::exception& e) {
-            std::cout << "Failed to create window/renderer: " << e.what() << std::endl;
-            return false;
-        }
+        _window = std::make_unique<Window>("Keyboard Event Example", kScreenWidth, kScreenHeight, 0);
+        _renderer = std::make_unique<Renderer>(*_window);
         
         // Create font
-        font_ = std::make_unique<Font>(tiny_ttf.data(), tiny_ttf.size(), kFontSize);
+        _font = std::make_unique<Font>(kTinyTTF.data(), kTinyTTF.size(), kFontSize);
         
         // Register keyboard event handler
-        auto& runner = ApplicationRunner::getInstance();
-        if (auto eventRouter = runner.getEventRouter()) {
+        if (auto eventRouter = getEventRouter()) {
             eventRouter->registerEventHandler<KeyboardEvent>(
                 [this](const KeyboardEvent& event) {
                     if (event.down) {  // Only handle key down events, not key up
@@ -71,8 +65,8 @@ public:
     
     auto iterate() -> bool override {
         // Clear screen with black background
-        renderer_->setDrawColour(NamedColor::kBlack);
-        renderer_->clear();
+        _renderer->setDrawColour(NamedColor::kBlack);
+        _renderer->clear();
         
         // Render current key text in center of window
         if (textTexture_) {
@@ -83,19 +77,19 @@ public:
                 textureSize.getWidth(),
                 textureSize.getHeight()
             };
-            renderer_->copy(*textTexture_, renderPosition);
+            _renderer->copy(*textTexture_, renderPosition);
         }
         
-        renderer_->present();
+        _renderer->present();
         return true;
     }
     
     auto quit() -> void override {
         std::cout << "KeyboardEventExample: Cleaning up..." << std::endl;
         textTexture_.reset();
-        font_.reset();
-        renderer_.reset();
-        window_.reset();
+        _font.reset();
+        _renderer.reset();
+        _window.reset();
     }
     
 private:
@@ -114,16 +108,16 @@ private:
     
     void updateTextTexture() {
         try {
-            auto text = Text::renderBlended(*font_, currentKeyText_, NamedColor::kWhite);
-            textTexture_ = std::make_unique<Texture>(*renderer_, text);
+            auto text = Text::renderBlended(*_font, currentKeyText_, NamedColor::kWhite);
+            textTexture_ = std::make_unique<Texture>(*_renderer, text);
         } catch (const std::exception& e) {
             std::cout << "Failed to update text texture: " << e.what() << std::endl;
         }
     }
     
-    std::unique_ptr<Window> window_;
-    std::unique_ptr<Renderer> renderer_;
-    std::unique_ptr<Font> font_;
+    std::unique_ptr<Window> _window;
+    std::unique_ptr<Renderer> _renderer;
+    std::unique_ptr<Font> _font;
     std::unique_ptr<Texture> textTexture_;
     std::string currentKeyText_;
 };

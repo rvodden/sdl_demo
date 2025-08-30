@@ -1,6 +1,5 @@
+#include <cassert>
 #include <string_view>
-
-#include <assert.h>
 
 #include <sdl/application.h>
 #include <sdl/font.h>
@@ -34,7 +33,7 @@ class HelloWorld : public BaseApplication {
     _renderer = std::make_unique<Renderer>(*_window);
 
     const float fontSize = 18.0F;
-    auto font = Font(tiny_ttf.data(), tiny_ttf.size(), fontSize);
+    auto font = Font(kTinyTTF.data(), kTinyTTF.size(), fontSize);
     auto text = Text::renderBlended(font, "Hello, World!", NamedColor::kWhite);
     _texture = std::make_unique<Texture>(*_renderer, text);
 

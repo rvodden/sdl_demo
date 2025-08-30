@@ -53,13 +53,6 @@ public:
   }
 
 private:
-  auto getEventBus() -> std::shared_ptr<BaseEventBus> {
-    return ApplicationRunner::getInstance().getEventBus();
-  }
-
-  auto getEventRouter() -> std::shared_ptr<EventRouter> {
-    return ApplicationRunner::getInstance().getEventRouter();
-  }
 
   auto setupEventHandlers() -> void {
     auto eventRouter = getEventRouter();

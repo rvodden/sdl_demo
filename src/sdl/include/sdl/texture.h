@@ -54,6 +54,8 @@ class SDL_EXPORT Texture {
  public:
   using BlendMode = uint8_t;
 
+  Texture();
+
   /**
    * @brief Create a texture by loading an image file
    * @param renderer The renderer that will own this texture (must remain valid)

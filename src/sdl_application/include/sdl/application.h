@@ -17,6 +17,8 @@ namespace sdl {
 // Forward declarations
 class BaseEventBus;
 class SDL;
+class ApplicationRunner;
+
 namespace tools {
   class EventRouter;
 }
@@ -81,6 +83,9 @@ protected:
   
   template<typename T>
   auto requestService() -> T&;
+  
+  auto getEventBus() -> std::shared_ptr<BaseEventBus>;
+  auto getEventRouter() -> std::shared_ptr<tools::EventRouter>;
   
 private:
   friend class ApplicationRunner;  // Allow access to service management

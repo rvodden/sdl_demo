@@ -32,6 +32,14 @@ namespace {
   constexpr auto kSdlResultMap = sdl::Map(kSdlResultArray);
 }  // namespace
 
+auto BaseApplication::getEventBus() -> std::shared_ptr<BaseEventBus> {
+  return ApplicationRunner::getInstance().getEventBus();
+}
+
+auto BaseApplication::getEventRouter() -> std::shared_ptr<tools::EventRouter> {
+  return ApplicationRunner::getInstance().getEventRouter();
+}
+
 // ApplicationRunner implementation
 auto ApplicationRunner::registerApplication(std::unique_ptr<BaseApplication> app) -> void {
   getInstance()._application = std::move(app);

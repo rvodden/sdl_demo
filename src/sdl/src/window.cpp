@@ -41,6 +41,12 @@ auto Window::operator=(Window&& other) noexcept -> Window& {
   return *this;
 }
 
+Rectangle<int32_t> Window::getSize() const {
+  int32_t w, h;
+  SDL_GetWindowSize(_impl->_sdlWindow, &w, &h);
+  return { 0, 0, w, h };
+}
+
 auto Window::getTitle() -> std::string_view {
   return {SDL_GetWindowTitle(_impl->_sdlWindow)};
 }

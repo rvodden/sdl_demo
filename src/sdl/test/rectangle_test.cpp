@@ -287,6 +287,98 @@ TEST(RectangleAliasTest, TypeAliases) {
     EXPECT_FLOAT_EQ(floatRect.getX(), 1.5f);
 }
 
+// Conversion Constructor Tests
+class RectangleConversionTest : public ::testing::Test {
+protected:
+    using IntRect = sdl::Rectangle<int32_t>;
+    using FloatRect = sdl::Rectangle<float>;
+};
+
+TEST_F(RectangleConversionTest, IntToFloatConversion) {
+    IntRect intRect(10, 20, 100, 50);
+    FloatRect floatRect(intRect);  // Explicit conversion
+    
+    EXPECT_FLOAT_EQ(floatRect.getX(), 10.0f);
+    EXPECT_FLOAT_EQ(floatRect.getY(), 20.0f);
+    EXPECT_FLOAT_EQ(floatRect.getWidth(), 100.0f);
+    EXPECT_FLOAT_EQ(floatRect.getHeight(), 50.0f);
+}
+
+TEST_F(RectangleConversionTest, FloatToIntConversion) {
+    FloatRect floatRect(10.75f, 20.25f, 100.5f, 50.125f);
+    IntRect intRect(floatRect);  // Explicit conversion (truncates)
+    
+    EXPECT_EQ(intRect.getX(), 10);     // 10.75f -> 10
+    EXPECT_EQ(intRect.getY(), 20);     // 20.25f -> 20
+    EXPECT_EQ(intRect.getWidth(), 100);  // 100.5f -> 100
+    EXPECT_EQ(intRect.getHeight(), 50);  // 50.125f -> 50
+}
+
+TEST_F(RectangleConversionTest, NegativeValueConversion) {
+    FloatRect floatRect(-10.75f, -5.25f, 30.8f, 15.9f);
+    IntRect intRect(floatRect);  // Explicit conversion
+    
+    EXPECT_EQ(intRect.getX(), -10);    // -10.75f -> -10
+    EXPECT_EQ(intRect.getY(), -5);     // -5.25f -> -5
+    EXPECT_EQ(intRect.getWidth(), 30);   // 30.8f -> 30
+    EXPECT_EQ(intRect.getHeight(), 15);  // 15.9f -> 15
+}
+
+TEST_F(RectangleConversionTest, ZeroValueConversion) {
+    IntRect intRect(0, 0, 0, 0);
+    FloatRect floatRect(intRect);  // Explicit conversion
+    
+    EXPECT_FLOAT_EQ(floatRect.getX(), 0.0f);
+    EXPECT_FLOAT_EQ(floatRect.getY(), 0.0f);
+    EXPECT_FLOAT_EQ(floatRect.getWidth(), 0.0f);
+    EXPECT_FLOAT_EQ(floatRect.getHeight(), 0.0f);
+    
+    // Convert back
+    IntRect convertedBack(floatRect);  // Explicit conversion
+    EXPECT_EQ(convertedBack.getX(), 0);
+    EXPECT_EQ(convertedBack.getY(), 0);
+    EXPECT_EQ(convertedBack.getWidth(), 0);
+    EXPECT_EQ(convertedBack.getHeight(), 0);
+}
+
+TEST_F(RectangleConversionTest, ExplicitConversionConstructor) {
+    IntRect intRect(42, 84, 168, 252);
+    
+    // Test explicit conversion constructor call
+    FloatRect floatRect(intRect);
+    
+    EXPECT_FLOAT_EQ(floatRect.getX(), 42.0f);
+    EXPECT_FLOAT_EQ(floatRect.getY(), 84.0f);
+    EXPECT_FLOAT_EQ(floatRect.getWidth(), 168.0f);
+    EXPECT_FLOAT_EQ(floatRect.getHeight(), 252.0f);
+}
+
+TEST_F(RectangleConversionTest, ConversionIndependence) {
+    IntRect intRect(10, 20, 100, 50);
+    FloatRect floatRect(intRect);  // Explicit conversion
+    
+    // Modify original
+    intRect.setX(999);
+    
+    // Converted rectangle should be unchanged
+    EXPECT_FLOAT_EQ(floatRect.getX(), 10.0f);
+    EXPECT_FLOAT_EQ(floatRect.getY(), 20.0f);
+    EXPECT_FLOAT_EQ(floatRect.getWidth(), 100.0f);
+    EXPECT_FLOAT_EQ(floatRect.getHeight(), 50.0f);
+}
+
+TEST_F(RectangleConversionTest, ContainmentAfterConversion) {
+    IntRect intRect(10, 20, 50, 40);  // Rectangle from (10,20) to (60,60)
+    FloatRect floatRect(intRect);  // Explicit conversion
+    
+    // Test same containment behavior
+    EXPECT_TRUE(intRect.contains(30, 35));
+    EXPECT_TRUE(floatRect.contains(30.0f, 35.0f));
+    
+    EXPECT_FALSE(intRect.contains(60, 35));
+    EXPECT_FALSE(floatRect.contains(60.0f, 35.0f));
+}
+
 // Test RectangleCoordinate concept
 TEST(RectangleConceptTest, ValidTypes) {
     // Test that the concept correctly identifies valid coordinate types

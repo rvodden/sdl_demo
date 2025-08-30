@@ -10,6 +10,8 @@
 
 namespace sdl {
 
+Texture::Texture() : _impl{std::make_unique<TextureImpl>()} {}
+
 Texture::Texture(const Renderer& renderer,
                  const std::filesystem::path& filePath)
     : _impl{std::make_unique<TextureImpl>()} {
@@ -84,7 +86,7 @@ Texture::Texture(Texture&& other) noexcept
     : _impl{std::move(other._impl)} {}
 
 Texture::~Texture() {
-  if (_impl->_sdlTexture != nullptr) {
+  if (_impl && _impl->_sdlTexture != nullptr) {
     SDL_DestroyTexture(_impl->_sdlTexture);
   }
 }

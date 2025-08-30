@@ -16,15 +16,28 @@
 
 namespace sdl {
 
-Renderer::Renderer(Window& window)
+Renderer::Renderer(Window& window, uint32_t flags)
     : _impl{std::make_unique<RendererImpl>()} {
   _impl->_sdlWindow = window.getImpl().getSdlWindow();
   
   if (_impl->_sdlWindow == nullptr) {
     throw Exception("Attempting to create Renderer from null window.");
   }
-  _impl->_sdlRenderer =
-      SDL_CreateRenderer(_impl->_sdlWindow, nullptr);
+
+  if (flags == 0) {
+    // Use simple renderer creation for default case
+    _impl->_sdlRenderer = SDL_CreateRenderer(_impl->_sdlWindow, nullptr);
+  } else {
+    // Use properties-based creation for custom flags
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, _impl->_sdlWindow);
+    if (flags & kPresentVSync) {
+      SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, 1);
+    }
+    _impl->_sdlRenderer = SDL_CreateRendererWithProperties(props);
+    SDL_DestroyProperties(props);
+  }
+  
   if (_impl->_sdlRenderer == nullptr) {
     throw Exception("SDL_CreateRenderer");
   }
@@ -130,6 +143,17 @@ auto Renderer::readPixels(uint32_t x, uint32_t y, uint32_t width, uint32_t heigh
 void Renderer::setScale(float xScale, float yScale) {
   auto success = SDL_SetRenderScale(_impl->_sdlRenderer, xScale, yScale);
   if(!success) { throw Exception("SDL_SetRenderScale"); }
+}
+  
+void Renderer::drawLine(float x1, float y1, float x2, float y2) {
+  auto success = SDL_RenderLine(_impl->_sdlRenderer, x1, y1, x2, y2);
+  if(!success) { throw Exception("SDL_RenderDrawLine"); }
+}
+
+void Renderer::fillRect(const Rectangle<float>& rect) {
+  SDL_FRect* sdlRect = rect.impl_->getSDLRect();
+  auto success = SDL_RenderFillRect(_impl->_sdlRenderer, sdlRect);
+  if(!success) { throw Exception("SDL_RenderFillRect"); }
 }
 
 auto Renderer::getOutputSize() -> Rectangle<int> {
