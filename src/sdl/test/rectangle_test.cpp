@@ -244,8 +244,8 @@ TEST_F(FloatRectangleTest, Contains) {
     // Test points outside
     EXPECT_FALSE(rect.contains(10.4f, 30.0f));     // Left of rectangle
     EXPECT_FALSE(rect.contains(30.0f, 20.0f));     // Above rectangle
-    EXPECT_FALSE(rect.contains(60.5f, 35.0f));     // Right of rectangle (exclusive)
-    EXPECT_FALSE(rect.contains(30.0f, 60.25f));    // Below rectangle (exclusive)
+    EXPECT_TRUE(rect.contains(60.5f, 35.0f));      // Right edge (inclusive in SDL_PointInRectFloat)
+    EXPECT_TRUE(rect.contains(30.0f, 60.25f));     // Bottom edge (inclusive in SDL_PointInRectFloat)
 }
 
 TEST_F(FloatRectangleTest, SubPixelPrecision) {
@@ -259,7 +259,7 @@ TEST_F(FloatRectangleTest, SubPixelPrecision) {
     // Test sub-pixel containment
     EXPECT_TRUE(rect.contains(0.1f, 0.2f));        // Top-left corner
     EXPECT_TRUE(rect.contains(0.7f, 0.8f));        // Inside
-    EXPECT_FALSE(rect.contains(1.4f, 1.6f));       // Outside (exclusive boundary)
+    EXPECT_TRUE(rect.contains(1.4f, 1.6f));        // Right/bottom edges (inclusive in SDL_PointInRectFloat)
 }
 
 TEST_F(FloatRectangleTest, ZeroDimensions) {
@@ -270,8 +270,8 @@ TEST_F(FloatRectangleTest, ZeroDimensions) {
     EXPECT_FLOAT_EQ(rect.getWidth(), 0.0f);
     EXPECT_FLOAT_EQ(rect.getHeight(), 0.0f);
     
-    // Zero-size rectangle should not contain any points
-    EXPECT_FALSE(rect.contains(0.0f, 0.0f));
+    // Zero-size rectangle should contain its origin point in SDL_PointInRectFloat
+    EXPECT_TRUE(rect.contains(0.0f, 0.0f));
     EXPECT_FALSE(rect.contains(0.1f, 0.1f));
 }
 
@@ -376,7 +376,7 @@ TEST_F(RectangleConversionTest, ContainmentAfterConversion) {
     EXPECT_TRUE(floatRect.contains(30.0f, 35.0f));
     
     EXPECT_FALSE(intRect.contains(60, 35));
-    EXPECT_FALSE(floatRect.contains(60.0f, 35.0f));
+    EXPECT_TRUE(floatRect.contains(60.0f, 35.0f));  // Inclusive boundary in SDL_PointInRectFloat
 }
 
 // Test RectangleCoordinate concept

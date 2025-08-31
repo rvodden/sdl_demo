@@ -181,6 +181,34 @@ The generated documentation includes:
 - **Exception safety**: All SDL errors converted to typed exceptions
 - **Modern C++20**: Concepts, constexpr, and CTAD throughout
 
+## SDL3 Compatibility Notes
+
+SDL++ faithfully mirrors SDL3 behavior, including inconsistencies in the underlying library. The following SDL3 inconsistencies are preserved:
+
+### Rectangle Containment Behavior
+
+SDL3 has inconsistent boundary behavior between integer and floating-point rectangles:
+
+- **`SDL_PointInRect` (integer)**: Right and bottom edges are **exclusive** (`< x+w`, `< y+h`)
+- **`SDL_PointInRectFloat` (float)**: Right and bottom edges are **inclusive** (`<= x+w`, `<= y+h`)
+
+This means:
+```cpp
+// Integer rectangle (10, 20, 50, 40) - bounds from (10,20) to (59,59)
+Rectangle<int32_t> intRect(10, 20, 50, 40);
+intRect.contains(59, 59);  // true  (inside)
+intRect.contains(60, 60);  // false (outside, exclusive boundary)
+
+// Float rectangle (10.0, 20.0, 50.0, 40.0) - bounds from (10.0,20.0) to (60.0,60.0)  
+Rectangle<float> floatRect(10.0f, 20.0f, 50.0f, 40.0f);
+floatRect.contains(59.9f, 59.9f);  // true  (inside)
+floatRect.contains(60.0f, 60.0f);  // true  (on boundary, inclusive)
+```
+
+Zero-size rectangles also behave differently:
+- `Rectangle<int32_t>(0, 0, 0, 0).contains(0, 0)` returns `false`
+- `Rectangle<float>(0.0f, 0.0f, 0.0f, 0.0f).contains(0.0f, 0.0f)` returns `true`
+
 ## Contributing
 
 1. Follow the existing code style (trailing return types, RAII patterns)

@@ -24,6 +24,8 @@
 
 #]]
 
+include(CMakePrintHelpers)
+
 #[[
     Using the function `install_component` looks like this:
     ```
@@ -100,7 +102,7 @@ function(install_package)
     endif()
 
     if(NOT DEFINED INSTALL_PACKAGE_DIRECTORY)
-        set(INSTALL_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_PACKAGE_NAME}")
+        set(INSTALL_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CodeTests/${INSTALL_PACKAGE_NAME}")
         message(DEBUG "DIRECTORY not specified. Falling back on default of ${INSTALL_PACKAGE_DIRECTORY}")
     endif()
 
@@ -129,7 +131,7 @@ function(install_package)
             COMMAND ${CMAKE_COMMAND}
                 -E remove_directory ${${PACKAGE_UPPER}_INSTALL_DIR}
         )
-        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP CodeTest.${INSTALL_COMPONENT_NAME}_installed)
+        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP CodeTest.${INSTALL_PACKAGE_NAME}_installed)
     else()
         foreach(COMPONENT ${INSTALL_PACKAGE_COMPONENTS})
             # defin a fixture to install the component
@@ -154,10 +156,76 @@ function(install_package)
             COMMAND ${CMAKE_COMMAND}
                 -E remove_directory ${${PACKAGE_UPPER}_INSTALL_DIR}
         )
-        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP ${INSTALL_PACKAGE_NAME}_installed)
+        set_tests_properties(CodeTest.remove_${INSTALL_PACKAGE_NAME} PROPERTIES FIXTURES_CLEANUP CodeTest.${INSTALL_PACKAGE_NAME}_installed)
 
     endif()
 
+endfunction()
+
+function(install_fetched_dependency)
+    set(options "")
+    set(oneValueArgs NAME DIRECTORY)
+    set(multiValueArgs COMPONENTS)
+    cmake_parse_arguments(PARSE_ARGV 0 INSTALL_FETCHED_DEPENDENCY "${options}" "${oneValueArgs}" "${multiValueArgs}")
+    
+    set(DEPENDENCY ${INSTALL_FETCHED_DEPENDENCY_NAME})
+    set(COMPONENTS ${INSTALL_FETCHED_DEPENDENCY_COMPONENTS})
+    
+    # Create unique install directory for this dependency
+    set(${DEPENDENCY}_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/CodeTests/${DEPENDENCY}")
+    set(${DEPENDENCY}_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/CodeTests/${DEPENDENCY}" PARENT_SCOPE)
+
+    if(NOT DEFINED ${DEPENDENCY}_BINARY_DIR)
+        string(TOLOWER ${DEPENDENCY} DEPENDENCY_LOWER)
+        if(DEFINED ${DEPENDENCY_LOWER}_BINARY_DIR)
+            set(${DEPENDENCY}_BINARY_DIR ${${DEPENDENCY_LOWER}_BINARY_DIR})
+        else()
+            message(FATAL_ERROR "Cannot find binary location of ${DEPENDENCY}, neither ${DEPENDENCY}_BINARY_DIR nor ${DEPENDENCY_LOWER}_BINARY_DIR is set.")
+        endif()
+
+    endif()
+    
+    if(DEFINED INSTALL_FETCHED_DEPENDENCY_COMPONENTS)
+        foreach(COMPONENT ${INSTALL_FETCHED_DEPENDENCY_COMPONENTS})
+        if(${DEPENDENCY} STREQUAL GTest AND ${COMPONENT} STREQUAL gmock)
+            set(${DEPENDENCY}_BINARY_DIR ${gmock_BINARY_DIR})
+        endif()
+        add_test(
+            NAME CodeTest.install_${DEPENDENCY}_${COMPONENT}
+            COMMAND ${CMAKE_COMMAND}
+                --install ${${DEPENDENCY}_BINARY_DIR}
+                --prefix ${${DEPENDENCY}_INSTALL_DIR}
+                --config $<CONFIG>
+                --component ${COMPONENT}
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            COMMAND_EXPAND_LISTS
+        )
+        set_tests_properties(CodeTest.install_${DEPENDENCY}_${COMPONENT}
+            PROPERTIES FIXTURES_SETUP CodeTest.${DEPENDENCY}_installed)
+        endforeach()
+    else()
+        # Add a test to install the fetched dependency libraries to unique directory
+        add_test(
+            NAME CodeTest.install_${DEPENDENCY}
+            COMMAND ${CMAKE_COMMAND}
+                --install ${${DEPENDENCY}_BINARY_DIR}
+                --prefix ${${DEPENDENCY}_INSTALL_DIR}
+                --config $<CONFIG>
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            COMMAND_EXPAND_LISTS
+        )
+        set_tests_properties(CodeTest.install_${DEPENDENCY}
+            PROPERTIES FIXTURES_SETUP CodeTest.${DEPENDENCY}_installed)
+    endif()
+        
+    # Add cleanup fixture for the dependency
+    add_test(
+        NAME CodeTest.remove_${DEPENDENCY}
+        COMMAND ${CMAKE_COMMAND}
+            -E remove_directory ${${DEPENDENCY}_INSTALL_DIR}
+    )
+    set_tests_properties(CodeTest.remove_${DEPENDENCY}
+        PROPERTIES FIXTURES_CLEANUP CodeTest.${DEPENDENCY}_installed)
 endfunction()
 
 #[[
@@ -191,7 +259,7 @@ function(register_code_test)
     endif()
 
     if(NOT DEFINED REGISTER_CODE_TEST_BUILD_DIRECTIRY)
-        set(REGISTER_CODE_TEST_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${REGISTER_CODE_TEST_NAME})
+        set(REGISTER_CODE_TEST_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CodeTests/${REGISTER_CODE_TEST_NAME})
     endif()
 
     # Define a fixture to create the build directory for the code test
@@ -210,10 +278,15 @@ function(register_code_test)
 
     foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
         message(VERBOSE "Associating ${DEPENDENCY} with ${REGISTER_CODE_TEST_NAME}")
-        if(NOT DEFINED ${DEPENDENCY}_BINARY_DIR)
-            message(FATAL_ERROR "Do not know where to find source for dependency ${DEPENDENCY}, required by CodeTest.${REGISTER_CODE_TEST_NAME}.")
+
+        if(NOT DEFINED ${DEPENDENCY}_INSTALL_DIR)
+            message(FATAL_ERROR "Do not know where to find source for dependency ${DEPENDENCY}, (${DEPENDENCY}_INSTALL_DIR not found) required by CodeTest.${REGISTER_CODE_TEST_NAME}.")
         endif()
-        list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_BINARY_DIR}")
+        
+        # Pass the installed dependency's cmake config directory to the code test
+        # Special case: gtest installs as GTest (uppercase) in CMake
+        list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_INSTALL_DIR}/lib/cmake/${DEPENDENCY}")
+        list(APPEND FIXTURES_REQUIRED "CodeTest.${DEPENDENCY}_installed")
     endforeach()
 
     foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
@@ -226,6 +299,19 @@ function(register_code_test)
         list(APPEND FIXTURES_REQUIRED "CodeTest.${COMPONENT}_installed")
     endforeach()
     string(JOIN ";" FIXTURES_REQUIRED_STRING ${FIXTURES_REQUIRED})
+    
+    # Build LD_LIBRARY_PATH from all dependency lib directories
+    set(LIBRARY_PATHS "")
+    foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
+        string(TOUPPER ${DEPENDENCY} DEPENDENCY_UPPER)
+        list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/lib")
+    endforeach()
+    foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
+        string(TOUPPER ${COMPONENT} COMPONENT_UPPER)
+        list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/lib")
+    endforeach()
+    string(JOIN ":" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
+    cmake_print_variables(LD_LIBRARY_PATH_VALUE)
 
     if(DEFINED CMAKE_TOOLCHAIN_FILE)
         list(APPEND ARGUMENT_LIST "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
@@ -254,9 +340,15 @@ function(register_code_test)
         COMMAND ${CMAKE_COMMAND}
             --build
             .
+            --config $<CONFIG>
         WORKING_DIRECTORY ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
     )
     # Compilation requires HDAS to be installed, requires the build directory, and requires configuration to have happened.
-    set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles PROPERTIES FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured")
+    set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
+        PROPERTIES 
+            FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured"
+            ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH_VALUE}"
+    )
+    cmake_print_properties(TESTS CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles PROPERTIES ENVIRONMENT)
 
 endfunction()

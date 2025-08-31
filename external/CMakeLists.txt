@@ -10,7 +10,7 @@ endif()
 option(SDLXX_USE_VENDORED_GTEST "Download GTest from GitHub" ON)
 if(SDLXX_USE_VENDORED_GTEST)
         FetchContent_Declare(
-                googletest
+                GTest
                 GIT_REPOSITORY https://github.com/google/googletest.git
                 GIT_TAG v1.17.0
                 DOWNLOAD_EXTRACT_TIMESTAMP false
@@ -93,7 +93,7 @@ elseif(SDLXX_USE_VENDORED_SDL3)
 endif()
 
 if(SDLXX_USE_VENDORED_GTEST)
-        FetchContent_MakeAvailable(googletest)
+        FetchContent_MakeAvailable(GTest)
 endif()
 
 if(SDLXX_USE_VENDORED_GBENCH AND SDLXX_ENABLE_BENCHMARKS)

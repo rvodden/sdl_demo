@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(tictactoe LANGUAGES CXX)
+project(tictactoe LANGUAGES CXX VERSION 0.1.0)
 
 
 add_subdirectory(data)
@@ -24,7 +24,7 @@ if(HEADER_FILES)
 endif()
 
 add_executable(${PROJECT_NAME})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/ FILES ${HEADER_FILES})
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
@@ -38,3 +38,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_application)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_main)
 
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
+    FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}
+    FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${PROJECT_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${PROJECT_NAME}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${PROJECT_NAME}
+)
