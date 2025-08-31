@@ -32,78 +32,56 @@ using namespace pong;
 class PongApp : public sdl::BaseApplication {
  public:
   auto init() -> bool override {
-    try {
-      auto& sdl = requestSDL();
-      [[maybe_unused]] auto& ttf = requestService<sdl::ttf::TTF>();
-      sdl.initSubSystem(sdl::SDL::kVideo);
-      sdl.initSubSystem(sdl::SDL::kEvents);
+    auto& sdl = requestSDL();
+    [[maybe_unused]] auto& ttf = requestService<sdl::ttf::TTF>();
+    sdl.initSubSystem(sdl::SDL::kVideo);
+    sdl.initSubSystem(sdl::SDL::kEvents);
 
-      // Validate window dimensions
-      if (kWindowWidth <= 0 || kWindowHeight <= 0) {
-        std::cerr << "Error: Invalid window dimensions (" << kWindowWidth << "x" << kWindowHeight << ")\n";
-        return false;
-      }
-
-      if (kWindowWidth < 400 || kWindowHeight < 300) {
-        std::cerr << "Warning: Window size may be too small for proper gameplay\n";
-      }
-
-      auto windowSize = Point<float>{static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)};
-
-      _pong = std::make_unique<Pong>(windowSize, getEventBus(), getEventRouter());
-      if (!_pong) {
-        std::cerr << "Error: Failed to create Pong game instance\n";
-        return false;
-      }
-
-      _pongUI = std::make_unique<PongUI>(windowSize);
-      if (!_pongUI) {
-        std::cerr << "Error: Failed to create Pong UI instance\n";
-        return false;
-      }
-
-      return true;
-    } catch (const sdl::Exception& e) {
-      std::cerr << "SDL Error during initialization: " << e.what() << "\n";
-      return false;
-    } catch (const std::exception& e) {
-      std::cerr << "Error during initialization: " << e.what() << "\n";
-      return false;
-    } catch (...) {
-      std::cerr << "Unknown error during initialization\n";
+    // Validate window dimensions
+    if (kWindowWidth <= 0 || kWindowHeight <= 0) {
+      std::cerr << "Error: Invalid window dimensions (" << kWindowWidth << "x" << kWindowHeight << ")\n";
       return false;
     }
+
+    if (kWindowWidth < 400 || kWindowHeight < 300) {
+      std::cerr << "Warning: Window size may be too small for proper gameplay\n";
+    }
+
+    auto windowSize = Point<float>{static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)};
+
+    _pong = std::make_unique<Pong>(windowSize, getEventBus(), getEventRouter());
+    if (!_pong) {
+      std::cerr << "Error: Failed to create Pong game instance\n";
+      return false;
+    }
+
+    _pongUI = std::make_unique<PongUI>(windowSize);
+    if (!_pongUI) {
+      std::cerr << "Error: Failed to create Pong UI instance\n";
+      return false;
+    }
+
+    return true;
   }
 
   auto iterate() -> bool override {
-    try {
-      auto dt = _timer.elapsed();
+    auto dt = _timer.elapsed();
 
-      // Validate delta time to prevent physics issues
-      if (dt < 0.0f || dt > 1.0f) {
-        std::cerr << "Warning: Invalid delta time: " << dt << "s, clamping to safe range\n";
-        dt = std::clamp(dt, 0.001f, 0.1f);
-      }
-
-      if (_pong) {
-        _pong->update(dt);
-      }
-      
-      if (_pongUI && _pong) {
-        _pongUI->render(*_pong);
-      }
-      
-      return true;
-    } catch (const sdl::Exception& e) {
-      std::cerr << "SDL Error during game loop: " << e.what() << "\n";
-      return false;
-    } catch (const std::exception& e) {
-      std::cerr << "Error during game loop: " << e.what() << "\n";
-      return false;
-    } catch (...) {
-      std::cerr << "Unknown error during game loop\n";
-      return false;
+    // Validate delta time to prevent physics issues
+    if (dt < 0.0f || dt > 1.0f) {
+      std::cerr << "Warning: Invalid delta time: " << dt << "s, clamping to safe range\n";
+      dt = std::clamp(dt, 0.001f, 0.1f);
     }
+
+    if (_pong) {
+      _pong->update(dt);
+    }
+    
+    if (_pongUI && _pong) {
+      _pongUI->render(*_pong);
+    }
+    
+    return true;
   }
 
   auto quit() -> void override {

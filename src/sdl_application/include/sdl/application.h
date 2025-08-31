@@ -77,6 +77,11 @@ class SDL_APPLICATION_EXPORT BaseApplication {
   virtual auto iterate() -> bool = 0;
   virtual auto quit() -> void = 0;
   
+  // Exception-safe wrappers for the virtual methods
+  auto safeInit() -> bool;
+  auto safeIterate() -> bool;
+  auto safeQuit() -> void;
+  
 protected:
   // Service request methods - SDL has hard dependency, others use registry
   auto requestSDL() -> SDL&;

@@ -1,8 +1,11 @@
 #include <memory>
+#include <iostream>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
 #include <sdl/application.h>
+#include <sdl/exception.h>
 
 using namespace sdl;
 
@@ -254,4 +257,325 @@ TEST(ApplicationServiceTest, ServiceSingletonBehavior) {
   
   // Clean up
   ApplicationRunner::getInstance().reset();
+}
+
+// Exception handling test applications
+class SdlExceptionApp : public BaseApplication {
+public:
+  auto init() -> bool override {
+    throw sdl::Exception("Test SDL exception during init");
+  }
+  
+  auto iterate() -> bool override {
+    throw sdl::Exception("Test SDL exception during iterate");
+  }
+  
+  auto quit() -> void override {
+    throw sdl::Exception("Test SDL exception during quit");
+  }
+};
+
+class StdExceptionApp : public BaseApplication {
+public:
+  auto init() -> bool override {
+    throw std::runtime_error("Test std exception during init");
+  }
+  
+  auto iterate() -> bool override {
+    throw std::logic_error("Test std exception during iterate");
+  }
+  
+  auto quit() -> void override {
+    throw std::invalid_argument("Test std exception during quit");
+  }
+};
+
+class UnknownExceptionApp : public BaseApplication {
+public:
+  auto init() -> bool override {
+    throw 42; // Unknown exception type
+  }
+  
+  auto iterate() -> bool override {
+    throw "Unknown exception string";
+  }
+  
+  auto quit() -> void override {
+    throw 3.14; // Another unknown type
+  }
+};
+
+class MixedExceptionApp : public BaseApplication {
+public:
+  enum class Phase { Init, Iterate, Quit };
+  
+  MixedExceptionApp(Phase phase) : phase_(phase) {}
+  
+  auto init() -> bool override {
+    if (phase_ == Phase::Init) {
+      throw sdl::Exception("SDL exception in init");
+    }
+    return true;
+  }
+  
+  auto iterate() -> bool override {
+    if (phase_ == Phase::Iterate) {
+      throw std::runtime_error("Std exception in iterate");
+    }
+    return true;
+  }
+  
+  auto quit() -> void override {
+    if (phase_ == Phase::Quit) {
+      throw "Unknown exception in quit";
+    }
+  }
+  
+private:
+  Phase phase_;
+};
+
+// Helper to capture stderr output
+class StderrCapture {
+public:
+  StderrCapture() {
+    originalBuf_ = std::cerr.rdbuf();
+    std::cerr.rdbuf(buffer_.rdbuf());
+  }
+  
+  ~StderrCapture() {
+    std::cerr.rdbuf(originalBuf_);
+  }
+  
+  auto getOutput() -> std::string {
+    return buffer_.str();
+  }
+  
+  auto clear() -> void {
+    buffer_.str("");
+    buffer_.clear();
+  }
+  
+private:
+  std::ostringstream buffer_;
+  std::streambuf* originalBuf_;
+};
+
+// Exception handling tests
+TEST(ApplicationExceptionTest, SafeInitHandlesSdlException) {
+  StderrCapture capture;
+  
+  SdlExceptionApp app;
+  bool result = app.safeInit();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("SDL Error during initialization"), std::string::npos);
+  EXPECT_NE(output.find("Test SDL exception during init"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeInitHandlesStdException) {
+  StderrCapture capture;
+  
+  StdExceptionApp app;
+  bool result = app.safeInit();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Error during initialization"), std::string::npos);
+  EXPECT_NE(output.find("Test std exception during init"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeInitHandlesUnknownException) {
+  StderrCapture capture;
+  
+  UnknownExceptionApp app;
+  bool result = app.safeInit();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Unknown error during initialization"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeIterateHandlesSdlException) {
+  StderrCapture capture;
+  
+  SdlExceptionApp app;
+  bool result = app.safeIterate();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("SDL Error during game loop"), std::string::npos);
+  EXPECT_NE(output.find("Test SDL exception during iterate"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeIterateHandlesStdException) {
+  StderrCapture capture;
+  
+  StdExceptionApp app;
+  bool result = app.safeIterate();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Error during game loop"), std::string::npos);
+  EXPECT_NE(output.find("Test std exception during iterate"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeIterateHandlesUnknownException) {
+  StderrCapture capture;
+  
+  UnknownExceptionApp app;
+  bool result = app.safeIterate();
+  
+  EXPECT_FALSE(result);
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Unknown error during game loop"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeQuitHandlesSdlException) {
+  StderrCapture capture;
+  
+  SdlExceptionApp app;
+  app.safeQuit(); // void return, shouldn't crash
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("SDL Error during cleanup"), std::string::npos);
+  EXPECT_NE(output.find("Test SDL exception during quit"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeQuitHandlesStdException) {
+  StderrCapture capture;
+  
+  StdExceptionApp app;
+  app.safeQuit(); // void return, shouldn't crash
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Error during cleanup"), std::string::npos);
+  EXPECT_NE(output.find("Test std exception during quit"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeQuitHandlesUnknownException) {
+  StderrCapture capture;
+  
+  UnknownExceptionApp app;
+  app.safeQuit(); // void return, shouldn't crash
+  
+  std::string output = capture.getOutput();
+  EXPECT_NE(output.find("Unknown error during cleanup"), std::string::npos);
+}
+
+TEST(ApplicationExceptionTest, SafeMethodsProvideCorrectReturnValues) {
+  // Test that safe methods return appropriate values when exceptions occur
+  
+  // safeInit should return false on exception
+  {
+    SdlExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeInit());
+  }
+  
+  {
+    StdExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeInit());
+  }
+  
+  {
+    UnknownExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeInit());
+  }
+  
+  // safeIterate should return false on exception
+  {
+    SdlExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeIterate());
+  }
+  
+  {
+    StdExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeIterate());
+  }
+  
+  {
+    UnknownExceptionApp app;
+    StderrCapture capture;
+    EXPECT_FALSE(app.safeIterate());
+  }
+  
+  // safeQuit is void, but should not crash
+  {
+    SdlExceptionApp app;
+    StderrCapture capture;
+    EXPECT_NO_THROW(app.safeQuit());
+  }
+  
+  {
+    StdExceptionApp app;
+    StderrCapture capture;
+    EXPECT_NO_THROW(app.safeQuit());
+  }
+  
+  {
+    UnknownExceptionApp app;
+    StderrCapture capture;
+    EXPECT_NO_THROW(app.safeQuit());
+  }
+}
+
+TEST(ApplicationExceptionTest, SafeMethodsWorkWithNormalOperation) {
+  // Test that safe methods work correctly when no exceptions are thrown
+  
+  TestApplication app;
+  StderrCapture capture;
+  
+  // Normal operations should work as expected
+  EXPECT_TRUE(app.safeInit());
+  EXPECT_FALSE(app.safeIterate()); // TestApplication returns false to exit immediately
+  EXPECT_NO_THROW(app.safeQuit());
+  
+  // Should not produce any error output
+  std::string output = capture.getOutput();
+  EXPECT_EQ(output, "");
+}
+
+TEST(ApplicationExceptionTest, ExceptionHandlingIntegrationTest) {
+  // Test the complete flow with different exception types in different phases
+  
+  for (auto phase : {MixedExceptionApp::Phase::Init, 
+                     MixedExceptionApp::Phase::Iterate, 
+                     MixedExceptionApp::Phase::Quit}) {
+    StderrCapture capture;
+    MixedExceptionApp app(phase);
+    
+    switch (phase) {
+      case MixedExceptionApp::Phase::Init:
+        EXPECT_FALSE(app.safeInit());
+        EXPECT_NE(capture.getOutput().find("SDL Error during initialization"), std::string::npos);
+        break;
+        
+      case MixedExceptionApp::Phase::Iterate:
+        EXPECT_TRUE(app.safeInit());   // Should succeed
+        capture.clear();
+        EXPECT_FALSE(app.safeIterate());  // Should fail with exception
+        EXPECT_NE(capture.getOutput().find("Error during game loop"), std::string::npos);
+        break;
+        
+      case MixedExceptionApp::Phase::Quit:
+        EXPECT_TRUE(app.safeInit());   // Should succeed
+        EXPECT_TRUE(app.safeIterate()); // Should succeed 
+        capture.clear();
+        app.safeQuit();                // Should handle exception
+        EXPECT_NE(capture.getOutput().find("Unknown error during cleanup"), std::string::npos);
+        break;
+    }
+  }
 }

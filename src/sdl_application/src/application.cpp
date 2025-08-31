@@ -10,7 +10,10 @@
 #include "sdl/constexpr_map.h"
 #include "sdl/event.h"
 #include "sdl/event_router.h"
+#include "sdl/exception.h"
 #include "sdl/sdl.h"
+
+#include <iostream>
 
 #include "event_impl.h"
 
@@ -31,6 +34,49 @@ namespace {
   };
   constexpr auto kSdlResultMap = sdl::Map(kSdlResultArray);
 }  // namespace
+
+// Exception-safe wrapper implementations
+auto BaseApplication::safeInit() -> bool {
+  try {
+    return init();
+  } catch (const sdl::Exception& e) {
+    std::cerr << "SDL Error during initialization: " << e.what() << "\n";
+    return false;
+  } catch (const std::exception& e) {
+    std::cerr << "Error during initialization: " << e.what() << "\n";
+    return false;
+  } catch (...) {
+    std::cerr << "Unknown error during initialization\n";
+    return false;
+  }
+}
+
+auto BaseApplication::safeIterate() -> bool {
+  try {
+    return iterate();
+  } catch (const sdl::Exception& e) {
+    std::cerr << "SDL Error during game loop: " << e.what() << "\n";
+    return false;
+  } catch (const std::exception& e) {
+    std::cerr << "Error during game loop: " << e.what() << "\n";
+    return false;
+  } catch (...) {
+    std::cerr << "Unknown error during game loop\n";
+    return false;
+  }
+}
+
+auto BaseApplication::safeQuit() -> void {
+  try {
+    quit();
+  } catch (const sdl::Exception& e) {
+    std::cerr << "SDL Error during cleanup: " << e.what() << "\n";
+  } catch (const std::exception& e) {
+    std::cerr << "Error during cleanup: " << e.what() << "\n";
+  } catch (...) {
+    std::cerr << "Unknown error during cleanup\n";
+  }
+}
 
 auto BaseApplication::getEventBus() -> std::shared_ptr<BaseEventBus> {
   return ApplicationRunner::getInstance().getEventBus();
@@ -118,7 +164,7 @@ SDL_APPLICATION_EXPORT auto SDL_AppInit(void** appstate, [[maybe_unused]] int ar
   // Store runner reference in appstate
   *appstate = &runner;
   
-  if (app->init()) {
+  if (app->safeInit()) {
     return SDL_APP_CONTINUE;
   }
   return SDL_APP_FAILURE;
@@ -135,7 +181,7 @@ SDL_APPLICATION_EXPORT auto SDL_AppIterate(void* appstate) -> SDL_AppResult {
     return SDL_APP_SUCCESS;
   }
   
-  if (app->iterate()) {
+  if (app->safeIterate()) {
     return SDL_APP_CONTINUE;
   }
   return SDL_APP_SUCCESS;
@@ -149,7 +195,7 @@ SDL_APPLICATION_EXPORT auto SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_App
   
   auto* app = runner->getApplication();
   if (app != nullptr) {
-    app->quit();
+    app->safeQuit();
   }
   
   // Reset application state
