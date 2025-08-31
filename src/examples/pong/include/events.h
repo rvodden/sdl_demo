@@ -1,7 +1,12 @@
+#ifndef EVENTS_H
+#define EVENTS_H
+
 #include <chrono>
 #include <sdl/user_event.h>
 
 #include "player.h"
+
+namespace pong {
 
 class PaddleCollisionEvent : public sdl::CustomUserEvent<PaddleCollisionEvent> {
  public:
@@ -34,3 +39,7 @@ class WallCollisionEvent : public sdl::CustomUserEvent<WallCollisionEvent> {
   
   Wall wall;
 };
+
+} // namespace pong
+
+#endif // EVENTS_H

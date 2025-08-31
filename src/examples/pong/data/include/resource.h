@@ -1,1 +1,1 @@
-const uint16_t kDejaVuSansMono_Ttf = 1;
+const uint16_t kPressStart2P_Regular_Ttf = 1;

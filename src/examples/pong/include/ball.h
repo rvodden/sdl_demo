@@ -1,29 +1,41 @@
 #ifndef BALL_H
 #define BALL_H
 
+#include <cmath>
+#include <stdexcept>
+
 #include <sdl/rectangle.h>
 #include <sdl/renderer.h>
 
 #include "point.h"
+#include "constants.h"
 
-const auto kBallSize = Point<float> { 15.F, 15.F };
-const auto kBallSpeed = Point<float> {-0.5F, 0.F };
+namespace pong {
 
 class Ball {
   public:
-    Ball(const Point<float>& initialPosition) : _initialPosition { initialPosition }, _extent( _initialExtent() ) {}
+    Ball(const Point<float>& initialPosition) : _initialPosition { initialPosition }, _extent( _initialExtent() ) {
+      if (initialPosition.x < 0 || initialPosition.y < 0) {
+        throw std::invalid_argument("Ball initial position cannot be negative");
+      }
+    }
 
     auto getExtent() const -> sdl::Rectangle<float> {
       return _extent;
     }
 
-    void reset() {
+    void resetToStartPositionAndVelocity() {
       _extent = _initialExtent();
       _velocity = kBallSpeed;
     }
 
     auto getVelocity() const -> Point<float> { return _velocity; }
-    void setVelocity(Point<float> velocity) { _velocity = velocity; }
+    void setVelocity(Point<float> velocity) { 
+      if (std::abs(velocity.x) > kMaxBallSpeed || std::abs(velocity.y) > kMaxBallSpeed) {
+        throw std::invalid_argument("Ball velocity exceeds maximum speed");
+      }
+      _velocity = velocity; 
+    }
 
     void update(float dt) {
       _extent.setX(_extent.getX() + (_velocity.x * dt));
@@ -39,5 +51,7 @@ class Ball {
     sdl::Rectangle<float> _extent;
     Point<float> _velocity = kBallSpeed;
 };
+
+} // namespace pong
 
 #endif  // BALL_H

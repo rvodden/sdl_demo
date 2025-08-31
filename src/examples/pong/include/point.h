@@ -5,6 +5,8 @@
 
 template<class T> concept Numeric = std::is_arithmetic_v<T>;
 
+namespace pong {
+
 template<Numeric T>
 class Point {
  public:
@@ -27,5 +29,7 @@ class Point {
   T x;
   T y;
 };
+
+} // namespace pong
 
 #endif  // POINT_H

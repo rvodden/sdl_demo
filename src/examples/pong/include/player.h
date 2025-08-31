@@ -1,11 +1,15 @@
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <cstdint>
+
+namespace pong {
 
 enum class Player : uint8_t {
   kLeft,
   kRight
 };
 
-#endif // PLAYER_H_
+} // namespace pong
+
+#endif // PLAYER_H

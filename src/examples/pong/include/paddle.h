@@ -1,12 +1,15 @@
 #ifndef PADDLE_H
 #define PADDLE_H
 
+#include <stdexcept>
+
 #include <sdl/rectangle.h>
 
 #include "point.h"
+#include "constants.h"
+#include "events.h"
 
-const auto kPaddleSize = Point<float> { 10.F, 100.F };
-const auto kPaddleSpeed = 1.F; // pixels per second
+namespace pong {
 
 class Paddle {
   public:
@@ -17,7 +20,20 @@ class Paddle {
     };
 
     Paddle(const Point<float>& initialPosition, float minY, float maxY, Point<float> size = kPaddleSize) 
-      : _initialPosition(initialPosition), _size(size), _extent(_initialExtents()), _minY(minY), _maxY(maxY - size.y) {}
+      : _initialPosition(initialPosition), _size(size), _extent(_initialExtents()), _minY(minY), _maxY(maxY - size.y) {
+      
+      if (initialPosition.x < 0 || initialPosition.y < 0) {
+        throw std::invalid_argument("Paddle initial position cannot be negative");
+      }
+      
+      if (minY < 0 || maxY < 0 || maxY <= minY) {
+        throw std::invalid_argument("Invalid paddle movement bounds");
+      }
+      
+      if (size.x <= 0 || size.y <= 0) {
+        throw std::invalid_argument("Paddle size must be positive");
+      }
+    }
 
     auto getExtent() const -> sdl::Rectangle<float> {
       return _extent;
@@ -50,7 +66,7 @@ class Paddle {
 
     PaddleCollisionEvent::Zone determineCollisionZone(const sdl::Rectangle<float>& ballExtent) const {
       float paddleTop = _extent.getY();
-      float paddleThird = _extent.getHeight() / 4.0f;
+      float paddleThird = _extent.getHeight() / kPaddleCollisionZoneDivisions;
 
       float ballCenterY = ballExtent.getY() + (ballExtent.getHeight() / 2.0f);
 
@@ -75,5 +91,7 @@ class Paddle {
     float _minY;
     float _maxY;
 };
+
+} // namespace pong
 
 #endif  // PADDLE_H

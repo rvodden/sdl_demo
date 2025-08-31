@@ -3,7 +3,7 @@
 # Based on Google style with custom include ordering
 
 BasedOnStyle: Google
-ColumnLimit: 0
+ColumnLimit: 120
 Standard: c++20
 
 # Include ordering configuration

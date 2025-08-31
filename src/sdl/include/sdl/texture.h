@@ -186,9 +186,9 @@ class SDL_EXPORT Texture {
    * @return The current blend mode
    * @note This is a fast operation that returns cached state
    */
-  [[nodiscard]] auto getTextureBlendMode() -> BlendMode;
+  [[nodiscard]] auto getTextureBlendMode() const -> BlendMode;
 
-  [[nodiscard]] auto getSize() -> Rectangle<float>;
+  [[nodiscard]] auto getSize() const -> Rectangle<float>;
 
   /**
    * @brief Get controlled access to implementation details

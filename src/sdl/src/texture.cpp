@@ -110,7 +110,7 @@ void Texture::setTextureBlendMode(const BlendMode& blendMode) {
   }
 }
 
-auto Texture::getSize() -> Rectangle<float> {
+auto Texture::getSize() const -> Rectangle<float> {
   float x;
   float y;
   auto success = SDL_GetTextureSize(_impl->_sdlTexture, &x, &y);

@@ -1,16 +1,18 @@
+#include <algorithm>
 #include <chrono>
-#include <memory>
-#include <map>
 #include <iostream>
+#include <map>
+#include <memory>
 
 #include <sdl/application.h>
+#include <sdl/event.h>
+#include <sdl/event_router.h>
+#include <sdl/exception.h>
+#include <sdl/font.h>
 #include <sdl/rectangle.h>
 #include <sdl/renderer.h>
 #include <sdl/sdl.h>
 #include <sdl/ttf_service.h>
-#include <sdl/event_router.h>
-#include <sdl/event.h>
-#include <sdl/font.h>
 #include <sdl/window.h>
 
 #include "ball.h"
@@ -21,51 +23,98 @@
 #include "pong_ui.h"
 #include "renderers.h"
 #include "resources.h"
+#include "timer.h"
+#include "constants.h"
 
-const auto kWindowWidth = 1280;
-const auto kWindowHeight = 720;
+using namespace pong;
+
 
 class PongApp : public sdl::BaseApplication {
  public:
   auto init() -> bool override {
-    auto& sdl = requestSDL();
-    [[maybe_unused]] auto& ttf = requestService<sdl::ttf::TTF>();
-    sdl.initSubSystem(sdl::SDL::kVideo);
-    sdl.initSubSystem(sdl::SDL::kEvents);
+    try {
+      auto& sdl = requestSDL();
+      [[maybe_unused]] auto& ttf = requestService<sdl::ttf::TTF>();
+      sdl.initSubSystem(sdl::SDL::kVideo);
+      sdl.initSubSystem(sdl::SDL::kEvents);
 
-    auto windowSize = Point<float>{kWindowWidth, kWindowHeight};
+      // Validate window dimensions
+      if (kWindowWidth <= 0 || kWindowHeight <= 0) {
+        std::cerr << "Error: Invalid window dimensions (" << kWindowWidth << "x" << kWindowHeight << ")\n";
+        return false;
+      }
 
-    _pong = std::make_unique<Pong>(windowSize, getEventBus(), getEventRouter());
-    _pongUI = std::make_unique<PongUI>(windowSize);
+      if (kWindowWidth < 400 || kWindowHeight < 300) {
+        std::cerr << "Warning: Window size may be too small for proper gameplay\n";
+      }
 
-    return true;
+      auto windowSize = Point<float>{static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)};
+
+      _pong = std::make_unique<Pong>(windowSize, getEventBus(), getEventRouter());
+      if (!_pong) {
+        std::cerr << "Error: Failed to create Pong game instance\n";
+        return false;
+      }
+
+      _pongUI = std::make_unique<PongUI>(windowSize);
+      if (!_pongUI) {
+        std::cerr << "Error: Failed to create Pong UI instance\n";
+        return false;
+      }
+
+      return true;
+    } catch (const sdl::Exception& e) {
+      std::cerr << "SDL Error during initialization: " << e.what() << "\n";
+      return false;
+    } catch (const std::exception& e) {
+      std::cerr << "Error during initialization: " << e.what() << "\n";
+      return false;
+    } catch (...) {
+      std::cerr << "Unknown error during initialization\n";
+      return false;
+    }
   }
 
   auto iterate() -> bool override {
-    // Get Time
-    auto stopTime = std::chrono::high_resolution_clock::now();
-	  auto dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
-   
-    // Update Actors
-    _pong->update(dt);
-    _pongUI->update(*_pong);
+    try {
+      auto dt = _timer.elapsed();
 
-    // Update timer
-    startTime = stopTime;
+      // Validate delta time to prevent physics issues
+      if (dt < 0.0f || dt > 1.0f) {
+        std::cerr << "Warning: Invalid delta time: " << dt << "s, clamping to safe range\n";
+        dt = std::clamp(dt, 0.001f, 0.1f);
+      }
 
-    // Render
-    _pongUI->render(*_pong);
-    return true;
+      if (_pong) {
+        _pong->update(dt);
+      }
+      
+      if (_pongUI && _pong) {
+        _pongUI->render(*_pong);
+      }
+      
+      return true;
+    } catch (const sdl::Exception& e) {
+      std::cerr << "SDL Error during game loop: " << e.what() << "\n";
+      return false;
+    } catch (const std::exception& e) {
+      std::cerr << "Error during game loop: " << e.what() << "\n";
+      return false;
+    } catch (...) {
+      std::cerr << "Unknown error during game loop\n";
+      return false;
+    }
   }
 
   auto quit() -> void override {
     // Cleanup if necessary
   }
- 
+
  private:
   std::unique_ptr<Pong> _pong = nullptr;
   std::unique_ptr<PongUI> _pongUI = nullptr;
-  std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point _startTime = std::chrono::high_resolution_clock::now();
+  Timer _timer;
 };
 
 REGISTER_APPLICATION(PongApp);

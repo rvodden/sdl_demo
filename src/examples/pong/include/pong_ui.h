@@ -7,27 +7,24 @@
 #include <sdl/renderer.h>
 #include <sdl/font.h>
 
-#include "pong.h"
+#include "game_state.h"
 #include "renderers.h"
 #include "resources.h"
+#include "constants.h"
+
+namespace pong {
 
 class PongUI {
  public:
   PongUI(Point<float> windowSize) : _windowSize(windowSize) {
     _window = std::make_unique<sdl::Window>("Pong", static_cast<uint16_t>(windowSize.x), static_cast<uint16_t>(windowSize.y), 0);
     _renderer = std::make_shared<sdl::Renderer>(*_window);
-    _font = std::make_shared<sdl::ttf::Font>(&_binary_DejaVuSansMono_ttf_start, dejaVuSansMonoSize(), 40); 
-  
-    _scoreRenderers[Player::kLeft] = std::make_shared<ScoreRenderer>(0, _font, _renderer, Point<float>{ windowSize.x * 0.25F, 20.F });
-    _scoreRenderers[Player::kRight] = std::make_shared<ScoreRenderer>(0, _font, _renderer, Point<float>{ windowSize.x * 0.75F, 20.F });
+    _font = std::make_shared<sdl::ttf::Font>(&_binary_PressStart2P_Regular_ttf_start, pressStart2PSize(), kScoreFontSize);
+    _scoreRenderer = std::make_unique<ScoreRenderer<kMaxScore>>(_font, _renderer);
   }
 
-  void update(const Pong& pong) {
-    _scoreRenderers[Player::kLeft]->setScore(pong.getScore(Player::kLeft));
-    _scoreRenderers[Player::kRight]->setScore(pong.getScore(Player::kRight));
-  }
-
-  void render(const Pong& pong) {
+  template<GameState State>
+  void render(const State& state) {
     _renderer->setDrawColour(sdl::NamedColor::kBlack);
     _renderer->clear();
 
@@ -35,11 +32,12 @@ class PongUI {
     _renderer->setDrawColour(sdl::NamedColor::kWhite);
     _renderer->drawLine(static_cast<float>(size.getWidth()) / 2, 0, static_cast<float>(size.getWidth()) / 2, static_cast<float>(size.getHeight()));
 
-    renderRectangle(*_renderer, *pong.getBall());
-    renderRectangle(*_renderer, *pong.getPaddle(Player::kLeft));
-    renderRectangle(*_renderer, *pong.getPaddle(Player::kRight));
-    _scoreRenderers[Player::kLeft]->render();
-    _scoreRenderers[Player::kRight]->render();
+    renderRectangle(*_renderer, state.getBall());
+    renderRectangle(*_renderer, state.getPaddle(Player::kLeft));
+    renderRectangle(*_renderer, state.getPaddle(Player::kRight));
+
+    _scoreRenderer->render(state.getScore(Player::kLeft),  Point<float>{ _windowSize.x * kScorePositionLeftRatio, kScoreVerticalOffset });
+    _scoreRenderer->render(state.getScore(Player::kRight), Point<float>{ _windowSize.x * kScorePositionRightRatio, kScoreVerticalOffset });
 
     _renderer->present();
   }
@@ -48,10 +46,10 @@ class PongUI {
   Point<float> _windowSize;
   std::unique_ptr<sdl::Window> _window;
   std::shared_ptr<sdl::Renderer> _renderer;
-
   std::shared_ptr<sdl::ttf::Font> _font;
-  std::map<Player, std::shared_ptr<ScoreRenderer>> _scoreRenderers;
-
+  std::unique_ptr<ScoreRenderer<20>> _scoreRenderer;
 };
+
+} // namespace pong
 
 #endif // PONG_UI_H

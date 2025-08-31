@@ -1,148 +1,166 @@
 #ifndef PONG_H
 #define PONG_H
 
+#include <array>
+#include <stdexcept>
+
 #include <sdl/event.h>
 #include <sdl/event_router.h>
 
 #include "ball.h"
 #include "paddle.h"
+#include "constants.h"
+
+namespace pong {
 
 class Pong {
  public:
-  Pong(const Point<float>& windowSize, std::shared_ptr<sdl::BaseEventBus> eventBus, std::shared_ptr<sdl::tools::EventRouter> eventRouter) : 
-    _windowSize(windowSize),
-    _ball ( std::make_shared<Ball>(Point{ windowSize.x / 2.F, windowSize.y / 2.F }) ),
-    _paddles {
-      { Player::kLeft, std::make_shared<Paddle>(Point<float>{ 50.F, windowSize.y / 2.F }, 0, windowSize.y ) },
-      { Player::kRight, std::make_shared<Paddle>(Point<float>{ windowSize.x - 50.F, windowSize.y / 2.F }, 0, windowSize.y ) }
-    },
-    _scores { {Player::kLeft, 0}, {Player::kRight, 0} },
-    _eventBus(eventBus),
-    _eventRouter(eventRouter) {
-      _registerEventHandlers();
+  Pong(const Point<float>& windowSize, std::shared_ptr<sdl::BaseEventBus> eventBus,
+       std::shared_ptr<sdl::tools::EventRouter> eventRouter)
+      : _windowSize(windowSize),
+        _ball(Point{windowSize.x / 2.0F, windowSize.y / 2.0F}),
+        _paddles{Paddle(Point<float>{kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y),
+                 Paddle(Point<float>{windowSize.x - kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y)},
+        _scores{{Player::kLeft, 0}, {Player::kRight, 0}},
+        _eventBus(std::move(eventBus)),
+        _eventRouter(std::move(eventRouter)) {
+    
+    if (!_eventBus || !_eventRouter) {
+      throw std::invalid_argument("Event bus and event router cannot be null");
+    }
+    
+    if (windowSize.x <= 0 || windowSize.y <= 0) {
+      throw std::invalid_argument("Window size must be positive");
+    }
+    
+    _registerEventHandlers();
   }
 
   void update(float dt) {
-    _paddles[Player::kLeft]->update(dt);
-    _paddles[Player::kRight]->update(dt);
-    _ball->update(dt);
+    if (dt < 0.0f || dt > 1.0f) {
+      return; // Invalid delta time, skip update
+    }
 
-    const auto ballExtent = _ball->getExtent();
+    _paddles.at(static_cast<size_t>(Player::kLeft)).update(dt);
+    _paddles.at(static_cast<size_t>(Player::kRight)).update(dt);
+    _ball.update(dt);
+
+    const auto ballExtent = _ball.getExtent();
+    auto ballVelocity = _ball.getVelocity();
 
     // Check Collisions between Ball and Walls
-    if(ballExtent.getY() <= 0) {
+    if (ballVelocity.y < 0 && ballExtent.getY() <= 0) {
       _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kTop));
-    } else if (ballExtent.getY() + ballExtent.getHeight() >= _windowSize.y) {
+    } else if (ballVelocity.y > 0 && ballExtent.getY() + ballExtent.getHeight() >= _windowSize.y) {
       _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kBottom));
     }
 
-    if(ballExtent.getX() <= 0) {
-      _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kLeft));
-    } else if( ballExtent.getX() + ballExtent.getWidth() >= _windowSize.x ) {
-      _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kRight));
-    }
-
-    // Check Collisions between Ball and Paddles
-    auto ballVelocity = _ball->getVelocity();
-    if(ballVelocity.x < 0) { // moving left so might hit kLeft
-      if (_paddles[Player::kLeft]->checkCollision(ballExtent)) {
-        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(Player::kLeft, _paddles[Player::kLeft]->determineCollisionZone(ballExtent)));
+    if (ballVelocity.x < 0) {  // moving left so might hit kLeft or the Left wall
+      const auto& leftPaddle = _paddles.at(static_cast<size_t>(Player::kLeft));
+      if (leftPaddle.checkCollision(ballExtent)) {
+        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(
+            Player::kLeft, leftPaddle.determineCollisionZone(ballExtent)));
+      } else if (ballExtent.getX() <= 0) {
+        _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kLeft));
       }
     }
-    if(ballVelocity.x > 0) { // moving right so might hit kRight
-      if (_paddles[Player::kRight]->checkCollision(ballExtent)) {
-        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(Player::kRight, _paddles[Player::kRight]->determineCollisionZone(ballExtent)));
+
+    if (ballVelocity.x > 0) {  // moving right so might hit kRight
+      const auto& rightPaddle = _paddles.at(static_cast<size_t>(Player::kRight));
+      if (rightPaddle.checkCollision(ballExtent)) {
+        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(
+            Player::kRight, rightPaddle.determineCollisionZone(ballExtent)));
+      } else if (ballExtent.getX() + ballExtent.getWidth() >= _windowSize.x) {
+        _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kRight));
       }
     }
   }
 
-  [[nodiscard]] auto getBall() const -> std::shared_ptr<Ball> { return _ball; }
-  [[nodiscard]] auto getPaddle(Player player) const -> std::shared_ptr<Paddle> { return _paddles.at(player); }
+  [[nodiscard]] auto getBall() const -> const Ball& { return _ball; }
+  [[nodiscard]] auto getPaddle(Player player) const -> const Paddle& { return _paddles.at(static_cast<size_t>(player)); }
   [[nodiscard]] auto getScore(Player player) const -> uint16_t { return _scores.at(player); }
 
   void incrementScore(Player player) { _scores[player]++; }
-  void setPaddleVelocity(Player player, Paddle::Velocity velocity) { _paddles[player]->setVelocity(velocity); }
-  void resetBall() { _ball->reset(); }
+  void setPaddleVelocity(Player player, Paddle::Velocity velocity) { _paddles.at(static_cast<size_t>(player)).setVelocity(velocity); }
+  void setBallVelocity(const Point<float>& velocity) { _ball.setVelocity(velocity); }
+  void resetBall() { _ball.resetToStartPositionAndVelocity(); }
 
  private:
   Point<float> _windowSize;
 
   // Actors
-  std::shared_ptr<Ball> _ball;
-  std::map<Player, std::shared_ptr<Paddle>> _paddles;
+  Ball _ball;
+  std::array<Paddle, 2> _paddles;
   std::map<Player, uint16_t> _scores;
   std::shared_ptr<sdl::BaseEventBus> _eventBus;
   std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
-  
-  void _registerEventHandlers() {
-    _eventRouter->registerEventHandler<sdl::KeyboardEvent>(
-      [=,this](const sdl::KeyboardEvent& event) {
-        switch(event.keycode) {
-          case sdl::KeyboardEvent::KeyCode::kA:
-            _paddles[Player::kLeft]->setVelocity(event.down ? Paddle::Velocity::kUp : Paddle::Velocity::kStopped);
-            break;
-          case sdl::KeyboardEvent::KeyCode::kZ:
-            _paddles[Player::kLeft]->setVelocity(event.down ? Paddle::Velocity::kDown : Paddle::Velocity::kStopped);
-            break;
-          case sdl::KeyboardEvent::KeyCode::kL:
-            _paddles[Player::kRight]->setVelocity(event.down ? Paddle::Velocity::kUp : Paddle::Velocity::kStopped);
-            break;
-          case sdl::KeyboardEvent::KeyCode::kComma:
-            _paddles[Player::kRight]->setVelocity(event.down ? Paddle::Velocity::kDown : Paddle::Velocity::kStopped);
-            break;
-          default:
-            break;
-        }
-      }
-    );
-    
-    _eventRouter->registerEventHandler<PaddleCollisionEvent>(
-      [=,this]([[maybe_unused]] const PaddleCollisionEvent& event) {
-        float velocityX = -_ball->getVelocity().x;
-        float velocityY;
-        switch(event.zone) {
-          case PaddleCollisionEvent::Zone::kTop:
-            velocityY = - 0.325F; // TODO: be cleverer about this.
-            break;
-          case PaddleCollisionEvent::Zone::kMiddle:
-            velocityY = 0;
-            break;
-          case PaddleCollisionEvent::Zone::kBottom:
-            velocityY = 0.325F; // TODO: be cleverer about this.
-            break;
-          default:
-            velocityY = 0;
-            break;
-        }
-        _ball->setVelocity({velocityX, velocityY});
-      }
-    );
 
-    _eventRouter->registerEventHandler<WallCollisionEvent>(
-      [=,this](const WallCollisionEvent& event) {
-        switch(event.wall) {
-          case WallCollisionEvent::Wall::kTop:
-          case WallCollisionEvent::Wall::kBottom: {
-            auto velocity = _ball->getVelocity();
-            _ball->setVelocity({velocity.x, -velocity.y});
-            break;
+  void _registerEventHandlers() {
+    _eventRouter->registerEventHandler<sdl::KeyboardEvent>([this](const sdl::KeyboardEvent& event) -> void {
+      switch (event.keycode) {
+        case sdl::KeyboardEvent::KeyCode::kA:
+          _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(event.down ? Paddle::Velocity::kUp : Paddle::Velocity::kStopped);
+          break;
+        case sdl::KeyboardEvent::KeyCode::kZ:
+          _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(event.down ? Paddle::Velocity::kDown : Paddle::Velocity::kStopped);
+          break;
+        case sdl::KeyboardEvent::KeyCode::kL:
+          _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(event.down ? Paddle::Velocity::kUp : Paddle::Velocity::kStopped);
+          break;
+        case sdl::KeyboardEvent::KeyCode::kComma:
+          _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(event.down ? Paddle::Velocity::kDown : Paddle::Velocity::kStopped);
+          break;
+        default:
+          break;
+      }
+    });
+
+    _eventRouter->registerEventHandler<PaddleCollisionEvent>(
+        [this]([[maybe_unused]] const PaddleCollisionEvent& event) -> void {
+          float velocityX = -_ball.getVelocity().x;
+          float velocityY = 0;
+          switch (event.zone) {
+            case PaddleCollisionEvent::Zone::kTop:
+              velocityY = -kBallDeflectionAngle;
+              break;
+            case PaddleCollisionEvent::Zone::kMiddle:
+              velocityY = 0;
+              break;
+            case PaddleCollisionEvent::Zone::kBottom:
+              velocityY = kBallDeflectionAngle;
+              break;
+            default:
+              velocityY = 0;
+              break;
           }
-          case WallCollisionEvent::Wall::kLeft: {
-            _scores[Player::kRight] += 1;
-            _ball->reset();
-            _ball->setVelocity({0.5F, 0}); // TODO: be cleverer about this.
-            break;
-          }
-          case WallCollisionEvent::Wall::kRight: {
-            _scores[Player::kLeft] += 1;
-            _ball->reset();
-            _ball->setVelocity({-0.5F, 0}); // TODO: be cleverer about this.
-            break;
-          }
+          _ball.setVelocity({velocityX, velocityY});
+        });
+
+    _eventRouter->registerEventHandler<WallCollisionEvent>([this](const WallCollisionEvent& event) -> void {
+      switch (event.wall) {
+        case WallCollisionEvent::Wall::kTop:
+        case WallCollisionEvent::Wall::kBottom: {
+          auto velocity = _ball.getVelocity();
+          _ball.setVelocity({velocity.x, -velocity.y});
+          break;
+        }
+        case WallCollisionEvent::Wall::kLeft: {
+          _scores[Player::kRight] += 1;
+          _ball.resetToStartPositionAndVelocity();
+          _ball.setVelocity({kBallResetSpeed, 0});
+          break;
+        }
+        case WallCollisionEvent::Wall::kRight: {
+          _scores[Player::kLeft] += 1;
+          _ball.resetToStartPositionAndVelocity();
+          _ball.setVelocity({-kBallResetSpeed, 0});
+          break;
         }
       }
-    );
+    });
   }
 };
+
+} // namespace pong
 
 #endif  // PONG_H

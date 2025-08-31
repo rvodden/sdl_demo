@@ -1,4 +1,4 @@
 #include <windows.h>
 #include "resource.h"
 
-kDejaVuSansMono_Ttf RCDATA ""
+kPressStart2P_Ttf RCDATA ""

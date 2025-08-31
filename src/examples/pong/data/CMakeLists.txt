@@ -1,20 +1,15 @@
 # Define output file path
-set(FONT_FILE ${CMAKE_CURRENT_BINARY_DIR}/DejaVuSansMono.ttf)
+set(FONT_FILE "${CMAKE_CURRENT_BINARY_DIR}/PressStart2P-Regular.ttf")
 
 # Create custom command to download and extract font
 add_custom_command(
     OUTPUT ${FONT_FILE}
     COMMAND ${CMAKE_COMMAND} -E echo "Downloading DejaVu Sans Mono font..."
     COMMAND ${CMAKE_COMMAND} 
-        -DURL=https://www.fontsquirrel.com/fonts/download/dejavu-sans-mono
-        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/dejavu-sans-mono.zip
-        -DEXPECTED_HASH=adada75ccc7cd9627de5b8f5259fdd49ceaba24bb2e58b5726ca9aef17fac47c
+        -DURL=https://github.com/google/fonts/raw/e324c91423626034f1e10098081182bb88e340db/ofl/pressstart2p/PressStart2P-Regular.ttf
+        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/PressStart2P-Regular.ttf
+        -DEXPECTED_HASH=034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d
         -P ${CMAKE_CURRENT_LIST_DIR}/download_font.cmake
-    COMMAND ${CMAKE_COMMAND} 
-        -DINPUT=${CMAKE_CURRENT_BINARY_DIR}/dejavu-sans-mono.zip
-        -DDESTINATION=${CMAKE_CURRENT_BINARY_DIR}
-        -P ${CMAKE_CURRENT_LIST_DIR}/extract_font.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Downloading and extracting DejaVu Sans Mono font"
     VERBATIM
 )

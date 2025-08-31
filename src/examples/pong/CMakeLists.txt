@@ -6,6 +6,8 @@ add_subdirectory(data)
 
 find_package(SDLXX REQUIRED)
 
+option(PONG_BUILD_TESTS "Build the Pong tests" ON)
+
 # Has HEADER Files?
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
@@ -37,3 +39,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_application)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_main)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_ttf)
+
+# Enable testing
+if(PONG_BUILD_TESTS)
+    add_subdirectory(test)
+endif()
