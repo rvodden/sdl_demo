@@ -120,7 +120,7 @@ TEST_F(PongTest, UpdateWithInvalidDeltaTime) {
     EXPECT_FLOAT_EQ(initialBallExtent.getY(), ballAfterNegative.getY());
     
     // Test excessively large delta time
-    pong.update(2.0f);
+    pong.update(2000.0f);
     auto ballAfterLarge = pong.getBall().getExtent();
     
     // Ball should not have moved
@@ -133,7 +133,7 @@ TEST_F(PongTest, TopWallCollision) {
     Pong pong(windowSize, mockEventBus, eventRouter);
     
     // Move ball to top with upward velocity
-    Point<float> upwardVelocity{-200.0f, -400.0f};
+    Point<float> upwardVelocity{-5.0f, -7.0f};
     pong.setBallVelocity(upwardVelocity);
     
     // Expect top wall collision event
@@ -147,7 +147,7 @@ TEST_F(PongTest, TopWallCollision) {
         }));
     
     // Update multiple times to trigger collision
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 3000; ++i) {
         pong.update(kDeltaTime);
     }
 }
@@ -156,7 +156,7 @@ TEST_F(PongTest, BottomWallCollision) {
     Pong pong(windowSize, mockEventBus, eventRouter);
     
     // Move ball to bottom with downward velocity
-    Point<float> downwardVelocity{-200.0f, 400.0f};
+    Point<float> downwardVelocity{-5.0f, 7.0f};
     pong.setBallVelocity(downwardVelocity);
     
     // Expect bottom wall collision event
@@ -170,7 +170,7 @@ TEST_F(PongTest, BottomWallCollision) {
         }));
     
     // Update multiple times to trigger collision
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 3000; ++i) {
         pong.update(kDeltaTime);
     }
 }
@@ -187,7 +187,7 @@ TEST_F(PongTest, LeftWallCollisionScoring) {
         .Times(testing::AnyNumber());
     
     // Update multiple times to trigger collision
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 4000; ++i) {
         pong.update(kDeltaTime);
     }
     
@@ -250,7 +250,7 @@ TEST_F(PongTest, ResetBall) {
     Pong pong(windowSize, mockEventBus, eventRouter);
     
     // Move the ball
-    Point<float> velocity{200.0f, 100.0f};
+    Point<float> velocity{6.0f, 5.0f};
     pong.setBallVelocity(velocity);
     pong.update(kDeltaTime);
     
@@ -301,7 +301,7 @@ TEST_F(PongTest, BallMovingLeftChecksLeftPaddle) {
     Pong pong(windowSize, mockEventBus, eventRouter);
     
     // Set ball moving left toward left paddle
-    Point<float> leftwardVelocity{-300.0f, 0.0f};
+    Point<float> leftwardVelocity{-7.0f, 0.0f};
     pong.setBallVelocity(leftwardVelocity);
     
     // Position ball closer to left paddle for potential collision
@@ -319,7 +319,7 @@ TEST_F(PongTest, BallMovingRightChecksRightPaddle) {
     Pong pong(windowSize, mockEventBus, eventRouter);
     
     // Set ball moving right toward right paddle
-    Point<float> rightwardVelocity{300.0f, 0.0f};
+    Point<float> rightwardVelocity{7.0f, 0.0f};
     pong.setBallVelocity(rightwardVelocity);
     
     pong.update(kDeltaTime);

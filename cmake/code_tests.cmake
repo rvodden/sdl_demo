@@ -119,6 +119,7 @@ function(install_package)
             COMMAND ${CMAKE_COMMAND}
             --install .
             --prefix ${${PACKAGE_UPPER}_INSTALL_DIR}
+            --config $<CONFIG>
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
             COMMAND_EXPAND_LISTS
         )
@@ -142,6 +143,7 @@ function(install_package)
                 --install .
                 --prefix ${${PACKAGE_UPPER}_INSTALL_DIR}
                 --component ${COMPONENT}
+                --config $<CONFIG>
                 WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
                 COMMAND_EXPAND_LISTS
             )

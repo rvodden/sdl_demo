@@ -68,9 +68,9 @@ class PongApp : public sdl::BaseApplication {
     auto dt = _timer.elapsed();
 
     // Validate delta time to prevent physics issues
-    if (dt < 0.0f || dt > 1.0f) {
-      std::cerr << "Warning: Invalid delta time: " << dt << "s, clamping to safe range\n";
-      dt = std::clamp(dt, 0.001f, 0.1f);
+    if (dt < 0.0F || dt > 1000.0F) {
+      std::cerr << "Warning: Invalid delta time: " << dt << "ms, clamping to safe range\n";
+      dt = std::clamp(dt, 1.F, 1000.F);
     }
 
     if (_pong) {

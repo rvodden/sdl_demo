@@ -11,8 +11,8 @@ using pong::Point;
 // Test constants
 constexpr float kTestX = 100.0f;
 constexpr float kTestY = 50.0f;
-constexpr float kValidVelocityX = 200.0f;
-constexpr float kValidVelocityY = 150.0f;
+constexpr float kValidVelocityX = 7.0f;
+constexpr float kValidVelocityY = 6.0f;
 constexpr float kDeltaTime = 0.016f; // ~60 FPS
 constexpr float kLargeDeltaTime = 0.1f;
 

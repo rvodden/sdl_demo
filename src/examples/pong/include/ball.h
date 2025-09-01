@@ -20,7 +20,7 @@ class Ball {
       }
     }
 
-    auto getExtent() const -> sdl::Rectangle<float> {
+    [[nodiscard]] auto getExtent() const -> sdl::Rectangle<float> {
       return _extent;
     }
 
@@ -29,7 +29,7 @@ class Ball {
       _velocity = kBallSpeed;
     }
 
-    auto getVelocity() const -> Point<float> { return _velocity; }
+    [[nodiscard]] auto getVelocity() const -> Point<float> { return _velocity; }
     void setVelocity(Point<float> velocity) { 
       if (std::abs(velocity.x) > kMaxBallSpeed || std::abs(velocity.y) > kMaxBallSpeed) {
         throw std::invalid_argument("Ball velocity exceeds maximum speed");
@@ -43,7 +43,7 @@ class Ball {
     }
 
   private:
-    auto _initialExtent() -> sdl::Rectangle<float> {
+    auto _initialExtent() const -> sdl::Rectangle<float> {
       return { _initialPosition.x - (kBallSize.x / 2), _initialPosition.y - (kBallSize.y / 2), kBallSize.x, kBallSize.y }; 
     } 
    

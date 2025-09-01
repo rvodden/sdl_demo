@@ -136,7 +136,7 @@ TEST_F(PaddleTest, MovementBoundaryTopLimit) {
 
 TEST_F(PaddleTest, MovementBoundaryBottomLimit) {
     // Start near the bottom
-    Point<float> nearBottomPosition{kTestX, kMaxY - pong::kPaddleSize.y - 10.0f};
+    Point<float> nearBottomPosition{kTestX, kMaxY - pong::kPaddleSize.y + 49.0f};
     Paddle paddle(nearBottomPosition, kMinY, kMaxY);
     
     paddle.setVelocity(Paddle::Velocity::kDown);

@@ -26,6 +26,10 @@ class Point {
     return Point(x * scalar, y * scalar);
   }
 
+  auto operator-() const -> Point {
+    return {-x, -y};
+  };
+
   T x;
   T y;
 };

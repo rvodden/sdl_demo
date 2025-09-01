@@ -37,7 +37,7 @@ class Pong {
   }
 
   void update(float dt) {
-    if (dt < 0.0f || dt > 1.0f) {
+    if (dt < 0.0F || dt > 1000.0F) {
       return; // Invalid delta time, skip update
     }
 
@@ -147,13 +147,13 @@ class Pong {
         case WallCollisionEvent::Wall::kLeft: {
           _scores[Player::kRight] += 1;
           _ball.resetToStartPositionAndVelocity();
-          _ball.setVelocity({kBallResetSpeed, 0});
+          _ball.setVelocity(kBallResetSpeed);
           break;
         }
         case WallCollisionEvent::Wall::kRight: {
           _scores[Player::kLeft] += 1;
           _ball.resetToStartPositionAndVelocity();
-          _ball.setVelocity({-kBallResetSpeed, 0});
+          _ball.setVelocity(-kBallResetSpeed);
           break;
         }
       }
