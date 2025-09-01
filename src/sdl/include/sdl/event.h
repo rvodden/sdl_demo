@@ -20,6 +20,9 @@
 #include <typeindex>
 
 #include "sdl_export.h"
+#include "sdl/keycodes.h"
+#include "sdl/keymodifiers.h"
+#include "sdl/scancodes.h"
 
 namespace sdl {
 
@@ -299,10 +302,6 @@ class SDL_EXPORT MouseButtonEvent : public MousePositionEvent {
 
 class SDL_EXPORT KeyboardEvent : public Event {
  public:
-#include "sdl/keycodes.h"
-#include "sdl/keymodifiers.h"
-#include "sdl/scancodes.h"
-
   /**
    * @brief Construct a keyboard event
    * @param ts Timestamp when the event occurred
@@ -337,6 +336,88 @@ class SDL_EXPORT KeyboardEvent : public Event {
   bool down;          /**< True if the key was pressed, false if released */
   bool isRepeat;      /**< True if this is a repeat event due to key being held down */
 };
+
+/**
+ * @brief Enumeration for key press/release direction
+ */
+enum class KeyDirection {
+  Up,   /**< Key was released */
+  Down  /**< Key was pressed */
+};
+
+/**
+ * @brief Template-based specific keyboard event for individual key handling
+ * 
+ * This template class allows handlers to register for specific keys and optionally
+ * specific key directions (up/down). It inherits from KeyboardEvent, so handlers
+ * registered for the base KeyboardEvent will also receive these specific events.
+ *
+ * Usage examples:
+ * - SpecificKeyboardEvent<KeyCode::kA> - handles both up and down events for A key
+ * - SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down> - handles only A key down
+ * - SpecificKeyboardEvent<KeyCode::kEscape> - handles both up and down for Escape
+ * 
+ * @tparam Key The specific key this event represents
+ * @tparam Direction Optional key direction filter (defaults to both up and down)
+ */
+template<KeyCode Key, KeyDirection Direction = static_cast<KeyDirection>(-1)>
+class SpecificKeyboardEvent : public KeyboardEvent {
+public:
+  using KeyboardEvent::KeyboardEvent;
+  
+  static constexpr KeyCode key = Key;
+  static constexpr KeyDirection direction = Direction;
+  
+  void handle(BaseEventHandler& baseEventHandler) override { 
+    castHandler(*this, baseEventHandler); 
+  }
+  
+  /**
+   * @brief Check if this event matches the template parameters
+   * @param keyboardEvent The keyboard event to check
+   * @return True if the event matches the key and direction constraints
+   */
+  static bool matches(const KeyboardEvent& keyboardEvent) {
+    if (keyboardEvent.keycode != Key) {
+      return false;
+    }
+    
+    // If no specific direction is specified (default), accept both up and down
+    if constexpr (Direction == static_cast<KeyDirection>(-1)) {
+      return true;
+    } else {
+      return (Direction == KeyDirection::Down) == keyboardEvent.down;
+    }
+  }
+};
+
+/**
+ * @brief Template-based specific keyboard event factory
+ * 
+ * This function creates a specific keyboard event from a general keyboard event
+ * if it matches the template parameters.
+ * 
+ * @tparam Key The specific key to match
+ * @tparam Direction Optional key direction to match
+ * @param keyboardEvent The source keyboard event
+ * @return Unique pointer to specific event if matches, nullptr otherwise
+ */
+template<KeyCode Key, KeyDirection Direction = static_cast<KeyDirection>(-1)>
+auto createSpecificKeyboardEvent(const KeyboardEvent& keyboardEvent) -> std::unique_ptr<SpecificKeyboardEvent<Key, Direction>> {
+  if (SpecificKeyboardEvent<Key, Direction>::matches(keyboardEvent)) {
+    return std::make_unique<SpecificKeyboardEvent<Key, Direction>>(
+      keyboardEvent.timestamp,
+      keyboardEvent.windowId,
+      keyboardEvent.which,
+      keyboardEvent.scancode,
+      keyboardEvent.keycode,
+      keyboardEvent.down,
+      keyboardEvent.isRepeat,
+      keyboardEvent.keymod
+    );
+  }
+  return nullptr;
+}
 
 /**
  * @brief Template-based event adaptor for converting platform events to sdl events

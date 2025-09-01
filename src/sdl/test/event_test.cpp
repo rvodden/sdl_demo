@@ -683,11 +683,11 @@ TEST(KeyboardEventTest, BasicConstruction) {
     auto timestamp = std::chrono::milliseconds(5000);
     uint32_t windowId = 22222;
     uint32_t keyboardId = 1;
-    auto scancode = KeyboardEvent::ScanCode::kA;
-    auto keycode = KeyboardEvent::KeyCode::kA;
+    auto scancode = sdl::ScanCode::kA;
+    auto keycode = sdl::KeyCode::kA;
     bool down = true;
     bool repeat = false;
-    auto keymod = KeyboardEvent::KeyModifier::kLShift;
+    auto keymod = sdl::KeyModifier::kLShift;
     
     KeyboardEvent keyEvent(timestamp, windowId, keyboardId, scancode, keycode, down, repeat, keymod);
     
@@ -705,17 +705,17 @@ TEST(KeyboardEventTest, GetKeyNameBasicKeys) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test basic alphabetic keys
-    KeyboardEvent keyA(timestamp, 0, 0, KeyboardEvent::ScanCode::kA, KeyboardEvent::KeyCode::kA, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyA(timestamp, 0, 0, sdl::ScanCode::kA, sdl::KeyCode::kA, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyA.getKeyName(), "A");
     
-    KeyboardEvent keyZ(timestamp, 0, 0, KeyboardEvent::ScanCode::kZ, KeyboardEvent::KeyCode::kZ, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyZ(timestamp, 0, 0, sdl::ScanCode::kZ, sdl::KeyCode::kZ, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyZ.getKeyName(), "Z");
     
     // Test numeric keys
-    KeyboardEvent key1(timestamp, 0, 0, KeyboardEvent::ScanCode::k1, KeyboardEvent::KeyCode::k1, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent key1(timestamp, 0, 0, sdl::ScanCode::k1, sdl::KeyCode::k1, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(key1.getKeyName(), "1");
     
-    KeyboardEvent key0(timestamp, 0, 0, KeyboardEvent::ScanCode::k0, KeyboardEvent::KeyCode::k0, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent key0(timestamp, 0, 0, sdl::ScanCode::k0, sdl::KeyCode::k0, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(key0.getKeyName(), "0");
 }
 
@@ -723,16 +723,16 @@ TEST(KeyboardEventTest, GetKeyNameSpecialKeys) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test special keys
-    KeyboardEvent keySpace(timestamp, 0, 0, KeyboardEvent::ScanCode::kSpace, KeyboardEvent::KeyCode::kSpace, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keySpace(timestamp, 0, 0, sdl::ScanCode::kSpace, sdl::KeyCode::kSpace, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keySpace.getKeyName(), "Space");
     
-    KeyboardEvent keyEnter(timestamp, 0, 0, KeyboardEvent::ScanCode::kReturn, KeyboardEvent::KeyCode::kReturn, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyEnter(timestamp, 0, 0, sdl::ScanCode::kReturn, sdl::KeyCode::kReturn, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyEnter.getKeyName(), "Return");
     
-    KeyboardEvent keyEscape(timestamp, 0, 0, KeyboardEvent::ScanCode::kEscape, KeyboardEvent::KeyCode::kEscape, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyEscape(timestamp, 0, 0, sdl::ScanCode::kEscape, sdl::KeyCode::kEscape, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyEscape.getKeyName(), "Escape");
     
-    KeyboardEvent keyTab(timestamp, 0, 0, KeyboardEvent::ScanCode::kTab, KeyboardEvent::KeyCode::kTab, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyTab(timestamp, 0, 0, sdl::ScanCode::kTab, sdl::KeyCode::kTab, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyTab.getKeyName(), "Tab");
 }
 
@@ -740,10 +740,10 @@ TEST(KeyboardEventTest, GetKeyNameFunctionKeys) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test function keys
-    KeyboardEvent keyF1(timestamp, 0, 0, KeyboardEvent::ScanCode::kF1, KeyboardEvent::KeyCode::kF1, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyF1(timestamp, 0, 0, sdl::ScanCode::kF1, sdl::KeyCode::kF1, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyF1.getKeyName(), "F1");
     
-    KeyboardEvent keyF12(timestamp, 0, 0, KeyboardEvent::ScanCode::kF12, KeyboardEvent::KeyCode::kF12, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyF12(timestamp, 0, 0, sdl::ScanCode::kF12, sdl::KeyCode::kF12, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyF12.getKeyName(), "F12");
 }
 
@@ -751,13 +751,13 @@ TEST(KeyboardEventTest, GetKeyNameSymbols) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test symbol keys
-    KeyboardEvent keyMinus(timestamp, 0, 0, KeyboardEvent::ScanCode::kMinus, KeyboardEvent::KeyCode::kMinus, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyMinus(timestamp, 0, 0, sdl::ScanCode::kMinus, sdl::KeyCode::kMinus, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyMinus.getKeyName(), "-");
     
-    KeyboardEvent keyEquals(timestamp, 0, 0, KeyboardEvent::ScanCode::kEquals, KeyboardEvent::KeyCode::kEquals, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyEquals(timestamp, 0, 0, sdl::ScanCode::kEquals, sdl::KeyCode::kEquals, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyEquals.getKeyName(), "=");
     
-    KeyboardEvent keyLeftBracket(timestamp, 0, 0, KeyboardEvent::ScanCode::kLeftBracket, KeyboardEvent::KeyCode::kLeftBracket, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyLeftBracket(timestamp, 0, 0, sdl::ScanCode::kLeftBracket, sdl::KeyCode::kLeftBracket, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyLeftBracket.getKeyName(), "[");
 }
 
@@ -765,16 +765,16 @@ TEST(KeyboardEventTest, GetKeyNameArrowKeys) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test arrow keys
-    KeyboardEvent keyUp(timestamp, 0, 0, KeyboardEvent::ScanCode::kUp, KeyboardEvent::KeyCode::kUp, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyUp(timestamp, 0, 0, sdl::ScanCode::kUp, sdl::KeyCode::kUp, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyUp.getKeyName(), "Up");
     
-    KeyboardEvent keyDown(timestamp, 0, 0, KeyboardEvent::ScanCode::kDown, KeyboardEvent::KeyCode::kDown, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyDown(timestamp, 0, 0, sdl::ScanCode::kDown, sdl::KeyCode::kDown, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyDown.getKeyName(), "Down");
     
-    KeyboardEvent keyLeft(timestamp, 0, 0, KeyboardEvent::ScanCode::kLeft, KeyboardEvent::KeyCode::kLeft, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyLeft(timestamp, 0, 0, sdl::ScanCode::kLeft, sdl::KeyCode::kLeft, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyLeft.getKeyName(), "Left");
     
-    KeyboardEvent keyRight(timestamp, 0, 0, KeyboardEvent::ScanCode::kRight, KeyboardEvent::KeyCode::kRight, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyRight(timestamp, 0, 0, sdl::ScanCode::kRight, sdl::KeyCode::kRight, true, false, sdl::KeyModifier::kNone);
     EXPECT_EQ(keyRight.getKeyName(), "Right");
 }
 
@@ -782,7 +782,7 @@ TEST(KeyboardEventTest, GetKeyNameUnknownKey) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test unknown key
-    KeyboardEvent keyUnknown(timestamp, 0, 0, KeyboardEvent::ScanCode::kUnknown, KeyboardEvent::KeyCode::kUnknown, true, false, KeyboardEvent::KeyModifier::kNone);
+    KeyboardEvent keyUnknown(timestamp, 0, 0, sdl::ScanCode::kUnknown, sdl::KeyCode::kUnknown, true, false, sdl::KeyModifier::kNone);
     std::string keyName = keyUnknown.getKeyName();
     // SDL_GetKeyName for SDLK_UNKNOWN returns an empty string, which our function converts to "Unknown"
     EXPECT_TRUE(keyName == "Unknown" || keyName == "");
@@ -792,24 +792,24 @@ TEST(KeyboardEventTest, KeyModifierEnumValues) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test different key modifier combinations
-    std::vector<KeyboardEvent::KeyModifier> modifiers = {
-        KeyboardEvent::KeyModifier::kNone,
-        KeyboardEvent::KeyModifier::kLShift,
-        KeyboardEvent::KeyModifier::kRShift,
-        KeyboardEvent::KeyModifier::kLCtrl,
-        KeyboardEvent::KeyModifier::kRCtrl,
-        KeyboardEvent::KeyModifier::kLAlt,
-        KeyboardEvent::KeyModifier::kRAlt,
-        KeyboardEvent::KeyModifier::kLGui,
-        KeyboardEvent::KeyModifier::kRGui,
-        KeyboardEvent::KeyModifier::kCaps,
-        KeyboardEvent::KeyModifier::kNum,
-        KeyboardEvent::KeyModifier::kMode,
-        KeyboardEvent::KeyModifier::kScroll
+    std::vector<sdl::KeyModifier> modifiers = {
+        sdl::KeyModifier::kNone,
+        sdl::KeyModifier::kLShift,
+        sdl::KeyModifier::kRShift,
+        sdl::KeyModifier::kLCtrl,
+        sdl::KeyModifier::kRCtrl,
+        sdl::KeyModifier::kLAlt,
+        sdl::KeyModifier::kRAlt,
+        sdl::KeyModifier::kLGui,
+        sdl::KeyModifier::kRGui,
+        sdl::KeyModifier::kCaps,
+        sdl::KeyModifier::kNum,
+        sdl::KeyModifier::kMode,
+        sdl::KeyModifier::kScroll
     };
     
     for (auto modifier : modifiers) {
-        KeyboardEvent keyEvent(timestamp, 0, 0, KeyboardEvent::ScanCode::kA, KeyboardEvent::KeyCode::kA, true, false, modifier);
+        KeyboardEvent keyEvent(timestamp, 0, 0, sdl::ScanCode::kA, sdl::KeyCode::kA, true, false, modifier);
         EXPECT_EQ(keyEvent.keymod, modifier);
     }
 }
@@ -818,17 +818,17 @@ TEST(KeyboardEventTest, ScanCodeAndKeyCodeEnumValues) {
     auto timestamp = std::chrono::milliseconds(0);
     
     // Test that we can construct keyboard events with various scancode/keycode combinations
-    std::vector<std::pair<KeyboardEvent::ScanCode, KeyboardEvent::KeyCode>> keyPairs = {
-        {KeyboardEvent::ScanCode::kA, KeyboardEvent::KeyCode::kA},
-        {KeyboardEvent::ScanCode::kReturn, KeyboardEvent::KeyCode::kReturn},
-        {KeyboardEvent::ScanCode::kSpace, KeyboardEvent::KeyCode::kSpace},
-        {KeyboardEvent::ScanCode::kF1, KeyboardEvent::KeyCode::kF1},
-        {KeyboardEvent::ScanCode::kKp1, KeyboardEvent::KeyCode::kKp1},
-        {KeyboardEvent::ScanCode::kLeftBracket, KeyboardEvent::KeyCode::kLeftBracket}
+    std::vector<std::pair<sdl::ScanCode, sdl::KeyCode>> keyPairs = {
+        {sdl::ScanCode::kA, sdl::KeyCode::kA},
+        {sdl::ScanCode::kReturn, sdl::KeyCode::kReturn},
+        {sdl::ScanCode::kSpace, sdl::KeyCode::kSpace},
+        {sdl::ScanCode::kF1, sdl::KeyCode::kF1},
+        {sdl::ScanCode::kKp1, sdl::KeyCode::kKp1},
+        {sdl::ScanCode::kLeftBracket, sdl::KeyCode::kLeftBracket}
     };
     
     for (const auto& [scancode, keycode] : keyPairs) {
-        KeyboardEvent keyEvent(timestamp, 0, 0, scancode, keycode, true, false, KeyboardEvent::KeyModifier::kNone);
+        KeyboardEvent keyEvent(timestamp, 0, 0, scancode, keycode, true, false, sdl::KeyModifier::kNone);
         EXPECT_EQ(keyEvent.scancode, scancode);
         EXPECT_EQ(keyEvent.keycode, keycode);
         

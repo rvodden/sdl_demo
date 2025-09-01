@@ -4,8 +4,8 @@
  */
 
 #include <benchmark/benchmark.h>
-#include <event.h>
-#include <user_event.h>
+#include <sdl/event.h>
+#include <sdl/user_event.h>
 
 #include <memory>
 #include <vector>

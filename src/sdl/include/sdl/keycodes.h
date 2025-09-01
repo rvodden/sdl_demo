@@ -1,7 +1,15 @@
+#ifndef KEYCODES_H
+#define KEYCODES_H
+
 /**
  * @brief Keyboard Keycode enumeration
  * 
  */
+
+#include <array>
+
+namespace sdl {
+
 enum class KeyCode {
   kUnknown,
   // Basic ASCII characters
@@ -48,3 +56,24 @@ enum class KeyCode {
   // Mobile keys  
   kSoftLeft, kSoftRight, kCall, kEndCall
 };
+
+/**
+ * @brief Constexpr array of KeyCode values that support specific keyboard events
+ * 
+ * This array contains all the key codes for which specific keyboard events
+ * (SpecificKeyboardEvent<KeyCode>) will be generated automatically by the event router.
+ */
+static constexpr std::array kSpecificKeyboardEventSupportedKeys = {
+  KeyCode::kA, KeyCode::kB, KeyCode::kC, KeyCode::kD, KeyCode::kE, KeyCode::kF, KeyCode::kG,
+  KeyCode::kH, KeyCode::kI, KeyCode::kJ, KeyCode::kK, KeyCode::kL, KeyCode::kM, KeyCode::kN,
+  KeyCode::kO, KeyCode::kP, KeyCode::kQ, KeyCode::kR, KeyCode::kS, KeyCode::kT, KeyCode::kU,
+  KeyCode::kV, KeyCode::kW, KeyCode::kX, KeyCode::kY, KeyCode::kZ,
+  KeyCode::k0, KeyCode::k1, KeyCode::k2, KeyCode::k3, KeyCode::k4, KeyCode::k5, KeyCode::k6,
+  KeyCode::k7, KeyCode::k8, KeyCode::k9,
+  KeyCode::kSpace, KeyCode::kReturn, KeyCode::kEscape, KeyCode::kTab, KeyCode::kBackspace,
+  KeyCode::kComma, KeyCode::kUp, KeyCode::kDown, KeyCode::kLeft, KeyCode::kRight
+};
+
+}
+
+#endif

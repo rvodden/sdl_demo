@@ -1,3 +1,8 @@
+#ifndef KEYMODIFIERS_H
+#define KEYMODIFIERS_H
+
+namespace sdl {
+
 /**
  * @brief Keyboard Modifier enumeration
  * 
@@ -22,3 +27,7 @@ enum class KeyModifier {
   kAlt,      /**< Any Alt key is down. */
   kGui       /**< Any GUI key is down. */
 };
+
+}
+
+#endif

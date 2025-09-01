@@ -48,6 +48,9 @@ class EventRouterImpl {
 
   // Main dispatch method - uses standard polymorphic dispatch for safety
   void dispatchEvent(BaseEvent& event);
+  
+  // Helper method to dispatch specific keyboard events
+  void dispatchSpecificKeyboardEvents(const KeyboardEvent& keyboardEvent);
 
  private:
   std::shared_ptr<BaseEventBus> _eventBus;

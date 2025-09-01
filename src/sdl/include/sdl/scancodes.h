@@ -1,3 +1,8 @@
+#ifndef SCANCODES_H
+#define SCANCODES_H
+
+namespace sdl {
+
 /**
  * @brief Keyboard Scancode enumeration
  * 
@@ -54,3 +59,7 @@ enum class ScanCode {
   // Reserved and meta
   kReserved, kCount
 };
+
+}
+
+#endif // SCANCODES_H
