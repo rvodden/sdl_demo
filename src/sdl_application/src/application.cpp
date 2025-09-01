@@ -123,6 +123,14 @@ auto ApplicationRunner::initializeEventSystem() -> void {
         _eventRouter->routeEvent(std::move(event));
       }
     });
+
+  _eventBus->setSyncRouteCallback(
+    [this](const BaseEvent& event) -> void {
+      if (_eventRouter) {
+        // Direct dispatch - no heap allocation
+        _eventRouter->routeEvent(event);
+      }
+    });
 }
 
 auto ApplicationRunner::reset() -> void {

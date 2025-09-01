@@ -106,9 +106,18 @@ public:
         publishedEvents_.push_back(std::move(event));
     }
 
+    void publishSync(const UserEvent& event) override {
+        auto eventPtr = std::make_unique<UserEvent>(event);
+        publish(std::move(eventPtr));
+    }
+
     void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
         // Mock implementation - store callback if needed for testing
         routeCallback_ = std::move(callback);
+    }
+
+    void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) override {
+        (void)callback;
     }
 
     void injectEvent(const std::any&, std::type_index) override {

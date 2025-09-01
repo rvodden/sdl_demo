@@ -17,20 +17,23 @@ constexpr auto kMinWindowHeight = 300;
 
 // Ball Constants
 constexpr auto kBallSize = Point<float>{15.0F, 15.0F};
-constexpr auto kBallSpeed = Point<float>{-0.5F, 0.0F}; // pixels per second
-constexpr auto kMaxBallSpeed = 8.0F;
+constexpr auto kBallSpeed = Point<float>{-0.2F, 0.0F}; // pixels per millisecond
+constexpr auto kMaxBallSpeed = 0.8F;
 
 // Paddle Constants
 constexpr auto kPaddleSize = Point<float>{10.0F, 100.0F};
-constexpr auto kPaddleSpeed = 1.0F; // pixels per second
-constexpr auto kMaxPaddleSpeed = 8.0F;
+constexpr auto kPaddleSpeed = 0.3F; // pixels per millisecond
+constexpr auto kMaxPaddleSpeed = 0.6F;
 constexpr auto kMinPaddleSpeed = 0.1F;
 constexpr auto kPaddleFromWallDistance = 50.0F;
 
 // Game Physics Constants
-constexpr auto kBallDeflectionAngle = 0.75F * kBallSpeed.x; // pixels per second
+constexpr auto kBallDeflectionRatio = 0.75F;
+constexpr auto kBallDeflectionAngle = kBallDeflectionRatio * kBallSpeed.x; // pixels per millisecond
 constexpr auto kMaxDeflectionAngle = 4.0F;
 constexpr auto kBallResetSpeed = kBallSpeed;
+constexpr auto kMinimumDt = 1.0F;
+constexpr auto kMaximumDt = 1000.0F;
 
 // Collision Detection Constants
 constexpr auto kPaddleCollisionZoneDivisions = 3.0F; // Used to divide paddle into collision zones

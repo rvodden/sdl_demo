@@ -260,6 +260,12 @@ class SDL_TOOLS_EXPORT EventRouter {
    * @endcode
    */
   void routeEvent(std::unique_ptr<BaseEvent> event);
+  
+  /**
+   * @brief Route a stack-allocated event directly to handlers (sync dispatch)
+   * @param event Reference to the event to route
+   */
+  void routeEvent(const BaseEvent& event);
 
   /**
    * @brief Register an event handler to receive dispatched events

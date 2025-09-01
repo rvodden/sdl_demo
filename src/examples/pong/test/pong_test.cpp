@@ -25,7 +25,9 @@ public:
     MOCK_METHOD(std::unique_ptr<sdl::BaseEvent>, wait, (), (override));
     MOCK_METHOD((std::optional<std::unique_ptr<sdl::BaseEvent>>), poll, (), (override));
     MOCK_METHOD(void, publish, (std::unique_ptr<sdl::UserEvent> event), (override));
+    MOCK_METHOD(void, publishSync, (const sdl::UserEvent& event), (override));
     MOCK_METHOD(void, setRouteCallback, (std::function<void(std::unique_ptr<sdl::BaseEvent>)> callback), (override));
+    MOCK_METHOD(void, setSyncRouteCallback, (std::function<void(const sdl::BaseEvent&)> callback), (override));
     MOCK_METHOD(void, injectEvent, (const std::any& eventData, std::type_index eventTypeId), (override));
 };
 

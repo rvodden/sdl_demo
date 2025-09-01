@@ -796,8 +796,15 @@ class SDLEventBus : public TemplatedEventBus<SDLEventBus, SDL_Event>, public Bas
     TemplatedEventBus<SDLEventBus, SDL_Event>::publish(std::move(event));
   }
 
+  void publishSync(const UserEvent& event) override {
+    TemplatedEventBus<SDLEventBus, SDL_Event>::publishSync(event);
+  }
+
   void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
     TemplatedEventBus<SDLEventBus, SDL_Event>::setRouteCallback(std::move(callback));
+  }
+  void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) override {
+    TemplatedEventBus<SDLEventBus, SDL_Event>::setSyncRouteCallback(std::move(callback));
   }
 
   void injectEvent(const std::any& eventData, std::type_index eventTypeId) override;

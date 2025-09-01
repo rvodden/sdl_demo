@@ -43,7 +43,7 @@ void renderScore(sdl::Renderer& renderer, const uint16_t& score, const sdl::ttf:
 template<uint32_t maxScore>
 class ScoreRenderer {
   public:
-    ScoreRenderer(std::shared_ptr<sdl::ttf::Font> font, std::shared_ptr<sdl::Renderer> renderer)
+    ScoreRenderer(std::unique_ptr<sdl::ttf::Font> font, std::shared_ptr<sdl::Renderer> renderer)
       : _font(std::move(font)), _renderer(std::move(renderer)) {
       for (uint32_t i : std::views::iota(0U, maxScore + 1U)) {
         auto surface = sdl::ttf::Text::renderBlended(*_font, std::to_string(i), sdl::NamedColor::kWhite);
@@ -58,7 +58,7 @@ class ScoreRenderer {
 
   private:
     std::array<sdl::Texture, maxScore + 1> _scoreTextures;
-    std::shared_ptr<sdl::ttf::Font> _font;
+    std::unique_ptr<sdl::ttf::Font> _font;
     std::shared_ptr<sdl::Renderer> _renderer;
 };
 

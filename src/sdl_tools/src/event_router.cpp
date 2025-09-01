@@ -76,6 +76,10 @@ void EventRouter::routeEvent(std::unique_ptr<BaseEvent> event) {
   _impl->dispatchEvent(*event);
 }
 
+void EventRouter::routeEvent(const BaseEvent& event) {
+  _impl->dispatchEvent(const_cast<BaseEvent&>(event));
+}
+
 void EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) {
   _impl->_eventHandlers.push_back(std::ref(baseEventHandler));
 }

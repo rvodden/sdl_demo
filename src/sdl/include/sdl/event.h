@@ -415,10 +415,24 @@ class SDL_EXPORT BaseEventBus {
   virtual void publish(std::unique_ptr<UserEvent>) = 0;
 
   /**
+   * @brief Publish a custom event synchronously
+   * @param event The event to publish
+   */
+  virtual void publishSync(const UserEvent& event) = 0;
+
+  /**
    * @brief Set the callback for routing converted events
    * @param callback Function to call when events are available for routing
    */
   virtual void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) = 0;
+
+  /**
+   * @brief Set the callback for routing synchronous events
+   * @param callback Function to call when sync events are published
+   */
+  virtual void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) {
+    _syncRouteCallback = std::move(callback);
+  }
 
   /**
    * @brief Inject a platform event for processing
@@ -430,6 +444,10 @@ class SDL_EXPORT BaseEventBus {
    * Each concrete implementation handles its supported event types.
    */
   virtual void injectEvent(const std::any& eventData, std::type_index eventTypeId) = 0;
+
+protected:
+  /** @brief Callback for routing synchronous events */
+  std::function<void(const BaseEvent&)> _syncRouteCallback;
 };
 
 
@@ -501,9 +519,30 @@ public:
     static_cast<Derived*>(this)->publishImpl(std::move(event));
   }
 
+  /**
+   * @brief Publish a custom event synchronously using the template interface
+   * @param event The event to publish
+   */
+  template<typename EventType>
+  requires std::derived_from<EventType, UserEvent>
+  void publishSync(const EventType& event) {
+    if (_syncRouteCallback) {
+      _syncRouteCallback(event);
+    }
+  }
+
+  /**
+   * @brief Set the sync callback for this templated event bus
+   * @param callback Function to call when sync events are published
+   */
+  void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) {
+    _syncRouteCallback = std::move(callback);
+  }
+
  private:
   AdaptorType _adaptor;
   std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
+  std::function<void(const BaseEvent&)> _syncRouteCallback;
 friend Derived;
 };
 

@@ -37,8 +37,10 @@ class Pong {
   }
 
   void update(float dt) {
-    if (dt < 0.0F || dt > 1000.0F) {
-      return; // Invalid delta time, skip update
+    // Validate delta time to prevent physics issues
+    if (dt < kMinimumDt || dt > kMaximumDt ) {
+      std::cerr << "Warning: Invalid delta time: " << dt << "ms, clamping to safe range\n";
+      dt = std::clamp(dt, kMinimumDt, kMaximumDt);
     }
 
     _paddles.at(static_cast<size_t>(Player::kLeft)).update(dt);
@@ -50,9 +52,9 @@ class Pong {
 
     // Check Collisions between Ball and Walls
     if (ballVelocity.y < 0 && ballExtent.getY() <= 0) {
-      _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kTop));
+      _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kTop});
     } else if (ballVelocity.y > 0 && ballExtent.getY() + ballExtent.getHeight() >= _windowSize.y) {
-      _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kBottom));
+      _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kBottom});
     }
 
     if (ballVelocity.x < 0) {  // moving left so might hit kLeft or the Left wall
@@ -61,17 +63,17 @@ class Pong {
         _eventBus->publish(std::make_unique<PaddleCollisionEvent>(
             Player::kLeft, leftPaddle.determineCollisionZone(ballExtent)));
       } else if (ballExtent.getX() <= 0) {
-        _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kLeft));
+        _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kLeft});
       }
     }
 
     if (ballVelocity.x > 0) {  // moving right so might hit kRight
       const auto& rightPaddle = _paddles.at(static_cast<size_t>(Player::kRight));
       if (rightPaddle.checkCollision(ballExtent)) {
-        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(
-            Player::kRight, rightPaddle.determineCollisionZone(ballExtent)));
+        _eventBus->publishSync(PaddleCollisionEvent{
+            Player::kRight, rightPaddle.determineCollisionZone(ballExtent)});
       } else if (ballExtent.getX() + ballExtent.getWidth() >= _windowSize.x) {
-        _eventBus->publish(std::make_unique<WallCollisionEvent>(WallCollisionEvent::Wall::kRight));
+        _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kRight});
       }
     }
   }
@@ -121,13 +123,13 @@ class Pong {
           float velocityY = 0;
           switch (event.zone) {
             case PaddleCollisionEvent::Zone::kTop:
-              velocityY = -kBallDeflectionAngle;
+              velocityY = kBallDeflectionAngle;
               break;
             case PaddleCollisionEvent::Zone::kMiddle:
               velocityY = 0;
               break;
             case PaddleCollisionEvent::Zone::kBottom:
-              velocityY = kBallDeflectionAngle;
+              velocityY = -kBallDeflectionAngle;
               break;
             default:
               velocityY = 0;

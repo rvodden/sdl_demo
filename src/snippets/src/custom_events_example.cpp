@@ -139,7 +139,17 @@ class MockEventBus : public BaseEventBus {
     // Mock implementation - do nothing
   }
 
+  void publishSync(const UserEvent& event) override {
+    (void)event;
+    // Mock implementation - do nothing
+  }
+
   void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)>) override {
+    // Mock implementation - do nothing
+  }
+
+  void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) override {
+    (void)callback;
     // Mock implementation - do nothing
   }
 

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <sdl/window.h>
+#include <sdl/rectangle.h>
 #include <sdl/renderer.h>
 #include <sdl/font.h>
 
@@ -14,40 +15,66 @@
 
 namespace pong {
 
+class PongUI;
+
+class PongUIFactory {
+ public:
+  // Factory method for convenient creation
+  static std::unique_ptr<PongUI> createPongUI(Point<float> initialWindowSize) {
+    auto window = std::make_unique<sdl::Window>("Pong", 
+                                               static_cast<uint16_t>(initialWindowSize.x), 
+                                               static_cast<uint16_t>(initialWindowSize.y), 
+                                               0);
+    auto renderer = std::make_shared<sdl::Renderer>(*window);
+    auto scoreRenderer = createScoreRenderer(renderer);
+    
+    return std::make_unique<PongUI>(std::move(window), renderer, std::move(scoreRenderer));
+  }
+  
+  // Factory helper for font and score renderer creation
+  static std::unique_ptr<ScoreRenderer<kMaxScore>> createScoreRenderer(
+      std::shared_ptr<sdl::Renderer> renderer) {
+    auto font = std::make_unique<sdl::ttf::Font>(&_binary_PressStart2P_Regular_ttf_start, 
+                                                pressStart2PSize(), 
+                                                kScoreFontSize);
+    return std::make_unique<ScoreRenderer<kMaxScore>>(std::move(font), renderer);
+  }
+};
+
 class PongUI {
  public:
-  PongUI(Point<float> windowSize) : _windowSize(windowSize) {
-    _window = std::make_unique<sdl::Window>("Pong", static_cast<uint16_t>(windowSize.x), static_cast<uint16_t>(windowSize.y), 0);
-    _renderer = std::make_shared<sdl::Renderer>(*_window);
-    _font = std::make_shared<sdl::ttf::Font>(&_binary_PressStart2P_Regular_ttf_start, pressStart2PSize(), kScoreFontSize);
-    _scoreRenderer = std::make_unique<ScoreRenderer<kMaxScore>>(_font, _renderer);
-  }
+  // Constructor with dependency injection - follows SRP
+  PongUI(std::unique_ptr<sdl::Window> window, 
+         std::shared_ptr<sdl::Renderer> renderer,
+         std::unique_ptr<ScoreRenderer<kMaxScore>> scoreRenderer)
+    : _window(std::move(window))
+    , _renderer(std::move(renderer))
+    , _scoreRenderer(std::move(scoreRenderer)) {}
 
   template<GameState State>
   void render(const State& state) {
     _renderer->setDrawColour(sdl::NamedColor::kBlack);
     _renderer->clear();
 
-    auto size = _window->getSize();
+    auto size = static_cast<sdl::Rectangle<float>>(_window->getSize());
     _renderer->setDrawColour(sdl::NamedColor::kWhite);
-    _renderer->drawLine(static_cast<float>(size.getWidth()) / 2, 0, static_cast<float>(size.getWidth()) / 2, static_cast<float>(size.getHeight()));
+    _renderer->drawLine(size.getWidth() / 2, 0, size.getWidth() / 2, size.getHeight());
 
     renderRectangle(*_renderer, state.getBall());
     renderRectangle(*_renderer, state.getPaddle(Player::kLeft));
     renderRectangle(*_renderer, state.getPaddle(Player::kRight));
 
-    _scoreRenderer->render(state.getScore(Player::kLeft),  Point<float>{ _windowSize.x * kScorePositionLeftRatio, kScoreVerticalOffset });
-    _scoreRenderer->render(state.getScore(Player::kRight), Point<float>{ _windowSize.x * kScorePositionRightRatio, kScoreVerticalOffset });
+    _scoreRenderer->render(state.getScore(Player::kLeft),  Point<float>( size.getWidth() * kScorePositionLeftRatio, kScoreVerticalOffset ));
+    _scoreRenderer->render(state.getScore(Player::kRight), Point<float>( size.getWidth() * kScorePositionRightRatio, kScoreVerticalOffset ));
 
     _renderer->present();
   }
 
  private:
-  Point<float> _windowSize;
+
   std::unique_ptr<sdl::Window> _window;
   std::shared_ptr<sdl::Renderer> _renderer;
-  std::shared_ptr<sdl::ttf::Font> _font;
-  std::unique_ptr<ScoreRenderer<20>> _scoreRenderer;
+  std::unique_ptr<ScoreRenderer<kMaxScore>> _scoreRenderer;
 };
 
 } // namespace pong
