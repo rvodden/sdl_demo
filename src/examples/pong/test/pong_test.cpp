@@ -25,16 +25,14 @@ public:
     MOCK_METHOD(std::unique_ptr<sdl::BaseEvent>, wait, (), (override));
     MOCK_METHOD((std::optional<std::unique_ptr<sdl::BaseEvent>>), poll, (), (override));
     MOCK_METHOD(void, publish, (std::unique_ptr<sdl::UserEvent> event), (override));
-    MOCK_METHOD(void, publishSync, (const sdl::UserEvent& event), (override));
     MOCK_METHOD(void, setRouteCallback, (std::function<void(std::unique_ptr<sdl::BaseEvent>)> callback), (override));
-    MOCK_METHOD(void, setSyncRouteCallback, (std::function<void(const sdl::BaseEvent&)> callback), (override));
     MOCK_METHOD(void, injectEvent, (const std::any& eventData, std::type_index eventTypeId), (override));
 };
 
 // Test constants
 constexpr float kTestWindowWidth = 800.0f;
 constexpr float kTestWindowHeight = 600.0f;
-constexpr float kDeltaTime = 0.016f;
+constexpr float kDeltaTime = 16.0f;
 
 class PongTest : public ::testing::Test {
 protected:
@@ -51,19 +49,12 @@ protected:
 
 // Constructor Tests
 TEST_F(PongTest, ValidConstructor) {
-    EXPECT_NO_THROW(Pong pong(windowSize, mockEventBus, eventRouter));
-}
-
-TEST_F(PongTest, ConstructorWithNullEventBus) {
-    EXPECT_THROW(
-        Pong pong(windowSize, nullptr, eventRouter), 
-        std::invalid_argument
-    );
+    EXPECT_NO_THROW(Pong pong(windowSize, eventRouter));
 }
 
 TEST_F(PongTest, ConstructorWithNullEventRouter) {
     EXPECT_THROW(
-        Pong pong(windowSize, mockEventBus, nullptr), 
+        Pong pong(windowSize, nullptr), 
         std::invalid_argument
     );
 }
@@ -71,20 +62,20 @@ TEST_F(PongTest, ConstructorWithNullEventRouter) {
 TEST_F(PongTest, ConstructorWithInvalidWindowSize) {
     Point<float> invalidWindowSize{0.0f, kTestWindowHeight};
     EXPECT_THROW(
-        Pong pong(invalidWindowSize, mockEventBus, eventRouter), 
+        Pong pong(invalidWindowSize, eventRouter), 
         std::invalid_argument
     );
     
     Point<float> negativeWindowSize{-100.0f, kTestWindowHeight};
     EXPECT_THROW(
-        Pong pong(negativeWindowSize, mockEventBus, eventRouter), 
+        Pong pong(negativeWindowSize, eventRouter), 
         std::invalid_argument
     );
 }
 
 // Initial State Tests
 TEST_F(PongTest, InitialGameState) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     // Ball should be at center
     auto ball = pong.getBall();
@@ -109,101 +100,99 @@ TEST_F(PongTest, InitialGameState) {
 
 // Update Tests with Invalid Delta Time
 TEST_F(PongTest, UpdateWithInvalidDeltaTime) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     auto initialBallExtent = pong.getBall().getExtent();
+    auto initialBallVelocity = pong.getBall().getVelocity();
     
-    // Test negative delta time
+    // Test negative delta time - should be clamped to kMinimumDt (1.0f)
     pong.update(-0.1f);
     auto ballAfterNegative = pong.getBall().getExtent();
     
-    // Ball should not have moved
-    EXPECT_FLOAT_EQ(initialBallExtent.getX(), ballAfterNegative.getX());
-    EXPECT_FLOAT_EQ(initialBallExtent.getY(), ballAfterNegative.getY());
+    // Ball should have moved by clamped minimum delta time
+    float expectedXChangeMin = initialBallVelocity.x * pong::kMinimumDt;
+    EXPECT_FLOAT_EQ(ballAfterNegative.getX(), initialBallExtent.getX() + expectedXChangeMin);
     
-    // Test excessively large delta time
+    // Reset ball for next test
+    pong.resetBall();
+    auto resetExtent = pong.getBall().getExtent();
+    
+    // Test excessively large delta time - should be clamped to kMaximumDt (1000.0f)
     pong.update(2000.0f);
     auto ballAfterLarge = pong.getBall().getExtent();
     
-    // Ball should not have moved
-    EXPECT_FLOAT_EQ(initialBallExtent.getX(), ballAfterLarge.getX());
-    EXPECT_FLOAT_EQ(initialBallExtent.getY(), ballAfterLarge.getY());
+    // Ball should have moved by clamped maximum delta time
+    float expectedXChangeMax = initialBallVelocity.x * pong::kMaximumDt;
+    EXPECT_FLOAT_EQ(ballAfterLarge.getX(), resetExtent.getX() + expectedXChangeMax);
 }
 
 // Wall Collision Tests
 TEST_F(PongTest, TopWallCollision) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
-    // Move ball to top with upward velocity
-    Point<float> upwardVelocity{-5.0f, -7.0f};
+    // Position ball near top wall and set upward velocity
+    pong.resetBall();
+    Point<float> nearTopPosition{kTestWindowWidth / 2.0f, 10.0f};
+    pong.setBallPosition(nearTopPosition);
+    Point<float> upwardVelocity{0.0f, -0.5f};
     pong.setBallVelocity(upwardVelocity);
     
-    // Expect top wall collision event
-    EXPECT_CALL(*mockEventBus, publish(testing::_))
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Invoke([](std::unique_ptr<sdl::UserEvent> event) {
-            auto wallEvent = dynamic_cast<WallCollisionEvent*>(event.get());
-            if (wallEvent != nullptr && wallEvent->wall == WallCollisionEvent::Wall::kTop) {
-                // Found the expected top wall collision
-            }
-        }));
-    
     // Update multiple times to trigger collision
-    for (int i = 0; i < 3000; ++i) {
+    for (int i = 0; i < 150; ++i) {
         pong.update(kDeltaTime);
     }
+    
+    // Verify ball bounced (velocity should be reversed from -0.5 to +0.5)
+    auto finalVelocity = pong.getBall().getVelocity();
+    EXPECT_GT(finalVelocity.y, 0.0f); // Should be positive (bounced upward)
 }
 
 TEST_F(PongTest, BottomWallCollision) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
-    // Move ball to bottom with downward velocity
-    Point<float> downwardVelocity{-5.0f, 7.0f};
+    // Position ball near bottom wall and set downward velocity
+    pong.resetBall();
+    Point<float> nearBottomPosition{kTestWindowWidth / 2.0f, kTestWindowHeight - 10.0f};
+    pong.setBallPosition(nearBottomPosition);
+    Point<float> downwardVelocity{0.0f, 0.5f};
     pong.setBallVelocity(downwardVelocity);
     
-    // Expect bottom wall collision event
-    EXPECT_CALL(*mockEventBus, publish(testing::_))
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Invoke([](std::unique_ptr<sdl::UserEvent> event) {
-            auto wallEvent = dynamic_cast<WallCollisionEvent*>(event.get());
-            if (wallEvent != nullptr && wallEvent->wall == WallCollisionEvent::Wall::kBottom) {
-                // Found the expected bottom wall collision
-            }
-        }));
-    
     // Update multiple times to trigger collision
-    for (int i = 0; i < 3000; ++i) {
+    for (int i = 0; i < 150; ++i) {
         pong.update(kDeltaTime);
     }
+    
+    // Verify ball bounced (velocity should be reversed from +0.5 to -0.5)
+    auto finalVelocity = pong.getBall().getVelocity();
+    EXPECT_LT(finalVelocity.y, 0.0f); // Should be negative (bounced downward)
 }
 
 TEST_F(PongTest, LeftWallCollisionScoring) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
-    // Move ball to left wall with maximum allowed speed
+    // Check initial score
+    auto initialRightScore = pong.getScore(Player::kRight);
+    
+    // Position ball near left wall and set leftward velocity
+    pong.resetBall();
+    Point<float> nearLeftPosition{10.0f, kTestWindowHeight / 2.0f};
+    pong.setBallPosition(nearLeftPosition);
     Point<float> leftwardVelocity{-pong::kMaxBallSpeed, 0.0f};
     pong.setBallVelocity(leftwardVelocity);
     
-    // Allow any publish calls (collision detection might trigger multiple events)
-    EXPECT_CALL(*mockEventBus, publish(testing::_))
-        .Times(testing::AnyNumber());
-    
     // Update multiple times to trigger collision
-    for (int i = 0; i < 4000; ++i) {
+    for (int i = 0; i < 100; ++i) {
         pong.update(kDeltaTime);
     }
     
-    // Verify that something happened (ball moved significantly or score changed)
-    auto finalBall = pong.getBall();
-    auto finalExtent = finalBall.getExtent();
-    
-    // Ball should have either hit the wall or moved significantly
-    EXPECT_TRUE(finalExtent.getX() <= 0 || finalExtent.getX() < kTestWindowWidth / 2.0f - 100.0f);
+    // Verify right player scored (left wall collision increments right player score)
+    auto finalRightScore = pong.getScore(Player::kRight);
+    EXPECT_GT(finalRightScore, initialRightScore);
 }
 
 // Scoring Tests
 TEST_F(PongTest, IncrementScore) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     EXPECT_EQ(pong.getScore(Player::kLeft), 0);
     EXPECT_EQ(pong.getScore(Player::kRight), 0);
@@ -223,7 +212,7 @@ TEST_F(PongTest, IncrementScore) {
 
 // Paddle Control Tests
 TEST_F(PongTest, SetPaddleVelocity) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     // Test left paddle movement
     auto initialLeftPosition = pong.getPaddle(Player::kLeft).getExtent().getY();
@@ -249,10 +238,10 @@ TEST_F(PongTest, SetPaddleVelocity) {
 
 // Ball Reset Tests
 TEST_F(PongTest, ResetBall) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     // Move the ball
-    Point<float> velocity{6.0f, 5.0f};
+    Point<float> velocity{0.4f, 0.3f};
     pong.setBallVelocity(velocity);
     pong.update(kDeltaTime);
     
@@ -280,7 +269,7 @@ TEST_F(PongTest, ResetBall) {
 
 // Basic Update Test
 TEST_F(PongTest, BasicUpdate) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     auto initialBallExtent = pong.getBall().getExtent();
     auto initialBallVelocity = pong.getBall().getVelocity();
@@ -300,10 +289,10 @@ TEST_F(PongTest, BasicUpdate) {
 
 // Paddle Collision Direction Tests
 TEST_F(PongTest, BallMovingLeftChecksLeftPaddle) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     // Set ball moving left toward left paddle
-    Point<float> leftwardVelocity{-7.0f, 0.0f};
+    Point<float> leftwardVelocity{-0.6f, 0.0f};
     pong.setBallVelocity(leftwardVelocity);
     
     // Position ball closer to left paddle for potential collision
@@ -318,10 +307,10 @@ TEST_F(PongTest, BallMovingLeftChecksLeftPaddle) {
 }
 
 TEST_F(PongTest, BallMovingRightChecksRightPaddle) {
-    Pong pong(windowSize, mockEventBus, eventRouter);
+    Pong pong(windowSize, eventRouter);
     
     // Set ball moving right toward right paddle
-    Point<float> rightwardVelocity{7.0f, 0.0f};
+    Point<float> rightwardVelocity{0.6f, 0.0f};
     pong.setBallVelocity(rightwardVelocity);
     
     pong.update(kDeltaTime);

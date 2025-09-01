@@ -15,18 +15,17 @@ namespace pong {
 
 class Pong {
  public:
-  Pong(const Point<float>& windowSize, std::shared_ptr<sdl::BaseEventBus> eventBus,
+  Pong(const Point<float>& windowSize,
        std::shared_ptr<sdl::tools::EventRouter> eventRouter)
       : _windowSize(windowSize),
         _ball(Point{windowSize.x / 2.0F, windowSize.y / 2.0F}),
         _paddles{Paddle(Point<float>{kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y),
                  Paddle(Point<float>{windowSize.x - kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y)},
         _scores{{Player::kLeft, 0}, {Player::kRight, 0}},
-        _eventBus(std::move(eventBus)),
         _eventRouter(std::move(eventRouter)) {
     
-    if (!_eventBus || !_eventRouter) {
-      throw std::invalid_argument("Event bus and event router cannot be null");
+    if (!_eventRouter) {
+      throw std::invalid_argument("EventRouter cannot be null");
     }
     
     if (windowSize.x <= 0 || windowSize.y <= 0) {
@@ -52,28 +51,28 @@ class Pong {
 
     // Check Collisions between Ball and Walls
     if (ballVelocity.y < 0 && ballExtent.getY() <= 0) {
-      _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kTop});
+      _eventRouter->routeEvent(WallCollisionEvent{WallCollisionEvent::Wall::kTop});
     } else if (ballVelocity.y > 0 && ballExtent.getY() + ballExtent.getHeight() >= _windowSize.y) {
-      _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kBottom});
+      _eventRouter->routeEvent(WallCollisionEvent{WallCollisionEvent::Wall::kBottom});
     }
 
     if (ballVelocity.x < 0) {  // moving left so might hit kLeft or the Left wall
       const auto& leftPaddle = _paddles.at(static_cast<size_t>(Player::kLeft));
       if (leftPaddle.checkCollision(ballExtent)) {
-        _eventBus->publish(std::make_unique<PaddleCollisionEvent>(
-            Player::kLeft, leftPaddle.determineCollisionZone(ballExtent)));
+        _eventRouter->routeEvent(PaddleCollisionEvent{
+            Player::kLeft, leftPaddle.determineCollisionZone(ballExtent)});
       } else if (ballExtent.getX() <= 0) {
-        _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kLeft});
+        _eventRouter->routeEvent(WallCollisionEvent{WallCollisionEvent::Wall::kLeft});
       }
     }
 
     if (ballVelocity.x > 0) {  // moving right so might hit kRight
       const auto& rightPaddle = _paddles.at(static_cast<size_t>(Player::kRight));
       if (rightPaddle.checkCollision(ballExtent)) {
-        _eventBus->publishSync(PaddleCollisionEvent{
+        _eventRouter->routeEvent(PaddleCollisionEvent{
             Player::kRight, rightPaddle.determineCollisionZone(ballExtent)});
       } else if (ballExtent.getX() + ballExtent.getWidth() >= _windowSize.x) {
-        _eventBus->publishSync(WallCollisionEvent{WallCollisionEvent::Wall::kRight});
+        _eventRouter->routeEvent(WallCollisionEvent{WallCollisionEvent::Wall::kRight});
       }
     }
   }
@@ -85,6 +84,7 @@ class Pong {
   void incrementScore(Player player) { _scores[player]++; }
   void setPaddleVelocity(Player player, Paddle::Velocity velocity) { _paddles.at(static_cast<size_t>(player)).setVelocity(velocity); }
   void setBallVelocity(const Point<float>& velocity) { _ball.setVelocity(velocity); }
+  void setBallPosition(const Point<float>& position) { _ball.setPosition(position); }
   void resetBall() { _ball.resetToStartPositionAndVelocity(); }
 
  private:
@@ -94,7 +94,6 @@ class Pong {
   Ball _ball;
   std::array<Paddle, 2> _paddles;
   std::map<Player, uint16_t> _scores;
-  std::shared_ptr<sdl::BaseEventBus> _eventBus;
   std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
 
   void _registerEventHandlers() {

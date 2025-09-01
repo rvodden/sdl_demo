@@ -37,6 +37,14 @@ class Ball {
       _velocity = velocity; 
     }
 
+    void setPosition(const Point<float>& position) {
+      if (position.x < 0 || position.y < 0) {
+        throw std::invalid_argument("Ball position cannot be negative");
+      }
+      _extent.setX(position.x - (kBallSize.x / 2));
+      _extent.setY(position.y - (kBallSize.y / 2));
+    }
+
     void update(float dt) {
       _extent.setX(_extent.getX() + (_velocity.x * dt));
       _extent.setY(_extent.getY() + (_velocity.y * dt));

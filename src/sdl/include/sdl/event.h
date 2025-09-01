@@ -117,14 +117,12 @@ class SDL_EXPORT BaseEvent {
  * @param baseEventHandler The handler to attempt casting and dispatch to
  */
 template <class EventClass>
-void castHandler(const EventClass& eventClass,
-                 BaseEventHandler& baseEventHandler) {
+void castHandler(const EventClass& eventClass, BaseEventHandler& baseEventHandler) {
   try {
-    auto& eventHandler =
-        dynamic_cast<EventHandler<EventClass>&>(baseEventHandler);
+    auto& eventHandler = dynamic_cast<EventHandler<EventClass>&>(baseEventHandler);
     eventHandler.handle(eventClass);
   } catch ([[maybe_unused]] std::bad_cast& e) {  // NOLINT(bugprone-empty-catch) bad cast just
-                                // means this handler can't handle this event
+                                                 // means this handler can't handle this event
   }
 }
 
@@ -141,15 +139,13 @@ void castHandler(const EventClass& eventClass,
  * @tparam Callable The type of the callable object (lambda, function, etc.)
  */
 template <typename EventType, typename Callable>
-class FunctionEventHandler : public EventHandler<EventType>,
-                             public BaseEventHandler {
+class FunctionEventHandler : public EventHandler<EventType>, public BaseEventHandler {
  public:
   /**
    * @brief Construct a function event handler with the given callable
    * @param callable The callable object that will handle the events
    */
-  explicit FunctionEventHandler(Callable&& callable)
-      : _callable(std::forward<Callable>(std::move(callable))) {}
+  explicit FunctionEventHandler(Callable&& callable) : _callable(std::forward<Callable>(std::move(callable))) {}
 
   /**
    * @brief Handle an event by calling the wrapped callable
@@ -179,9 +175,7 @@ class SDL_EXPORT Event : public BaseEvent {
   /** @brief Timestamp indicating when this event occurred */
   std::chrono::duration<uint64_t, std::milli> timestamp;
 
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
 };
 
 /**
@@ -194,9 +188,7 @@ class SDL_EXPORT Event : public BaseEvent {
 class SDL_EXPORT QuitEvent : public Event {
  public:
   using Event::Event;
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
 };
 
 /**
@@ -213,13 +205,10 @@ class SDL_EXPORT MouseEvent : public Event {
    * @param winId ID of the window that has mouse focus
    * @param mouseId ID of the mouse device that generated the event
    */
-  MouseEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
-             uint32_t mouseId)
+  MouseEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId, uint32_t mouseId)
       : Event(ts), windowId{winId}, which{mouseId} {};
 
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
 
   /** @brief ID of the window that has mouse focus, if any */
   uint32_t windowId;
@@ -244,13 +233,11 @@ class SDL_EXPORT MousePositionEvent : public MouseEvent {
    * @param xPos X coordinate of the mouse position relative to the window
    * @param yPos Y coordinate of the mouse position relative to the window
    */
-  MousePositionEvent(std::chrono::duration<int64_t, std::milli> ts,
-                     uint32_t winId, uint32_t mouseId, float xPos, float yPos)
+  MousePositionEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId, uint32_t mouseId, float xPos,
+                     float yPos)
       : MouseEvent(ts, winId, mouseId), x{xPos}, y{yPos} {};
 
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
 
   /** @brief X coordinate of the event relative to the window origin */
   float x;
@@ -289,17 +276,11 @@ class SDL_EXPORT MouseButtonEvent : public MousePositionEvent {
    * @param btnDown True if button was pressed, false if released
    * @param clickCount Number of clicks (1=single, 2=double, etc.)
    */
-  MouseButtonEvent(std::chrono::duration<int64_t, std::milli> ts,
-                   uint32_t winId, uint32_t mouseId, float xPos, float yPos,
-                   Button btn, bool btnDown, uint8_t clickCount)
-      : MousePositionEvent(ts, winId, mouseId, xPos, yPos),
-        button{btn},
-        down{btnDown},
-        clicks{clickCount} {};
+  MouseButtonEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId, uint32_t mouseId, float xPos,
+                   float yPos, Button btn, bool btnDown, uint8_t clickCount)
+      : MousePositionEvent(ts, winId, mouseId, xPos, yPos), button{btn}, down{btnDown}, clicks{clickCount} {};
 
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
 
   /** @brief The mouse button that changed state */
   Button button;
@@ -318,9 +299,9 @@ class SDL_EXPORT MouseButtonEvent : public MousePositionEvent {
 
 class SDL_EXPORT KeyboardEvent : public Event {
  public:
-  #include "sdl/scancodes.h"
-  #include "sdl/keycodes.h"
-  #include "sdl/keymodifiers.h"
+#include "sdl/keycodes.h"
+#include "sdl/keymodifiers.h"
+#include "sdl/scancodes.h"
 
   /**
    * @brief Construct a keyboard event
@@ -333,8 +314,8 @@ class SDL_EXPORT KeyboardEvent : public Event {
    * @param repeat True if this is a repeat event due to key being held down
    * @param keyMod Current key modifiers
    */
-  KeyboardEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId,
-                uint32_t keyboardId, ScanCode sc, KeyCode kc, bool keyDown, bool repeat, KeyModifier keyMod)
+  KeyboardEvent(std::chrono::duration<int64_t, std::milli> ts, uint32_t winId, uint32_t keyboardId, ScanCode sc,
+                KeyCode kc, bool keyDown, bool repeat, KeyModifier keyMod)
       : Event(ts),
         windowId{winId},
         which{keyboardId},
@@ -343,20 +324,18 @@ class SDL_EXPORT KeyboardEvent : public Event {
         keymod{keyMod},
         down{keyDown},
         isRepeat{repeat} {};
-  
-  void handle(BaseEventHandler& baseEventHandler) override {
-    castHandler(*this, baseEventHandler);
-  };
-  
+
+  void handle(BaseEventHandler& baseEventHandler) override { castHandler(*this, baseEventHandler); };
+
   std::string getKeyName() const;
 
-  uint32_t windowId;   /**< ID of the window with keyboard focus, if any */
-  uint32_t which;      /**< ID of the keyboard device that generated this event */
-  ScanCode scancode;   /**< Physical key location */
-  KeyCode  keycode;    /**< The key that changed state */
-  KeyModifier keymod;  /**< Current key modifiers */
-  bool down;           /**< True if the key was pressed, false if released */
-  bool isRepeat;       /**< True if this is a repeat event due to key being held down */
+  uint32_t windowId;  /**< ID of the window with keyboard focus, if any */
+  uint32_t which;     /**< ID of the keyboard device that generated this event */
+  ScanCode scancode;  /**< Physical key location */
+  KeyCode keycode;    /**< The key that changed state */
+  KeyModifier keymod; /**< Current key modifiers */
+  bool down;          /**< True if the key was pressed, false if released */
+  bool isRepeat;      /**< True if this is a repeat event due to key being held down */
 };
 
 /**
@@ -368,7 +347,7 @@ class SDL_EXPORT KeyboardEvent : public Event {
  *
  * @tparam PlatformEventType The platform-specific event type (e.g., SDL_Event)
  */
-template<typename PlatformEventType>
+template <typename PlatformEventType>
 class EventAdaptor {
  public:
   /**
@@ -415,12 +394,6 @@ class SDL_EXPORT BaseEventBus {
   virtual void publish(std::unique_ptr<UserEvent>) = 0;
 
   /**
-   * @brief Publish a custom event synchronously
-   * @param event The event to publish
-   */
-  virtual void publishSync(const UserEvent& event) = 0;
-
-  /**
    * @brief Set the callback for routing converted events
    * @param callback Function to call when events are available for routing
    */
@@ -438,18 +411,17 @@ class SDL_EXPORT BaseEventBus {
    * @brief Inject a platform event for processing
    * @param eventData Type-erased platform event data
    * @param eventTypeId Type identifier for the event
-   * 
+   *
    * This method allows external code to inject platform events into the event bus
    * without exposing platform-specific types in the public interface.
    * Each concrete implementation handles its supported event types.
    */
   virtual void injectEvent(const std::any& eventData, std::type_index eventTypeId) = 0;
 
-protected:
+ protected:
   /** @brief Callback for routing synchronous events */
   std::function<void(const BaseEvent&)> _syncRouteCallback;
 };
-
 
 /**
  * @brief CRTP template-based event bus for zero-cost platform-specific event handling
@@ -463,14 +435,11 @@ protected:
  * @tparam PlatformEventType The platform-specific event type
  * @tparam AdaptorType The adaptor type for converting events (auto-deduced)
  */
-template<typename Derived, typename PlatformEventType, typename AdaptorType = EventAdaptor<PlatformEventType>>
+template <typename Derived, typename PlatformEventType, typename AdaptorType = EventAdaptor<PlatformEventType>>
 class TemplatedEventBus {
+  friend Derived;
+
  public:
- private:
- TemplatedEventBus() = default;
-public:
-
-
   /**
    * @brief Set the callback for routing converted events
    * @param callback Function to call when events are converted and ready for routing
@@ -499,59 +468,32 @@ public:
    * @brief Wait for and return the next event (delegates to derived implementation)
    * @return A unique pointer to the next available event
    */
-  auto wait() -> std::unique_ptr<BaseEvent> {
-    return static_cast<Derived*>(this)->waitImpl();
-  }
+  auto wait() -> std::unique_ptr<BaseEvent> { return static_cast<Derived*>(this)->waitImpl(); }
 
   /**
    * @brief Poll for the next event without blocking (delegates to derived implementation)
    * @return A unique pointer to the next available event, or std::nullopt if no events available
    */
-  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> {
-    return static_cast<Derived*>(this)->pollImpl();
-  }
+  auto poll() -> std::optional<std::unique_ptr<BaseEvent>> { return static_cast<Derived*>(this)->pollImpl(); }
 
   /**
    * @brief Publish a custom event to the event bus (delegates to derived implementation)
    * @param event The event to publish
    */
-  void publish(std::unique_ptr<UserEvent> event) {
-    static_cast<Derived*>(this)->publishImpl(std::move(event));
-  }
-
-  /**
-   * @brief Publish a custom event synchronously using the template interface
-   * @param event The event to publish
-   */
-  template<typename EventType>
-  requires std::derived_from<EventType, UserEvent>
-  void publishSync(const EventType& event) {
-    if (_syncRouteCallback) {
-      _syncRouteCallback(event);
-    }
-  }
-
-  /**
-   * @brief Set the sync callback for this templated event bus
-   * @param callback Function to call when sync events are published
-   */
-  void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) {
-    _syncRouteCallback = std::move(callback);
-  }
+  void publish(std::unique_ptr<UserEvent> event) { static_cast<Derived*>(this)->publishImpl(std::move(event)); }
 
  private:
+  TemplatedEventBus() = default;
   AdaptorType _adaptor;
   std::function<void(std::unique_ptr<BaseEvent>)> _routeCallback;
-  std::function<void(const BaseEvent&)> _syncRouteCallback;
-friend Derived;
 };
 
 /**
  * @brief Factory function to create an SDL event bus
- * 
+ *
  * This function creates an SDLEventBus instance that uses CRTP internally
  * for zero-cost abstraction while providing the BaseEventBus interface.
- * 
+ *
  * @return A shared pointer to an SDL event bus as BaseEventBus
  */
 [[nodiscard]] SDL_EXPORT auto createSDLEventBus() -> std::shared_ptr<BaseEventBus>;

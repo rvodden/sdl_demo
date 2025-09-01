@@ -44,7 +44,7 @@ class PongApp : public sdl::BaseApplication {
     validateWindowDimensions();
     auto windowSize = Point<float>{static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)};
 
-    _pong = std::make_unique<Pong>(windowSize, getEventBus(), getEventRouter());
+    _pong = std::make_unique<Pong>(windowSize, getEventRouter());
     _pongUI = PongUIFactory::createPongUI(windowSize);
 
     return true;

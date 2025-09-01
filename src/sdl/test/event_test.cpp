@@ -147,19 +147,8 @@ public:
         publishedUserEvents_.push_back(std::move(event));
     }
     
-    void publishSync(const UserEvent& event) override {
-        // Mock implementation - just create a unique_ptr and use async path
-        auto eventPtr = std::make_unique<UserEvent>(event);
-        publish(std::move(eventPtr));
-    }
-    
     void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
         routeCallback_ = std::move(callback);
-    }
-    
-    void setSyncRouteCallback(std::function<void(const BaseEvent&)> callback) override {
-        // Mock implementation - store for verification if needed
-        (void)callback;
     }
     
     void injectEvent(const std::any& eventData, std::type_index eventTypeId) override {

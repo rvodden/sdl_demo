@@ -11,10 +11,10 @@ using pong::Point;
 // Test constants
 constexpr float kTestX = 100.0f;
 constexpr float kTestY = 50.0f;
-constexpr float kValidVelocityX = 7.0f;
-constexpr float kValidVelocityY = 6.0f;
-constexpr float kDeltaTime = 0.016f; // ~60 FPS
-constexpr float kLargeDeltaTime = 0.1f;
+constexpr float kValidVelocityX = 0.5f;
+constexpr float kValidVelocityY = 0.4f;
+constexpr float kDeltaTime = 16.0f; // ~60 FPS in milliseconds
+constexpr float kLargeDeltaTime = 100.0f;
 
 class BallTest : public ::testing::Test {
 protected:

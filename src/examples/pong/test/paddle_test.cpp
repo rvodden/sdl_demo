@@ -17,7 +17,7 @@ constexpr float kTestX = 100.0f;
 constexpr float kTestY = 200.0f;
 constexpr float kMinY = 0.0f;
 constexpr float kMaxY = 400.0f;
-constexpr float kDeltaTime = 0.016f; // ~60 FPS
+constexpr float kDeltaTime = 16.0f; // ~60 FPS in milliseconds
 
 class PaddleTest : public ::testing::Test {
 protected:
