@@ -1,0 +1,286 @@
+name: CI Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+# Allow concurrent CI runs, but cancel previous runs on new commits
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} (${{ matrix.config }})
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        config: [Debug, Release]
+        include:
+          - os: ubuntu-latest
+            preset: ninja-mc
+            test_preset: ninja-mc-debug
+            install_deps: |
+              sudo apt-get update
+              sudo apt-get install -y cmake ninja-build
+          - os: windows-latest
+            preset: ninja-mc
+            test_preset: ninja-mc-debug
+            install_deps: |
+              # Windows dependencies are handled by vcpkg or built-in tools
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: ${{ matrix.install_deps }}
+
+    - name: Setup MSVC (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Configure CMake
+      run: |
+        cmake --preset ${{ matrix.preset }}
+
+    - name: Build (${{ matrix.config }})
+      run: |
+        cmake --build --preset ${{ matrix.preset }}-${{ matrix.config == 'Debug' && 'debug' || 'release' }}
+
+    - name: Run Tests (${{ matrix.config }})
+      run: |
+        ctest --preset ${{ matrix.test_preset }} --build-config ${{ matrix.config }} --output-on-failure --output-junit test-results-${{ matrix.os }}-${{ matrix.config }}.xml
+      continue-on-error: true
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.config }}
+        path: test-results-${{ matrix.os }}-${{ matrix.config }}.xml
+        retention-days: 30
+
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results (${{ matrix.os }} ${{ matrix.config }})
+        path: test-results-${{ matrix.os }}-${{ matrix.config }}.xml
+        reporter: java-junit
+        fail-on-error: false
+
+  # Collect all test results and generate a combined report
+  test-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-results-*
+        merge-multiple: true
+        path: test-results
+
+    - name: Install XML processing tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xmlstarlet jq python3-pip
+        pip3 install junit2html
+
+    - name: Generate combined test report
+      run: |
+        # Create output directory
+        mkdir -p test-report
+        
+        # Find all XML files
+        find test-results -name "*.xml" -type f | head -10
+        
+        # Generate HTML report for each XML file
+        for xml_file in test-results/*.xml; do
+          if [ -f "$xml_file" ]; then
+            base_name=$(basename "$xml_file" .xml)
+            echo "Processing $xml_file -> test-report/${base_name}.html"
+            junit2html --summary-matrix "$xml_file" "test-report/${base_name}.html" || echo "Failed to process $xml_file"
+          fi
+        done
+        
+        # Create index.html with links to all reports
+        cat > test-report/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>SDL Demo - Test Reports</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+                .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                .platform-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: #fafafa; }
+                .platform-card h3 { margin-top: 0; color: #333; }
+                .config-links { margin-top: 10px; }
+                .config-links a { display: inline-block; margin-right: 15px; padding: 8px 16px; background: #007acc; color: white; text-decoration: none; border-radius: 4px; }
+                .config-links a:hover { background: #005a9e; }
+                .timestamp { color: #666; font-size: 0.9em; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>SDL Demo - Test Reports</h1>
+                <p class="timestamp">Generated: $(date -u)</p>
+                <p>Commit: <code>${GITHUB_SHA:0:8}</code> | Branch: <code>${GITHUB_REF_NAME}</code></p>
+            </div>
+            
+            <div class="platform-grid">
+        EOF
+        
+        # Add platform sections
+        for platform in ubuntu-latest windows-latest; do
+          platform_display=$(echo "$platform" | sed 's/-latest//')
+          cat >> test-report/index.html << EOF
+                <div class="platform-card">
+                    <h3>${platform_display^}</h3>
+                    <div class="config-links">
+        EOF
+          
+          for config in Debug Release; do
+            report_file="test-results-${platform}-${config}.html"
+            if [ -f "test-report/$report_file" ]; then
+              cat >> test-report/index.html << EOF
+                        <a href="$report_file">$config Build</a>
+        EOF
+            else
+              cat >> test-report/index.html << EOF
+                        <span style="color: #999;">$config Build (No Results)</span>
+        EOF
+            fi
+          done
+          
+          cat >> test-report/index.html << 'EOF'
+                    </div>
+                </div>
+        EOF
+        done
+        
+        # Close HTML
+        cat >> test-report/index.html << 'EOF'
+            </div>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #f0f8ff; border-radius: 8px;">
+                <h3>Navigation</h3>
+                <p><a href="../index.html">← Back to Documentation</a></p>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+        echo "Generated test report files:"
+        ls -la test-report/
+
+    - name: Upload test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report-html
+        path: test-report/
+        retention-days: 90
+
+  # Update documentation with test reports (only on main branch)
+  update-docs-with-tests:
+    name: Update Documentation with Test Reports
+    runs-on: ubuntu-latest
+    needs: [build-and-test, test-report]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz cmake ninja-build gcovr
+
+    - name: Download test report
+      uses: actions/download-artifact@v4
+      with:
+        name: test-report-html
+        path: test-report
+
+    - name: Setup Pages
+      id: pages
+      uses: actions/configure-pages@v4
+
+    - name: Configure CMake with coverage
+      run: |
+        cmake --preset ninja-mc-coverage -DSDL_UNIX_CONSOLE_BUILD=ON
+
+    - name: Build project with coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage
+
+    - name: Run tests and generate coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage --target coverage
+
+    - name: Generate documentation with coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage --target docs
+
+    - name: Integrate test reports into documentation
+      run: |
+        # Copy test reports into documentation
+        mkdir -p build/ninja-mc-coverage/docs/output/html/test-reports
+        cp -r test-report/* build/ninja-mc-coverage/docs/output/html/test-reports/
+        
+        # Update the main documentation index to include test reports link
+        if [ -f "build/ninja-mc-coverage/docs/output/html/index.html" ]; then
+          # Add test reports link to the navigation (simple approach)
+          sed -i 's|</head>|<style>.test-reports-link { position: fixed; top: 10px; right: 10px; background: #28a745; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; z-index: 1000; } .test-reports-link:hover { background: #218838; }</style></head>|' build/ninja-mc-coverage/docs/output/html/index.html
+          sed -i 's|<body|<body><a href="test-reports/index.html" class="test-reports-link">📊 Test Reports</a>|' build/ninja-mc-coverage/docs/output/html/index.html
+        fi
+        
+        echo "Documentation structure:"
+        find build/ninja-mc-coverage/docs/output/html -type f -name "*.html" | head -10
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/ninja-mc-coverage/docs/output/html
+
+  # Deploy to GitHub Pages (only on main branch)
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: update-docs-with-tests
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
