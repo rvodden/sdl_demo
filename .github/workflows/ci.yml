@@ -50,11 +50,38 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
-      run: ${{ matrix.install_deps }}
+      run: |
+        ${{ matrix.install_deps }}
+        # Install newer CMake to ensure --output-junit works properly (requires CMake 3.21.4+)
+        CMAKE_VERSION="4.1.1"
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+        sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+        sudo apt-get update
+        sudo apt-get install -y cmake=${CMAKE_VERSION}* cmake-data=${CMAKE_VERSION}*
 
     - name: Setup MSVC (Windows)
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install newer CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Download and install CMake 4.1.1 for Windows
+        $CMAKE_VERSION = "4.1.1"
+        $CMAKE_URL = "https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-windows-x86_64.msi"
+        $CMAKE_INSTALLER = "$env:TEMP\cmake-installer.msi"
+        
+        Write-Host "Downloading CMake $CMAKE_VERSION..."
+        Invoke-WebRequest -Uri $CMAKE_URL -OutFile $CMAKE_INSTALLER
+        
+        Write-Host "Installing CMake $CMAKE_VERSION..."
+        Start-Process msiexec.exe -ArgumentList "/i", $CMAKE_INSTALLER, "/quiet", "/norestart" -Wait
+        
+        # Add CMake to PATH for this session
+        $env:PATH = "C:\Program Files\CMake\bin;$env:PATH"
+        
+        Write-Host "CMake version after installation:"
+        cmake --version
 
     - name: Configure CMake
       run: |
@@ -87,14 +114,25 @@ jobs:
           fi
         fi
         
-        # Verify we have results to upload
+        # Verify we have results to upload and validate XML format
         if [ -f "test-results-${{ matrix.os }}-${{ matrix.config }}.xml" ]; then
           echo "Successfully generated test results XML"
           echo "File size: $(wc -c < test-results-${{ matrix.os }}-${{ matrix.config }}.xml) bytes"
           echo "First few lines:"
           head -10 "test-results-${{ matrix.os }}-${{ matrix.config }}.xml"
+          
+          # Validate that it's actually JUnit XML format (should have <testsuite> root element)
+          if grep -q "<testsuite" "test-results-${{ matrix.os }}-${{ matrix.config }}.xml"; then
+            echo "✓ Valid JUnit XML format detected"
+            echo "JUNIT_XML_VALID=true" >> $GITHUB_ENV
+          else
+            echo "⚠ Invalid JUnit XML format - contains non-JUnit XML structure"
+            echo "This will cause the dorny/test-reporter to fail with parsing errors"
+            echo "JUNIT_XML_VALID=false" >> $GITHUB_ENV
+          fi
         else
           echo "Warning: No test results XML was generated"
+          echo "JUNIT_XML_VALID=false" >> $GITHUB_ENV
         fi
       continue-on-error: true
 
@@ -108,12 +146,19 @@ jobs:
 
     - name: Publish test results
       uses: dorny/test-reporter@v1
-      if: always()
+      if: always() && env.JUNIT_XML_VALID == 'true'
       with:
         name: Test Results (${{ matrix.os }} ${{ matrix.config }})
         path: test-results-${{ matrix.os }}-${{ matrix.config }}.xml
         reporter: java-junit
         fail-on-error: false
+
+    - name: Skip publishing invalid test results
+      if: always() && env.JUNIT_XML_VALID == 'false'
+      run: |
+        echo "⚠ Skipping test results publishing due to invalid or missing JUnit XML"
+        echo "This prevents the TypeError: Cannot read properties of undefined error"
+        echo "The XML file either doesn't exist or is not in proper JUnit format"
 
   # Collect all test results and generate a combined report
   test-report:
