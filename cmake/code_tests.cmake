@@ -24,8 +24,6 @@
 
 #]]
 
-include(CMakePrintHelpers)
-
 #[[
     Using the function `install_component` looks like this:
     ```
@@ -313,7 +311,6 @@ function(register_code_test)
         list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/lib")
     endforeach()
     string(JOIN ":" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
-    cmake_print_variables(LD_LIBRARY_PATH_VALUE)
 
     if(DEFINED CMAKE_TOOLCHAIN_FILE)
         list(APPEND ARGUMENT_LIST "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
@@ -351,6 +348,5 @@ function(register_code_test)
             FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured"
             ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH_VALUE}"
     )
-    cmake_print_properties(TESTS CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles PROPERTIES ENVIRONMENT)
 
 endfunction()
