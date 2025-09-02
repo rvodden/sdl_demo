@@ -169,7 +169,12 @@ auto BaseApplication::requestSDL() -> SDL& {
 
 extern "C" {
 
-SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+#ifdef WIN32
+#define SDL_APPLICATION_EXPORT_SAVED SDL_APPLICATION_EXPORT
+#define SDL_APPLICATION_EXPORT
+#endif
+
+SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   auto& runner = sdl::ApplicationRunner::getInstance();
   auto* app = runner.getApplication();
   
@@ -189,7 +194,7 @@ SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[maybe_unused]] int argc, [[
   return SDL_APP_FAILURE;
 }
 
-SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
+SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
   auto* runner = static_cast<sdl::ApplicationRunner*>(appstate);
   if (runner == nullptr) {
     return SDL_APP_SUCCESS;
@@ -206,7 +211,7 @@ SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
   return SDL_APP_SUCCESS;
 }
 
-void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_AppResult result) {
+SDL_APPLICATION_EXPORT void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_AppResult result) {
   auto* runner = static_cast<sdl::ApplicationRunner*>(appstate);
   if (runner == nullptr) {
     return;
@@ -222,7 +227,7 @@ void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_AppResult result) 
   instance.reset();
 }
 
-SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Event* event) {
+SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Event* event) {
   if (event == nullptr) {
     return SDL_APP_CONTINUE;
   }
@@ -243,5 +248,8 @@ SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Event* e
 }
 
 // SDL callback functions exported via pragma comment on Windows
+#ifdef WIN32
+#define SDL_APPLICATION_EXPORT SDL_APPLICATION_EXPORT_SAVED
+#endif
 
 }
