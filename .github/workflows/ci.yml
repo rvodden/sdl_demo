@@ -33,12 +33,14 @@ jobs:
           - os: ubuntu-latest
             preset: ninja-mc
             test_preset: ninja-mc-debug
+            cmake_configure_opts: -DSDL_UNIX_CONSOLE_BUILD=ON
             install_deps: |
               sudo apt-get update
               sudo apt-get install -y cmake ninja-build
           - os: windows-latest
-            preset: ninja-mc
-            test_preset: ninja-mc-debug
+            preset: msvcc
+            test_preset: msvcc-debug
+            cmake_configure_opts: ""
             install_deps: |
               # Windows dependencies are handled by vcpkg or built-in tools
     
@@ -58,7 +60,7 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cmake --preset ${{ matrix.preset }}
+        cmake --preset ${{ matrix.preset }} ${{ matrix.cmake_configure_opts }}
 
     - name: Build (${{ matrix.config }})
       run: |
