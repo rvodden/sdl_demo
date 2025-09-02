@@ -100,15 +100,36 @@ jobs:
         # Method 1: Try --output-junit (preferred, but may have issues in some CMake versions)
         ctest --preset ${{ matrix.test_preset }} --build-config ${{ matrix.config }} --output-on-failure --output-junit test-results-${{ matrix.os }}-${{ matrix.config }}.xml
         
+        # Find the XML file - it's created relative to the CTest working directory (build/preset/)
+        XML_FILE="test-results-${{ matrix.os }}-${{ matrix.config }}.xml"
+        BUILD_XML_PATH="build/${{ matrix.preset }}/$XML_FILE"
+        
+        # Check if XML was generated in the build directory
+        if [ -f "$BUILD_XML_PATH" ]; then
+          echo "Found XML file in build directory: $BUILD_XML_PATH"
+          # Copy to root directory for upload step
+          cp "$BUILD_XML_PATH" "$XML_FILE"
+        elif [ -f "$XML_FILE" ]; then
+          echo "Found XML file in current directory: $XML_FILE"
+        else
+          echo "XML not found, searching all locations..."
+          find . -name "$XML_FILE" -type f | head -5
+          FOUND_XML=$(find . -name "$XML_FILE" -type f | head -1)
+          if [ -n "$FOUND_XML" ]; then
+            echo "Found XML file at: $FOUND_XML"
+            cp "$FOUND_XML" "$XML_FILE"
+          fi
+        fi
+        
         # Verify we have results to upload and validate XML format
-        if [ -f "test-results-${{ matrix.os }}-${{ matrix.config }}.xml" ]; then
+        if [ -f "$XML_FILE" ]; then
           echo "Successfully generated test results XML"
-          echo "File size: $(wc -c < test-results-${{ matrix.os }}-${{ matrix.config }}.xml) bytes"
+          echo "File size: $(wc -c < $XML_FILE) bytes"
           echo "First few lines:"
-          head -10 "test-results-${{ matrix.os }}-${{ matrix.config }}.xml"
+          head -10 "$XML_FILE"
           
           # Validate that it's actually JUnit XML format (should have <testsuite> root element)
-          if grep -q "<testsuite" "test-results-${{ matrix.os }}-${{ matrix.config }}.xml"; then
+          if grep -q "<testsuite" "$XML_FILE"; then
             echo "✓ Valid JUnit XML format detected"
             echo "JUNIT_XML_VALID=true" >> $GITHUB_ENV
           else
