@@ -108,7 +108,7 @@ REGISTER_APPLICATION(MyGame)
 
 ## Performance Benchmarks
 
-SDL++ includes comprehensive performance benchmarks to validate the zero-overhead abstraction claims. The event system has been thoroughly benchmarked and shows exceptional performance characteristics.
+SDL++ includes comprehensive performance benchmarks to validate the zero-overhead abstraction claims. The event system has been thoroughly benchmarked and shows good performance characteristics.
 
 ### Running Benchmarks
 
