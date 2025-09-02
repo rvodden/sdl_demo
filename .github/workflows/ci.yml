@@ -286,76 +286,34 @@ jobs:
         path: test-report/
         retention-days: 90
 
-  # Update documentation with test reports (only on main branch)
-  update-docs-with-tests:
-    name: Update Documentation with Test Reports
+  # Deploy test reports to GitHub Pages (only on main branch)
+  deploy-test-reports:
+    name: Deploy Test Reports to GitHub Pages
     runs-on: ubuntu-latest
     needs: [build-and-test, test-report]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: always() && needs.test-report.result == 'success' && github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y doxygen graphviz cmake ninja-build gcovr
-
     - name: Download test report
       uses: actions/download-artifact@v4
       with:
         name: test-report-html
-        path: test-report
+        path: test-reports
 
     - name: Setup Pages
       id: pages
       uses: actions/configure-pages@v4
 
-    - name: Configure CMake with coverage
-      run: |
-        cmake --preset ninja-mc-coverage -DSDL_UNIX_CONSOLE_BUILD=ON
-
-    - name: Build project with coverage
-      run: |
-        cmake --build --preset ninja-mc-coverage
-
-    - name: Run tests and generate coverage
-      run: |
-        cmake --build --preset ninja-mc-coverage --target coverage
-
-    - name: Generate documentation with coverage
-      run: |
-        cmake --build --preset ninja-mc-coverage --target docs
-
-    - name: Integrate test reports into documentation
-      run: |
-        # Copy test reports into documentation
-        mkdir -p build/ninja-mc-coverage/docs/output/html/test-reports
-        cp -r test-report/* build/ninja-mc-coverage/docs/output/html/test-reports/
-        
-        # Update the main documentation index to include test reports link
-        if [ -f "build/ninja-mc-coverage/docs/output/html/index.html" ]; then
-          # Add test reports link to the navigation (simple approach)
-          sed -i 's|</head>|<style>.test-reports-link { position: fixed; top: 10px; right: 10px; background: #28a745; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; z-index: 1000; } .test-reports-link:hover { background: #218838; }</style></head>|' build/ninja-mc-coverage/docs/output/html/index.html
-          sed -i 's|<body|<body><a href="test-reports/index.html" class="test-reports-link">📊 Test Reports</a>|' build/ninja-mc-coverage/docs/output/html/index.html
-        fi
-        
-        echo "Documentation structure:"
-        find build/ninja-mc-coverage/docs/output/html -type f -name "*.html" | head -10
-
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: build/ninja-mc-coverage/docs/output/html
+        path: test-reports
 
   # Deploy to GitHub Pages (only on main branch)
   deploy-pages:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    needs: update-docs-with-tests
+    needs: deploy-test-reports
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: github-pages

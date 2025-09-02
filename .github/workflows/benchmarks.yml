@@ -55,6 +55,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
+        fetch-tags: true
         submodules: recursive
         
     - name: Setup dependencies
