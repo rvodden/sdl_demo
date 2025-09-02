@@ -98,23 +98,7 @@ jobs:
       run: |
         # Use both approaches to ensure we get test results even if one fails
         # Method 1: Try --output-junit (preferred, but may have issues in some CMake versions)
-        ctest --preset ${{ matrix.test_preset }} --build-config ${{ matrix.config }} --output-on-failure --output-junit test-results-${{ matrix.os }}-${{ matrix.config }}.xml || echo "ctest with --output-junit failed, trying alternative method"
-        
-        # Method 2: Fallback to -T Test which always generates XML in Testing/TAG/Test.xml
-        if [ ! -f "test-results-${{ matrix.os }}-${{ matrix.config }}.xml" ]; then
-          echo "JUnit XML not found, using -T Test method"
-          ctest --preset ${{ matrix.test_preset }} --build-config ${{ matrix.config }} --output-on-failure -T Test || true
-          
-          # Find the generated Test.xml file and copy it
-          test_xml=$(find . -path "*/Testing/*/Test.xml" -type f | head -1)
-          if [ -f "$test_xml" ]; then
-            echo "Found Test.xml at: $test_xml"
-            cp "$test_xml" "test-results-${{ matrix.os }}-${{ matrix.config }}.xml"
-          else
-            echo "No Test.xml found either, checking what was generated:"
-            find . -name "*.xml" -type f | head -10
-          fi
-        fi
+        ctest --preset ${{ matrix.test_preset }} --build-config ${{ matrix.config }} --output-on-failure --output-junit test-results-${{ matrix.os }}-${{ matrix.config }}.xml
         
         # Verify we have results to upload and validate XML format
         if [ -f "test-results-${{ matrix.os }}-${{ matrix.config }}.xml" ]; then
