@@ -1,11 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger when other workflows complete on main branch
-  workflow_run:
-    workflows: ["CI Build and Test", "Generate Documentation", "Generate Coverage Reports", "Performance Benchmarks"]
+  push:
     branches: [ main ]
-    types: [ completed ]
   # Allow manual triggering
   workflow_dispatch:
 
@@ -20,9 +17,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  wait-for-ci:
+    name: Wait for CI Build and Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for CI workflow
+      uses: fountainhead/action-wait-for-check@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        checkName: 'ubuntu-latest (Debug)'  # Wait for at least one key job
+        ref: ${{ github.sha }}
+        timeoutSeconds: 1800  # 30 minutes
+        intervalSeconds: 30
+
+  wait-for-docs:
+    name: Wait for Documentation Generation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for docs workflow
+      uses: fountainhead/action-wait-for-check@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        checkName: 'Generate Documentation'
+        ref: ${{ github.sha }}
+        timeoutSeconds: 900  # 15 minutes
+        intervalSeconds: 30
+
+  wait-for-coverage:
+    name: Wait for Coverage Generation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for coverage workflow
+      uses: fountainhead/action-wait-for-check@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        checkName: 'Generate Coverage Reports'
+        ref: ${{ github.sha }}
+        timeoutSeconds: 1200  # 20 minutes
+        intervalSeconds: 30
+
+  wait-for-benchmarks:
+    name: Wait for Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for benchmarks workflow
+      uses: fountainhead/action-wait-for-check@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        checkName: 'benchmarks (ubuntu-latest)'  # Wait for at least one platform
+        ref: ${{ github.sha }}
+        timeoutSeconds: 1800  # 30 minutes
+        intervalSeconds: 30
+
   deploy-pages:
     name: Deploy Combined Content to GitHub Pages
     runs-on: ubuntu-latest
+    needs: [wait-for-ci, wait-for-docs, wait-for-coverage, wait-for-benchmarks]
+    if: always()  # Run even if some wait jobs fail
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -42,8 +93,6 @@ jobs:
       with:
         name: test-report-html
         path: pages-content/test-reports
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download documentation artifact
       uses: actions/download-artifact@v4
@@ -51,8 +100,6 @@ jobs:
       with:
         name: documentation
         path: pages-content/docs
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download coverage reports artifact
       uses: actions/download-artifact@v4
@@ -60,8 +107,6 @@ jobs:
       with:
         name: coverage-reports
         path: pages-content/coverage
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download benchmark reports artifact
       uses: actions/download-artifact@v4
@@ -69,8 +114,6 @@ jobs:
       with:
         name: benchmark-html-report
         path: pages-content/benchmarks
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create main index page
       run: |
