@@ -28,7 +28,7 @@ class SDL_EXPORT Color {
   [[nodiscard]] auto constexpr getAlpha() const -> uint8_t { return _alpha; };
 
  private:
-  std::tuple<uint8_t, uint8_t, uint8_t> _color{0, 0, 0};
+  std::tuple<uint8_t, uint8_t, uint8_t> _color{uint8_t{0}, uint8_t{0}, uint8_t{0}};
   uint8_t _alpha{static_cast<uint8_t>(Alpha::kOpaque)};
 };
 

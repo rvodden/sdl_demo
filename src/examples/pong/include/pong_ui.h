@@ -35,7 +35,7 @@ class PongUIFactory {
   static std::unique_ptr<ScoreRenderer<kMaxScore>> createScoreRenderer(
       std::shared_ptr<sdl::Renderer> renderer) {
     auto font = std::make_unique<sdl::ttf::Font>(&_binary_PressStart2P_Regular_ttf_start, 
-                                                pressStart2PSize(), 
+                                                pressStart2PRegularSize(), 
                                                 kScoreFontSize);
     return std::make_unique<ScoreRenderer<kMaxScore>>(std::move(font), renderer);
   }

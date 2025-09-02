@@ -39,7 +39,7 @@ constexpr auto kMaximumDt = 1000.0F;
 constexpr auto kPaddleCollisionZoneDivisions = 3.0F; // Used to divide paddle into collision zones
 
 // UI Constants
-constexpr auto kScoreFontSize = 40;
+constexpr auto kScoreFontSize = 40.0F;
 constexpr auto kScorePositionLeftRatio = 0.25F;
 constexpr auto kScorePositionRightRatio = 0.75F;
 constexpr auto kScoreVerticalOffset = 20.0F;

@@ -56,9 +56,9 @@ set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 target_link_libraries( ${TEST_NAME} PRIVATE standard_compiler_options )
 target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME} )
-target_link_libraries( ${TEST_NAME} PUBLIC gtest )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC gmock )
-target_link_libraries( ${TEST_NAME} PUBLIC gtest_main )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest_main )
 
 gtest_discover_tests( ${TEST_NAME} 
     DISCOVERY_MODE POST_BUILD

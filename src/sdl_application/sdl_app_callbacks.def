@@ -1,0 +1,5 @@
+EXPORTS
+SDL_AppInit
+SDL_AppIterate
+SDL_AppEvent
+SDL_AppQuit

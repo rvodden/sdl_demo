@@ -19,11 +19,18 @@ add_custom_target(${PROJECT_NAME}_raw_data DEPENDS ${FONT_FILE})
 
 if(WIN32)
     enable_language(RC)
-    set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
+    
+    # Configure the resource file with the correct font path
+    set(RESOURCE_FILE "${CMAKE_CURRENT_BINARY_DIR}/resources.rc")
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources.rc.in" ${RESOURCE_FILE} @ONLY)
+    
     add_library(${PROJECT_NAME}_data OBJECT ${RESOURCE_FILE})
     set_target_properties(${PROJECT_NAME}_data PROPERTIES 
         LINKER_LANGUAGE RC
         RC_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    
+    # Make sure font is downloaded before configuring resources
+    add_dependencies(${PROJECT_NAME}_data ${PROJECT_NAME}_raw_data)
 else()
     set(DataFiles ${FONT_FILE})
 

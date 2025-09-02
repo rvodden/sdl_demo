@@ -95,6 +95,12 @@ private:
         }
 
         // TODO: Blocking call in event handler feels bad
+
+        // work around Windows SDK's #define of MessageBox
+        // TODO: find an alternative name for the MessageBox class
+        #ifdef WIN32
+          #undef MessageBox
+        #endif
         MessageBox("Game Over!", message).addButton("OK").show();
 
         getEventBus()->publish(std::make_unique<StartNewGameEvent>());

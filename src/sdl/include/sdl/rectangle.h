@@ -20,6 +20,8 @@ template<typename T>
 concept RectangleCoordinate = std::same_as<T, int32_t> || std::same_as<T, float>;
 
 class Renderer;
+
+// Forward declaration - full definition in rectangle_impl.h
 template<RectangleCoordinate T> class RectangleImpl;
 
 /**
@@ -105,7 +107,12 @@ public:
      */
     template<RectangleCoordinate U>
     requires (!std::same_as<T, U>)
-    explicit Rectangle(const Rectangle<U>& other);
+    explicit Rectangle(const Rectangle<U>& other) 
+        : Rectangle(static_cast<T>(other.getX()), 
+                   static_cast<T>(other.getY()), 
+                   static_cast<T>(other.getWidth()), 
+                   static_cast<T>(other.getHeight())) {
+    }
 
     /**
      * @brief Destructor.

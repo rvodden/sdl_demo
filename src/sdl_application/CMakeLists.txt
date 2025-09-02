@@ -13,6 +13,10 @@ generate_export_header(${PROJECT_NAME})
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
 
+# SDL callback functions are exported using cross-platform macro approach
+# On Windows: SDL_APPLICATION_EXPORT is temporarily undefined to avoid linkage conflicts
+# On Linux: SDL_APPLICATION_EXPORT provides proper symbol visibility
+
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 target_sources(${PROJECT_NAME} 
     PUBLIC 
@@ -65,9 +69,9 @@ endif()
 set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME} )
-target_link_libraries( ${TEST_NAME} PUBLIC gtest )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC gmock )
-target_link_libraries( ${TEST_NAME} PUBLIC gtest_main )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest_main )
 
 gtest_discover_tests( ${TEST_NAME} 
     DISCOVERY_MODE POST_BUILD
