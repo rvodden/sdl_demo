@@ -65,6 +65,36 @@ jobs:
     - name: Setup MSVC (Windows only)
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install newer CMake (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        # Install newer CMake to ensure --output-junit works properly (requires CMake 3.21.4+)
+        CMAKE_VERSION="4.1.1"
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+        sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+        sudo apt-get update
+        sudo apt-get install -y cmake=${CMAKE_VERSION}* cmake-data=${CMAKE_VERSION}*
+
+    - name: Install newer CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Download and install CMake 4.1.1 for Windows
+        $CMAKE_VERSION = "4.1.1"
+        $CMAKE_URL = "https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-windows-x86_64.msi"
+        $CMAKE_INSTALLER = "$env:TEMP\cmake-installer.msi"
+        
+        Write-Host "Downloading CMake $CMAKE_VERSION..."
+        Invoke-WebRequest -Uri $CMAKE_URL -OutFile $CMAKE_INSTALLER
+        
+        Write-Host "Installing CMake $CMAKE_VERSION..."
+        Start-Process msiexec.exe -ArgumentList "/i", $CMAKE_INSTALLER, "/quiet", "/norestart" -Wait
+        
+        # Add CMake to PATH for this session
+        $env:PATH = "C:\Program Files\CMake\bin;$env:PATH"
+        
+        Write-Host "CMake version after installation:"
+        cmake --version
       
     - name: Configure CMake
       run: cmake --preset ${{ matrix.cmake_preset }} -DSDLXX_ENABLE_BENCHMARKS=ON
