@@ -16,13 +16,16 @@ set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 # Try to find GTest package config, fallback to targets if using FetchContent
 find_package(GTest CONFIG REQUIRED)
+set(GTEST_CREATE_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
+set(GTEST_LINKED_AS_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Link with required libraries
 target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl )
 target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl_tools )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gmock )
-target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest_main )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gmock_main )
 
 # Include pong headers
 target_include_directories( ${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include )

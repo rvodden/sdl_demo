@@ -21,7 +21,7 @@ class Pong {
         _ball(Point{windowSize.x / 2.0F, windowSize.y / 2.0F}),
         _paddles{Paddle(Point<float>{kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y),
                  Paddle(Point<float>{windowSize.x - kPaddleFromWallDistance, windowSize.y / 2.0F}, 0, windowSize.y)},
-        _scores{{Player::kLeft, 0}, {Player::kRight, 0}},
+        _scores{{Player::kLeft, uint16_t{0}}, {Player::kRight, uint16_t{0}}},
         _eventRouter(std::move(eventRouter)) {
     
     if (!_eventRouter) {

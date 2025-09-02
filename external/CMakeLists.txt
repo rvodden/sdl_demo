@@ -17,6 +17,8 @@ if(SDLXX_USE_VENDORED_GTEST)
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
         )
+        set(GTEST_CREATE_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
+        set(GTEST_LINKED_AS_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 endif()
 

@@ -1,4 +1,4 @@
 #include <windows.h>
 #include "resource.h"
 
-kTicTacToe_Png RCDATA "DejaVuSansMono.ttf"
+kTicTacToe_Png RCDATA "tic_tac_toe.png"

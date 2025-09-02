@@ -8,9 +8,6 @@ namespace sdl {
 template class Rectangle<int32_t>;
 template class Rectangle<float>;
 
-// Explicit instantiation of conversion constructors
-template Rectangle<int32_t>::Rectangle(const Rectangle<float>&);
-template Rectangle<float>::Rectangle(const Rectangle<int32_t>&);
 
 // Constructor
 template<RectangleCoordinate T>
@@ -28,17 +25,7 @@ Rectangle<T>::Rectangle(const Rectangle& other)
 template<RectangleCoordinate T>
 Rectangle<T>::Rectangle(Rectangle&& other) noexcept = default;
 
-// Conversion constructor
-template<RectangleCoordinate T>
-template<RectangleCoordinate U>
-requires (!std::same_as<T, U>)
-Rectangle<T>::Rectangle(const Rectangle<U>& other)
-    : impl_(std::make_unique<RectangleImpl<T>>(
-        static_cast<T>(other.getX()),
-        static_cast<T>(other.getY()),
-        static_cast<T>(other.getWidth()),
-        static_cast<T>(other.getHeight()))) {
-}
+// Conversion constructor implementation is provided via explicit specializations above
 
 // Destructor
 template<RectangleCoordinate T>

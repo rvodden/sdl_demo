@@ -1,3 +1,6 @@
+#ifndef TINY_TTF_H
+#define TINY_TTF_H
+
 /* Data used by this example */
 /* tiny.txt
     Font: Tiny
@@ -46,6 +49,9 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
 */
+
+#include <array>
+
 const std::array<const uint8_t, 6656> kTinyTTF = {
   0x00, 0x01, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x80, 0x00, 0x03, 0x00, 0x20,
   0x4f, 0x53, 0x2f, 0x32, 0x7a, 0x61, 0x7a, 0x16, 0x00, 0x00, 0x00, 0xac,
@@ -605,3 +611,5 @@ const std::array<const uint8_t, 6656> kTinyTTF = {
 };
 
 const unsigned int kTinyTTFLen = 6656;
+
+#endif // TINY_TTF_H

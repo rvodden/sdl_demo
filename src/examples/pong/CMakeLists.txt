@@ -60,6 +60,8 @@ if(NOT PROJECT_IS_TOP_LEVEL)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_data)
+# Add the data include directory for C++ compilation (both Windows and Linux need this)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_application)
