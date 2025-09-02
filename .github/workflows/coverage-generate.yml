@@ -1,0 +1,58 @@
+name: Generate Coverage Reports
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Allow concurrent runs, but cancel previous runs on new commits
+concurrency:
+  group: coverage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-coverage:
+    name: Generate Coverage Reports
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build gcovr
+        # Install newer CMake to ensure compatibility
+        CMAKE_VERSION="4.1.1"
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+        sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+        sudo apt-get update
+        sudo apt-get install -y cmake=${CMAKE_VERSION}* cmake-data=${CMAKE_VERSION}*
+
+    - name: Configure CMake with coverage
+      run: |
+        cmake --preset ninja-mc-coverage -DSDL_UNIX_CONSOLE_BUILD=ON
+
+    - name: Build project with coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage
+
+    - name: Run tests and generate coverage
+      run: |
+        cmake --build --preset ninja-mc-coverage --target coverage
+
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports
+        path: build/ninja-mc-coverage/coverage/
+        retention-days: 90
