@@ -6,7 +6,7 @@ Be brutally honest, don't be a yes man. If I am wrong, point it out bluntly. I n
 
 ## Build System
 
-This project uses CMake with presets for configuration and building:
+This project uses CMake with presets for configuration and building. The following commands are for Ubuntu, on Windows `msvcc` should be used instead of `ninja-mc` in all the preset names.
 
 - **Configure**: `cmake --preset ninja-mc` (uses Ninja Multi-Config generator)
 - **Build Debug**: `cmake --build --preset ninja-mc-debug`
@@ -19,6 +19,8 @@ This project uses CMake with presets for configuration and building:
 This project includes comprehensive performance benchmarks for critical components, particularly the event system. Benchmarks are built using Google Benchmark and are disabled by default to keep build times fast.
 
 ### Building and Running Benchmarks
+
+The following commands are for Ubuntu, on Windows `msvcc` should be used instead of `ninja-mc` in all the preset names.
 
 **Enable benchmarks during configuration:**
 ```bash

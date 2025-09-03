@@ -1,4 +1,5 @@
 #include <benchmark/benchmark.h>
+#include <stdexcept>
 #include <SDL3/SDL.h>
 #include "sdl/window.h"
 
