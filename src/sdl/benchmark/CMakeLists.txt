@@ -33,7 +33,6 @@ target_include_directories(sdl_event_benchmarks
 set_target_properties(sdl_event_benchmarks PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
 # Enable all compiler optimizations for benchmarks
@@ -78,7 +77,6 @@ target_include_directories(sdl_abstraction_benchmarks
 set_target_properties(sdl_abstraction_benchmarks PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
 # Enable all compiler optimizations for benchmarks

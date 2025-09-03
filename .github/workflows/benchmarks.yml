@@ -20,7 +20,7 @@ jobs:
             os_name: ubuntu
             cmake_preset: ninja-mc
             build_preset: ninja-mc-release
-            executable_path: build/ninja-mc/bin/benchmarks/Release/sdl_abstraction_benchmarks
+            executable_path: build/ninja-mc/bin/Release/sdl_abstraction_benchmarks
             setup_deps: |
               sudo apt-get update
               sudo apt-get install -y \
@@ -47,7 +47,7 @@ jobs:
             os_name: windows
             cmake_preset: msvcc
             build_preset: msvcc-release
-            executable_path: build/msvcc/bin/benchmarks/Release/sdl_abstraction_benchmarks.exe
+            executable_path: build/msvcc/bin/Release/sdl_abstraction_benchmarks.exe
             setup_deps: echo "No additional deps needed for Windows"
 
     runs-on: ${{ matrix.os }}
