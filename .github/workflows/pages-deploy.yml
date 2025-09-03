@@ -56,23 +56,24 @@ jobs:
         timeoutSeconds: 1200  # 20 minutes
         intervalSeconds: 30
 
-  wait-for-benchmarks:
-    name: Wait for Performance Benchmarks
-    runs-on: ubuntu-latest
-    steps:
-    - name: Wait for benchmarks workflow
-      uses: fountainhead/action-wait-for-check@v1.2.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        checkName: 'benchmarks (ubuntu-latest)'  # Wait for at least one platform
-        ref: ${{ github.sha }}
-        timeoutSeconds: 1800  # 30 minutes
-        intervalSeconds: 30
+  # wait-for-benchmarks:
+  #   name: Wait for Performance Benchmarks
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Wait for benchmarks workflow
+  #     uses: fountainhead/action-wait-for-check@v1.2.0
+  #     with:
+  #       token: ${{ secrets.GITHUB_TOKEN }}
+  #       checkName: 'benchmarks (ubuntu-latest)'  # Wait for at least one platform
+  #       ref: ${{ github.sha }}
+  #       timeoutSeconds: 1800  # 30 minutes
+  #       intervalSeconds: 30
 
   deploy-pages:
     name: Deploy Combined Content to GitHub Pages
     runs-on: ubuntu-latest
-    needs: [wait-for-ci, wait-for-docs, wait-for-coverage, wait-for-benchmarks]
+    needs: [wait-for-ci, wait-for-docs, wait-for-coverage]
+    # needs: [wait-for-ci, wait-for-docs, wait-for-coverage, wait-for-benchmarks]
     if: always()  # Run even if some wait jobs fail
     environment:
       name: github-pages
@@ -108,12 +109,12 @@ jobs:
         name: coverage-reports
         path: pages-content/coverage
 
-    - name: Download benchmark reports artifact
-      uses: actions/download-artifact@v4
-      continue-on-error: true
-      with:
-        name: benchmark-html-report
-        path: pages-content/benchmarks
+    # - name: Download benchmark reports artifact
+    #   uses: actions/download-artifact@v4
+    #   continue-on-error: true
+    #   with:
+    #     name: benchmark-html-report
+    #     path: pages-content/benchmarks
 
     - name: Create main index page
       run: |
@@ -160,11 +161,11 @@ jobs:
                     <a href="coverage/index.html">View Coverage</a>
                 </div>
                 
-                <div class="section-card">
-                    <h3>⚡ Performance Benchmarks</h3>
-                    <p>SDL++ wrapper vs pure SDL3 performance comparisons validating zero-overhead abstractions.</p>
-                    <a href="benchmarks/index.html">View Benchmarks</a>
-                </div>
+                # <div class="section-card">
+                #     <h3>⚡ Performance Benchmarks</h3>
+                #     <p>SDL++ wrapper vs pure SDL3 performance comparisons validating zero-overhead abstractions.</p>
+                #     <a href="benchmarks/index.html">View Benchmarks</a>
+                # </div>
             </div>
             
             <div style="text-align: center; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
