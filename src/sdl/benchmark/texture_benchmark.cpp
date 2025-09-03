@@ -79,7 +79,9 @@ BENCHMARK_DEFINE_F(TextureFixture, TextureRender_SDL3)(benchmark::State& state) 
     SDL_UpdateTexture(texture, nullptr, pixels.data(), 64 * 4);
     
     for (auto _ : state) {
+        SDL_RenderClear(sdlRenderer);
         SDL_RenderTexture(sdlRenderer, texture, nullptr, nullptr);
+        SDL_RenderPresent(sdlRenderer);
     }
     
     SDL_DestroyTexture(texture);
@@ -90,7 +92,9 @@ BENCHMARK_DEFINE_F(TextureFixture, TextureRender_SDLpp)(benchmark::State& state)
     sdl::Texture texture(*sdlppRenderer, 64, 64, pixels.data());
     
     for (auto _ : state) {
+        sdlppRenderer->clear();
         sdlppRenderer->copy(texture);
+        sdlppRenderer->present();
     }
 }
 
@@ -104,7 +108,9 @@ BENCHMARK_DEFINE_F(TextureFixture, TextureRenderWithRects_SDL3)(benchmark::State
     SDL_FRect dstRect = {100, 100, 64, 64};
     
     for (auto _ : state) {
+        SDL_RenderClear(sdlRenderer);
         SDL_RenderTexture(sdlRenderer, texture, &srcRect, &dstRect);
+        SDL_RenderPresent(sdlRenderer);
     }
     
     SDL_DestroyTexture(texture);
@@ -118,7 +124,9 @@ BENCHMARK_DEFINE_F(TextureFixture, TextureRenderWithRects_SDLpp)(benchmark::Stat
     sdl::Rectangle<float> dstRect(100, 100, 64, 64);
     
     for (auto _ : state) {
+        sdlppRenderer->clear();
         sdlppRenderer->copy(texture, srcRect, dstRect);
+        sdlppRenderer->present();
     }
 }
 
