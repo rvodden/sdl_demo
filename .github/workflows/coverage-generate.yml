@@ -47,7 +47,7 @@ jobs:
 
     - name: Run tests and generate coverage
       run: |
-        cmake --build --preset ninja-mc-coverage --target coverage
+        cmake --build --preset ninja-mc-coverage --target coverage -C Debug
 
     - name: Upload coverage artifact
       uses: actions/upload-artifact@v4

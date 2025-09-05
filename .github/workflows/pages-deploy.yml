@@ -25,7 +25,7 @@ jobs:
       uses: fountainhead/action-wait-for-check@v1.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        checkName: 'ubuntu-latest (Debug)'  # Wait for at least one key job
+        checkName: 'Generate Test Report'  # Wait for at least one key job
         ref: ${{ github.sha }}
         timeoutSeconds: 1800  # 30 minutes
         intervalSeconds: 30

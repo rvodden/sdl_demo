@@ -204,7 +204,7 @@ jobs:
           if [ -f "$xml_file" ]; then
             base_name=$(basename "$xml_file" .xml)
             echo "Processing $xml_file -> test-report/${base_name}.html"
-            junit2html --summary-matrix "$xml_file" "test-report/${base_name}.html" || echo "Failed to process $xml_file"
+            junit2html --summary-matrix --report-dir test-report --output "${base_name}.html" "$xml_file" || echo "Failed to process $xml_file"
           fi
         done
         
