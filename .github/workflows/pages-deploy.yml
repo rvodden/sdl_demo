@@ -89,25 +89,34 @@ jobs:
         mkdir -p pages-content
 
     - name: Download test reports artifact
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v11
       continue-on-error: true
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: ci.yml
         name: test-report-html
         path: pages-content/test-reports
+        branch: main
 
     - name: Download documentation artifact
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v11
       continue-on-error: true
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: docs-generate.yml
         name: documentation
         path: pages-content/docs
+        branch: main
 
     - name: Download coverage reports artifact
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v11
       continue-on-error: true
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: coverage-generate.yml
         name: coverage-reports
         path: pages-content/coverage
+        branch: main
 
     # - name: Download benchmark reports artifact
     #   uses: actions/download-artifact@v4
