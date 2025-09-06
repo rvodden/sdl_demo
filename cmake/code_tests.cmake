@@ -285,7 +285,12 @@ function(register_code_test)
         
         # Pass the installed dependency's cmake config directory to the code test
         # Special case: gtest installs as GTest (uppercase) in CMake
-        list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_INSTALL_DIR}/lib/cmake/${DEPENDENCY}")
+        set(EXCEPTIONS SDL3 SDL3_image SDL3_ttf)
+        if((DEPENDENCY IN_LIST EXCEPTIONS) AND WIN32)
+            list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_INSTALL_DIR}/cmake/")
+        else()
+            list(APPEND ARGUMENT_LIST "-D${DEPENDENCY}_DIR=${${DEPENDENCY}_INSTALL_DIR}/lib/cmake/${DEPENDENCY}")
+        endif()
         list(APPEND FIXTURES_REQUIRED "CodeTest.${DEPENDENCY}_installed")
     endforeach()
 
@@ -304,13 +309,27 @@ function(register_code_test)
     set(LIBRARY_PATHS "")
     foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
         string(TOUPPER ${DEPENDENCY} DEPENDENCY_UPPER)
-        list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/lib")
+        if(WIN32)
+            list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/bin")
+        else()
+            list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/lib")
+        endif()
     endforeach()
     foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
         string(TOUPPER ${COMPONENT} COMPONENT_UPPER)
-        list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/lib")
+        if(WIN32)
+            list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/bin")
+        else()
+            list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/lib")
+        endif()
     endforeach()
-    string(JOIN ":" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
+
+
+    if(WIN32)
+        string(JOIN ";" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
+    else()
+        string(JOIN ":" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
+    endif()
 
     if(DEFINED CMAKE_TOOLCHAIN_FILE)
         list(APPEND ARGUMENT_LIST "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
@@ -346,7 +365,17 @@ function(register_code_test)
     set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
         PROPERTIES 
             FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured"
-            ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH_VALUE}"
     )
+    if(WIN32)
+        set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
+            PROPERTIES
+                ENVIRONMENT "PATH=$ENV{PATH};${LD_LIBRARY_PATH_VALUE}"
+        )
+    else()
+        set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
+            PROPERTIES
+                ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH_VALUE}"
+        )
+    endif()
 
 endfunction()

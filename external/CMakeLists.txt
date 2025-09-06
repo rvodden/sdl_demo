@@ -17,9 +17,11 @@ if(SDLXX_USE_VENDORED_GTEST)
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
         )
+        set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
         set(GTEST_CREATE_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
         set(GTEST_LINKED_AS_SHARED_LIBRARY 1 CACHE BOOL "" FORCE)
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
 endif()
 
 ### Google Benchmark ###
@@ -50,6 +52,7 @@ if(SDLXX_USE_SYSTEM_SDL3)
         find_package(SDL3_ttf REQUIRED)
 elseif(SDLXX_USE_VENDORED_SDL3)
         # Disable installation of vendored SDL3 to avoid export conflicts
+        # set(SDL_INSTALL_CMAKEDIR_ROOT ${CMAKE_INSTALL_LIBDIR}/cmake/SDL3/ CACHE STRING "" FORCE)
         set(SDL_INSTALL ON)
         set(SDL_VULKAN OFF)
         if(CCACHE_PROGRAM)
