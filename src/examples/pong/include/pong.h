@@ -2,6 +2,7 @@
 #define PONG_H
 
 #include <array>
+#include <map>
 #include <stdexcept>
 
 #include <sdl/event.h>

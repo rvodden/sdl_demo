@@ -1,8 +1,8 @@
 if(WIN32)
     enable_language(RC)
     set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
-    add_library(${PROJECT_NAME}_data OBJECT ${RESOURCE_FILE})
-    set_target_properties(${PROJECT_NAME}_data PROPERTIES 
+    add_library(${PROJECT_NAME}-data OBJECT ${RESOURCE_FILE})
+    set_target_properties(${PROJECT_NAME}-data PROPERTIES 
         LINKER_LANGUAGE RC
         RC_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 else()
@@ -27,14 +27,14 @@ else()
         list(APPEND DataObjectFiles ${OutFile})
     endforeach ()
 
-    add_library(${PROJECT_NAME}_data STATIC)
-    target_sources(${PROJECT_NAME}_data PRIVATE ${DataObjectFiles})
-    set_target_properties(${PROJECT_NAME}_data PROPERTIES LINKER_LANGUAGE CXX)
+    add_library(${PROJECT_NAME}-data STATIC)
+    target_sources(${PROJECT_NAME}-data PRIVATE ${DataObjectFiles})
+    set_target_properties(${PROJECT_NAME}-data PROPERTIES LINKER_LANGUAGE CXX)
 
 endif()
     
 target_include_directories( 
-    ${PROJECT_NAME}_data    
+    ${PROJECT_NAME}-data    
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )

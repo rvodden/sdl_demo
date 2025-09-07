@@ -50,22 +50,25 @@ if(HEADER_FILES)
     endforeach()
 endif()
 
-add_executable(${PROJECT_NAME})
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/ FILES ${HEADER_FILES})
-target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
+add_library(${PROJECT_NAME}-static)
+target_compile_features(${PROJECT_NAME}-static PUBLIC cxx_std_20)
+target_sources(${PROJECT_NAME}-static PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/ FILES ${HEADER_FILES})
+target_sources(${PROJECT_NAME}-static PRIVATE ${SOURCE_FILES})
 
 if(NOT PROJECT_IS_TOP_LEVEL)
-    target_link_libraries(${PROJECT_NAME} PRIVATE standard_compiler_options)
+    target_link_libraries(${PROJECT_NAME}-static PRIVATE standard_compiler_options)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_data)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC ${PROJECT_NAME}-data)
 # Add the data include directory for C++ compilation (both Windows and Linux need this)
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_main)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_ttf)
+# TODO: this should be done by cmake
+target_include_directories(${PROJECT_NAME}-static PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_tools)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_main)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_ttf)
+
+add_subdirectory(exe)
 
 # Enable testing
 if(PONG_BUILD_TESTS)
@@ -73,7 +76,7 @@ if(PONG_BUILD_TESTS)
 endif()
 
 include(GNUInstallDirs)
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
+install(TARGETS ${PROJECT_NAME}-static EXPORT ${PROJECT_NAME}Targets
     FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}
     FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${PROJECT_NAME}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${PROJECT_NAME}

@@ -1,4 +1,4 @@
-set( TEST_NAME "${PROJECT_NAME}_test" )
+set( TEST_NAME "${PROJECT_NAME}-test" )
 
 file( GLOB_RECURSE TEST_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h )
 add_executable( ${TEST_NAME} ${TEST_SOURCE_FILES} )
@@ -18,6 +18,7 @@ set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 find_package(GTest CONFIG REQUIRED)
 
 # Link with required libraries (static versions for tests)
+target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME}-static)
 target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl-static )
 target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl_tools-static )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )

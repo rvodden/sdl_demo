@@ -15,7 +15,7 @@ add_custom_command(
 )
 
 # Create target that depends on the font file
-add_custom_target(${PROJECT_NAME}_raw_data DEPENDS ${FONT_FILE})
+add_custom_target(${PROJECT_NAME}-raw_data DEPENDS ${FONT_FILE})
 
 if(WIN32)
     enable_language(RC)
@@ -24,13 +24,13 @@ if(WIN32)
     set(RESOURCE_FILE "${CMAKE_CURRENT_BINARY_DIR}/resources.rc")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources.rc.in" ${RESOURCE_FILE} @ONLY)
     
-    add_library(${PROJECT_NAME}_data OBJECT ${RESOURCE_FILE})
-    set_target_properties(${PROJECT_NAME}_data PROPERTIES 
+    add_library(${PROJECT_NAME}-data OBJECT ${RESOURCE_FILE})
+    set_target_properties(${PROJECT_NAME}-data PROPERTIES 
         LINKER_LANGUAGE RC
         RC_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include")
     
     # Make sure font is downloaded before configuring resources
-    add_dependencies(${PROJECT_NAME}_data ${PROJECT_NAME}_raw_data)
+    add_dependencies(${PROJECT_NAME}-data ${PROJECT_NAME}-raw_data)
 else()
     set(DataFiles ${FONT_FILE})
 
@@ -51,16 +51,16 @@ else()
         list(APPEND DataObjectFiles ${OutFile})
     endforeach ()
 
-    add_library(${PROJECT_NAME}_data STATIC)
-    target_sources(${PROJECT_NAME}_data PRIVATE ${DataObjectFiles})
-    set_target_properties(${PROJECT_NAME}_data PROPERTIES LINKER_LANGUAGE CXX)
+    add_library(${PROJECT_NAME}-data STATIC)
+    target_sources(${PROJECT_NAME}-data PRIVATE ${DataObjectFiles})
+    set_target_properties(${PROJECT_NAME}-data PROPERTIES LINKER_LANGUAGE CXX)
 
 endif()
     
 target_include_directories( 
-    ${PROJECT_NAME}_data    
+    ${PROJECT_NAME}-data    
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-add_dependencies(${PROJECT_NAME}_data ${PROJECT_NAME}_raw_data)
+add_dependencies(${PROJECT_NAME}-data ${PROJECT_NAME}-raw_data)
