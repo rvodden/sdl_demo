@@ -64,10 +64,10 @@ foreach(SUFFIX ${SUFFIXES})
         SOVERSION ${PROJECT_VERSION_MAJOR}
         OUTPUT_NAME ${PROJECT_NAME}
     )
-    foreach(DEPENDENCY ${PUBLIC_DEPENDENCIES})
-        target_link_libraries(${LIBRARY} PUBLIC ${DEPENDENCY}-${SUFFIX})
-    endforeach()
 endforeach()
+
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl-static sdl::sdl_tools-static)
+target_link_libraries(${PROJECT_NAME}-shared PUBLIC sdl::sdl-shared sdl::sdl_tools-shared)
 
 add_library(sdl::${PROJECT_NAME}-shared ALIAS ${PROJECT_NAME}-shared)
 set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
@@ -75,7 +75,7 @@ add_library(sdl::${PROJECT_NAME}-static ALIAS ${PROJECT_NAME}-static)
 set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 target_compile_definitions(${PROJECT_NAME}-shared PUBLIC SDL_EXPORTS)
-target_compile_definitions(${PROJECT_NAME}-static PUBLIC SDL_STATIC)
+target_compile_definitions(${PROJECT_NAME}-static PUBLIC $<UPPER_CASE:${PROJECT_NAME}>_STATIC_DEFINE)
 
 # Set up headers for both libraries
 include(GenerateExportHeader)

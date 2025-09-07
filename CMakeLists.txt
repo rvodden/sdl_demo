@@ -15,6 +15,11 @@ project(SDLXX
     VERSION ${PROJECT_VERSION}
 )
 
+set(TARGET_EXPORT_NAME ${PROJECT_NAME}Targets)
+set(DEVELOPMENT_COMPONENT_NAME ${PROJECT_NAME}_Development)
+set(RUNTIME_COMPONENT_NAME ${PROJECT_NAME}_Runtime)
+set(PACKAGE_NAME SDLXX)
+
 include(project_options)
 include(standard_build)
 include(ccache)
@@ -22,11 +27,6 @@ include(doxygen)
 include(iwyu)
 include(coverage)
 include(wrap_cmake_find_package)
-
-set(TARGET_EXPORT_NAME ${PROJECT_NAME}Targets)
-set(DEVELOPMENT_COMPONENT_NAME ${PROJECT_NAME}_Development)
-set(RUNTIME_COMPONENT_NAME ${PROJECT_NAME}_Runtime)
-set(PACKAGE_NAME SDLXX)
 
 # Setup code coverage first (must be before targets are defined)
 setup_coverage()

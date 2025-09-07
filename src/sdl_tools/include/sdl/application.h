@@ -144,7 +144,7 @@ class SDL_TOOLS_EXPORT ApplicationRunner {
 
  private:
   // Private constructor for singleton
-  ApplicationRunner() = default;
+  ApplicationRunner();
   
   // Private members instead of global state
   std::unique_ptr<BaseApplication> _application;

@@ -8,10 +8,12 @@ endif()
 
 
 # Private interface for internal headers
-add_library(${PROJECT_NAME}_private INTERFACE)
-target_include_directories(${PROJECT_NAME}_private INTERFACE 
+add_library(${PROJECT_NAME}-private INTERFACE)
+add_library(sdl::${PROJECT_NAME}-private ALIAS ${PROJECT_NAME}-private)
+target_include_directories(${PROJECT_NAME}-private INTERFACE 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
 )
+target_link_libraries(${PROJECT_NAME}-private INTERFACE SDL3::SDL3)
 
 # Collect source and header files
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
@@ -19,6 +21,7 @@ file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/sr
 
 # Create object libraries for static and shared builds
 add_library(${PROJECT_NAME}-objects OBJECT)
+add_library(sdl::${PROJECT_NAME}-objects ALIAS ${PROJECT_NAME}-objects)
 target_sources(${PROJECT_NAME}-objects PRIVATE ${SOURCE_FILES})
 target_sources(${PROJECT_NAME}-objects
     PUBLIC
@@ -26,10 +29,9 @@ target_sources(${PROJECT_NAME}-objects
             BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include 
             FILES ${HEADER_FILES}
 )
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE ${PROJECT_NAME}_private)
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE SDL3::SDL3)
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE SDL3_image::SDL3_image)
-target_link_libraries(${PROJECT_NAME}-objects PUBLIC  sdl::sdl-core)
+target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::${PROJECT_NAME}-private)
+target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::sdl-objects)
+target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::sdl-private)
 
 
 
@@ -44,16 +46,14 @@ if(SDLCPP_USE_CLANG_TIDY)
 endif()
 
 add_library(${PROJECT_NAME}-static STATIC)
-target_link_libraries(${PROJECT_NAME}-static sdl-static)
-
 add_library(${PROJECT_NAME}-shared SHARED)
-target_link_libraries(${PROJECT_NAME}-shared sdl-shared)
 
-set(SUFFIXES -shared -static)
-set(${PUBLIC_DEPENDENCIES} sdl::sdl)
+set(SUFFIXES shared static)
 foreach(SUFFIX ${SUFFIXES})
-    set(LIBRARY ${PROJECT_NAME}${SUFFIX})
+    set(LIBRARY ${PROJECT_NAME}-${SUFFIX})
     target_sources(${LIBRARY} PRIVATE $<TARGET_OBJECTS:${PROJECT_NAME}-objects>)
+    target_link_libraries(${LIBRARY} PUBLIC sdl::${PROJECT_NAME}-objects)
+    target_link_libraries(${LIBRARY} PRIVATE sdl::${PROJECT_NAME}-private)
     target_include_directories(${LIBRARY} PUBLIC 
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
@@ -62,18 +62,16 @@ foreach(SUFFIX ${SUFFIXES})
         SOVERSION ${PROJECT_VERSION_MAJOR}
         OUTPUT_NAME ${PROJECT_NAME}
     )
-    foreach(DEPENDENCY ${PUBLIC_DEPENDENCIES})
-        target_link_libraries(${LIBRARY} PUBLIC ${DEPENDENCY}-${SUFFIX})
-    endforeach()
+    add_library(sdl::${LIBRARY} ALIAS ${LIBRARY})
+    set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 endforeach()
-    
-add_library(sdl::${PROJECT_NAME}-shared ALIAS ${PROJECT_NAME}-shared)
-set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-add_library(sdl::${PROJECT_NAME}-static ALIAS ${PROJECT_NAME}-static)
-set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
-target_compile_definitions(${PROJECT_NAME}-shared PUBLIC SDL_TOOLS_EXPORTS)
-target_compile_definitions(${PROJECT_NAME}-static PUBLIC SDL_TOOLS_STATIC)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl-static)
+target_link_libraries(${PROJECT_NAME}-shared PUBLIC sdl::sdl-shared)
+
+   
+target_compile_definitions(${PROJECT_NAME}-shared PRIVATE ${PROJECT_NAME}_EXPORTS)
+target_compile_definitions(${PROJECT_NAME}-static PUBLIC $<UPPER_CASE:${PROJECT_NAME}>_STATIC_DEFINE)
 
 # Set up headers for both libraries
 include(GenerateExportHeader)
@@ -99,7 +97,7 @@ target_link_libraries(${PROJECT_NAME}-core INTERFACE
 
 include(GNUInstallDirs)
 # Install object library separately (not exported since it's an implementation detail)
-install(TARGETS ${PROJECT_NAME}-objects
+install(TARGETS ${PROJECT_NAME}-core ${PROJECT_NAME}-objects ${PROJECT_NAME}-private EXPORT ${TARGET_EXPORT_NAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
     FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
     FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}

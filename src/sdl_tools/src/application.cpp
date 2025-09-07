@@ -143,6 +143,9 @@ auto ApplicationRunner::reset() -> void {
   _services.clear();
 }
 
+// Constructor definition for singleton
+ApplicationRunner::ApplicationRunner() = default;
+
 // Service management implementation
 auto ApplicationRunner::getOrCreateSDL() -> SDL& {
   if (!_sdl) {
