@@ -718,7 +718,7 @@ static constexpr auto kKeyModifierToSdlMapArray = std::array{
 };
 static constexpr auto kKeyModifierToSdlMap = Map(kKeyModifierToSdlMapArray);
 
-auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
+inline auto createQuitEvent([[maybe_unused]] const SDL_QuitEvent* sdlQuitEvent)
     -> std::unique_ptr<QuitEvent> {
   return std::make_unique<QuitEvent>(std::chrono::milliseconds(SDL_GetTicks()));
 }

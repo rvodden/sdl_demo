@@ -19,71 +19,96 @@ target_link_libraries(${PROJECT_NAME}-private INTERFACE SDL3::SDL3)
 file( GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h )
 file( GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
 
-# Create object libraries for static and shared builds
-add_library(${PROJECT_NAME}-objects OBJECT)
-add_library(sdl::${PROJECT_NAME}-objects ALIAS ${PROJECT_NAME}-objects)
-target_sources(${PROJECT_NAME}-objects PRIVATE ${SOURCE_FILES})
-target_sources(${PROJECT_NAME}-objects
+# Common configuration for both libraries
+set(COMMON_LINK_LIBRARIES 
+    sdl::${PROJECT_NAME}-private
+    sdl::sdl-private
+)
+
+if(NOT PROJECT_IS_TOP_LEVEL)
+    list(APPEND COMMON_LINK_LIBRARIES 
+        standard_compiler_options
+        precompiled_headers
+    )
+endif()
+
+set(COMMON_COMPILE_OPTIONS "")
+if(SDLCPP_USE_CLANG_TIDY)
+    set(COMMON_COMPILE_OPTIONS CMAKE_CXX_CLANG_TIDY clang-tidy)
+endif()
+
+# Create static library
+add_library(${PROJECT_NAME}-static STATIC)
+target_sources(${PROJECT_NAME}-static PRIVATE ${SOURCE_FILES})
+target_sources(${PROJECT_NAME}-static
     PUBLIC
         FILE_SET HEADERS 
             BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include 
             FILES ${HEADER_FILES}
 )
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::${PROJECT_NAME}-private)
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::sdl-objects)
-target_link_libraries(${PROJECT_NAME}-objects PRIVATE sdl::sdl-private)
+target_compile_definitions(${PROJECT_NAME}-static PUBLIC $<UPPER_CASE:${PROJECT_NAME}>_STATIC_DEFINE)
+target_link_libraries(${PROJECT_NAME}-static PRIVATE ${COMMON_LINK_LIBRARIES})
 
-
-
-
-if(NOT PROJECT_IS_TOP_LEVEL)
-    target_link_libraries(${PROJECT_NAME}-objects PRIVATE standard_compiler_options)
-    target_link_libraries(${PROJECT_NAME}-objects PRIVATE precompiled_headers)
-endif()
-
-if(SDLCPP_USE_CLANG_TIDY)
-    set_target_properties(${PROJECT_NAME}-objects PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
-endif()
-
-add_library(${PROJECT_NAME}-static STATIC)
+# Create shared library  
 add_library(${PROJECT_NAME}-shared SHARED)
+target_sources(${PROJECT_NAME}-shared PRIVATE ${SOURCE_FILES})
+target_sources(${PROJECT_NAME}-shared
+    PUBLIC
+        FILE_SET HEADERS 
+            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include 
+            FILES ${HEADER_FILES}
+)
+target_compile_definitions(${PROJECT_NAME}-shared PRIVATE ${PROJECT_NAME}_shared_EXPORTS)
+target_link_libraries(${PROJECT_NAME}-shared PRIVATE ${COMMON_LINK_LIBRARIES})
 
-set(SUFFIXES shared static)
-foreach(SUFFIX ${SUFFIXES})
-    set(LIBRARY ${PROJECT_NAME}-${SUFFIX})
-    target_sources(${LIBRARY} PRIVATE $<TARGET_OBJECTS:${PROJECT_NAME}-objects>)
-    target_link_libraries(${LIBRARY} PUBLIC sdl::${PROJECT_NAME}-objects)
-    target_link_libraries(${LIBRARY} PRIVATE sdl::${PROJECT_NAME}-private)
-    target_include_directories(${LIBRARY} PUBLIC 
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    )
-    set_target_properties(${LIBRARY} PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-        OUTPUT_NAME ${PROJECT_NAME}
-    )
-    add_library(sdl::${LIBRARY} ALIAS ${LIBRARY})
-    set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-endforeach()
+# Set common properties
+set_target_properties(${PROJECT_NAME}-static ${PROJECT_NAME}-shared PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME}-static)
+set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
+# Add binary dir to include path for generated headers
+target_include_directories(${PROJECT_NAME}-static PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+target_include_directories(${PROJECT_NAME}-shared PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+# Use specific SDL variants for each library type
 target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl-static)
 target_link_libraries(${PROJECT_NAME}-shared PUBLIC sdl::sdl-shared)
 
-   
-target_compile_definitions(${PROJECT_NAME}-shared PRIVATE ${PROJECT_NAME}_EXPORTS)
-target_compile_definitions(${PROJECT_NAME}-static PUBLIC $<UPPER_CASE:${PROJECT_NAME}>_STATIC_DEFINE)
+# Create aliases
+add_library(sdl::${PROJECT_NAME}-shared ALIAS ${PROJECT_NAME}-shared)
+add_library(sdl::${PROJECT_NAME}-static ALIAS ${PROJECT_NAME}-static)
+
+# Apply clang-tidy if enabled
+if(SDLCPP_USE_CLANG_TIDY)
+    set_target_properties(${PROJECT_NAME}-static ${PROJECT_NAME}-shared PROPERTIES CMAKE_CXX_CLANG_TIDY clang-tidy)
+endif()
 
 # Set up headers for both libraries
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME}-shared BASE_NAME ${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME}-objects 
+# Add generated export header to both libraries
+target_sources(${PROJECT_NAME}-static 
     PUBLIC 
         FILE_SET generated_headers
             TYPE HEADERS
             BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME}-shared,BINARY_DIR>
             FILES ${CMAKE_CURRENT_BINARY_DIR}/$<LOWER_CASE:${PROJECT_NAME}>_export.h
-    )
+)
+target_sources(${PROJECT_NAME}-shared 
+    PUBLIC 
+        FILE_SET generated_headers
+            TYPE HEADERS
+            BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME}-shared,BINARY_DIR>
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/$<LOWER_CASE:${PROJECT_NAME}>_export.h
+)
 
 # Create default alias pointing to shared (for backward compatibility)
 add_library(${PROJECT_NAME} ALIAS ${PROJECT_NAME}-shared)
@@ -96,18 +121,18 @@ target_link_libraries(${PROJECT_NAME}-core INTERFACE
 )
 
 include(GNUInstallDirs)
-# Install object library separately (not exported since it's an implementation detail)
-install(TARGETS ${PROJECT_NAME}-core ${PROJECT_NAME}-objects ${PROJECT_NAME}-private EXPORT ${TARGET_EXPORT_NAME}
+# Install core interface library and private headers
+install(TARGETS ${PROJECT_NAME}-core ${PROJECT_NAME}-private EXPORT ${TARGET_EXPORT_NAME}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
+)
+
+# Install headers interface library and static/shared libraries with export
+install(TARGETS ${PROJECT_NAME}-shared ${PROJECT_NAME}-static EXPORT ${TARGET_EXPORT_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${RUNTIME_COMPONENT_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${RUNTIME_COMPONENT_NAME} NAMELINK_COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
     FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
     FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
-)
-
-# Install static and shared libraries with export
-install(TARGETS ${PROJECT_NAME}-shared ${PROJECT_NAME}-static EXPORT ${TARGET_EXPORT_NAME}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${RUNTIME_COMPONENT_NAME} 
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${RUNTIME_COMPONENT_NAME} NAMELINK_COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${DEVELOPMENT_COMPONENT_NAME}
 )
 
 if(NOT CMAKE_TESTING_ENABLED)

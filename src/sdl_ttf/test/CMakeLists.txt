@@ -15,6 +15,7 @@ endif()
 set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME}-static )
+target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl_tools-static )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC gmock )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest_main )
