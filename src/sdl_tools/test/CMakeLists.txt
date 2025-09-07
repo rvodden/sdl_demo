@@ -14,6 +14,7 @@ endif()
 # Disable clang-tidy for test files
 set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
+target_link_libraries( ${TEST_NAME} PRIVATE standard_compiler_options )
 target_link_libraries( ${TEST_NAME} PUBLIC ${PROJECT_NAME}-static )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC gmock )

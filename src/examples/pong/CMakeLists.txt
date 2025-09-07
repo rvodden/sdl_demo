@@ -64,7 +64,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_data)
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_application)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_main)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_ttf)
 

@@ -35,7 +35,6 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_data)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_tools)
-target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_application)
 target_link_libraries(${PROJECT_NAME} PUBLIC sdl::sdl_main)
 
 include(GNUInstallDirs)

@@ -6,7 +6,7 @@
 #define SDL_MAIN_HANDLED 1 //NOLINT(cppcoreguidelines-macro-usage)
 #include <SDL3/SDL_main.h>
 
-#include "sdl_application_export.h"
+#include "sdl_tools_export.h"
 
 #include "sdl/application.h"
 #include "sdl/constexpr_map.h"
@@ -170,11 +170,11 @@ auto BaseApplication::requestSDL() -> SDL& {
 extern "C" {
 
 #ifdef WIN32
-#define SDL_APPLICATION_EXPORT_SAVED SDL_APPLICATION_EXPORT
-#define SDL_APPLICATION_EXPORT
+#define SDL_TOOLS_EXPORT_SAVED SDL_TOOLS_EXPORT
+#define SDL_TOOLS_EXPORT
 #endif
 
-SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+SDL_TOOLS_EXPORT SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   auto& runner = sdl::ApplicationRunner::getInstance();
   auto* app = runner.getApplication();
   
@@ -194,7 +194,7 @@ SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppInit(void** appstate, [[mayb
   return SDL_APP_FAILURE;
 }
 
-SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
+SDL_TOOLS_EXPORT SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
   auto* runner = static_cast<sdl::ApplicationRunner*>(appstate);
   if (runner == nullptr) {
     return SDL_APP_SUCCESS;
@@ -211,7 +211,7 @@ SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppIterate(void* appstate) {
   return SDL_APP_SUCCESS;
 }
 
-SDL_APPLICATION_EXPORT void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_AppResult result) {
+SDL_TOOLS_EXPORT void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]] SDL_AppResult result) {
   auto* runner = static_cast<sdl::ApplicationRunner*>(appstate);
   if (runner == nullptr) {
     return;
@@ -227,7 +227,7 @@ SDL_APPLICATION_EXPORT void SDLCALL SDL_AppQuit(void* appstate, [[maybe_unused]]
   instance.reset();
 }
 
-SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Event* event) {
+SDL_TOOLS_EXPORT SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void* appstate, SDL_Event* event) {
   if (event == nullptr) {
     return SDL_APP_CONTINUE;
   }
@@ -249,7 +249,7 @@ SDL_APPLICATION_EXPORT SDL_AppResult SDLCALL SDL_AppEvent([[maybe_unused]] void*
 
 // SDL callback functions exported via pragma comment on Windows
 #ifdef WIN32
-#define SDL_APPLICATION_EXPORT SDL_APPLICATION_EXPORT_SAVED
+#define SDL_TOOLS_EXPORT SDL_TOOLS_EXPORT_SAVED
 #endif
 
 }

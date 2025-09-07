@@ -16,18 +16,26 @@ set_target_properties( ${TEST_NAME} PROPERTIES CXX_CLANG_TIDY "" )
 
 # Try to find GTest package config, fallback to targets if using FetchContent
 find_package(GTest CONFIG REQUIRED)
-target_compile_definitions(${TEST_NAME} PUBLIC GTEST_LINKED_AS_SHARED_LIBRARY=1)
-target_compile_definitions(${TEST_NAME} PUBLIC gtest_force_shared_crt=1)
 
-# Link with required libraries
-target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl )
-target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl_tools )
+# Link with required libraries (static versions for tests)
+target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl-static )
+target_link_libraries( ${TEST_NAME} PUBLIC sdl::sdl_tools-static )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest )
 target_link_libraries( ${TEST_NAME} PUBLIC GTest::gmock )
-target_link_libraries( ${TEST_NAME} PUBLIC GTest::gmock_main )
+target_link_libraries( ${TEST_NAME} PUBLIC GTest::gtest_main )
 
 # Include pong headers
 target_include_directories( ${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include )
+
+# Set test executable to output in the same directory as the pong executable
+if(win32)
+    get_target_property(PONG_OUTPUT_DIR pong BINARY_DIR)
+    if(PONG_OUTPUT_DIR)
+        set_target_properties( ${TEST_NAME} PROPERTIES 
+            RUNTIME_OUTPUT_DIRECTORY "${PONG_OUTPUT_DIR}"
+        )
+    endif()
+endif()
 
 if(NOT CMAKE_TESTING_ENABLED)
     include(GoogleTest)

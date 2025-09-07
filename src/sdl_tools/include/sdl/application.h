@@ -10,7 +10,7 @@
 #include <any>
 #include <stdexcept>
 
-#include "sdl_application_export.h"
+#include "sdl_tools_export.h"
 
 namespace sdl {
 
@@ -30,7 +30,7 @@ enum class AppResult : uint8_t {
 };
 
 // Service registry for optional services
-class SDL_APPLICATION_EXPORT ServiceRegistry {
+class SDL_TOOLS_EXPORT ServiceRegistry {
 public:
   // Register a service factory function
   template<typename T>
@@ -69,7 +69,7 @@ private:
 };
 
 // Base interface for all applications
-class SDL_APPLICATION_EXPORT BaseApplication {
+class SDL_TOOLS_EXPORT BaseApplication {
  public:
   virtual ~BaseApplication() = default;
   
@@ -97,7 +97,7 @@ private:
 };
 
 // Runner that manages application lifecycle
-class SDL_APPLICATION_EXPORT ApplicationRunner {
+class SDL_TOOLS_EXPORT ApplicationRunner {
  public:
   // Register an application instance
   static auto registerApplication(std::unique_ptr<BaseApplication> app) -> void;
