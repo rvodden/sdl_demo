@@ -305,32 +305,6 @@ function(register_code_test)
     endforeach()
     string(JOIN ";" FIXTURES_REQUIRED_STRING ${FIXTURES_REQUIRED})
     
-    # Build LD_LIBRARY_PATH from all dependency lib directories
-    set(LIBRARY_PATHS "")
-    foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
-        string(TOUPPER ${DEPENDENCY} DEPENDENCY_UPPER)
-        if(WIN32)
-            list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/bin")
-        else()
-            list(APPEND LIBRARY_PATHS "${${DEPENDENCY}_INSTALL_DIR}/lib")
-        endif()
-    endforeach()
-    foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
-        string(TOUPPER ${COMPONENT} COMPONENT_UPPER)
-        if(WIN32)
-            list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/bin")
-        else()
-            list(APPEND LIBRARY_PATHS "${${COMPONENT_UPPER}_INSTALL_DIR}/lib")
-        endif()
-    endforeach()
-
-
-    if(WIN32)
-        string(JOIN ";" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
-    else()
-        string(JOIN ":" LD_LIBRARY_PATH_VALUE ${LIBRARY_PATHS})
-    endif()
-
     if(DEFINED CMAKE_TOOLCHAIN_FILE)
         list(APPEND ARGUMENT_LIST "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
     endif()
@@ -361,60 +335,11 @@ function(register_code_test)
             --config $<CONFIG>
         WORKING_DIRECTORY ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
     )
-    # On Windows, create individual tests to copy DLLs from each dependency and build fixture list
-    set(DLL_FIXTURES "")
-    if(WIN32)
-        foreach(DEPENDENCY ${REGISTER_CODE_TEST_USE_FETCHED_DEPENDENCIES})
-            string(TOUPPER ${DEPENDENCY} DEPENDENCY_UPPER)
-            add_test(
-                NAME CodeTest.test_${REGISTER_CODE_TEST_NAME}_copy_${DEPENDENCY}_dlls
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${${DEPENDENCY}_INSTALL_DIR}/bin" "${REGISTER_CODE_TEST_BUILD_DIRECTORY}/$<CONFIG>"
-                WORKING_DIRECTORY ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
-            )
-            set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_copy_${DEPENDENCY}_dlls
-                PROPERTIES 
-                    FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured"
-                    FIXTURES_SETUP CodeTest.${REGISTER_CODE_TEST_NAME}_${DEPENDENCY}_dlls_copied
-            )
-            list(APPEND DLL_FIXTURES "CodeTest.${REGISTER_CODE_TEST_NAME}_${DEPENDENCY}_dlls_copied")
-        endforeach()
-        
-        foreach(COMPONENT ${REGISTER_CODE_TEST_COMPONENTS})
-            string(TOUPPER ${COMPONENT} COMPONENT_UPPER)
-            add_test(
-                NAME CodeTest.test_${REGISTER_CODE_TEST_NAME}_copy_${COMPONENT}_dlls
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${${COMPONENT_UPPER}_INSTALL_DIR}/bin" "${REGISTER_CODE_TEST_BUILD_DIRECTORY}/$<CONFIG>"
-                WORKING_DIRECTORY ${REGISTER_CODE_TEST_BUILD_DIRECTORY}
-            )
-            set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_copy_${COMPONENT}_dlls
-                PROPERTIES 
-                    FIXTURES_REQUIRED "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured"
-                    FIXTURES_SETUP CodeTest.${REGISTER_CODE_TEST_NAME}_${COMPONENT}_dlls_copied
-            )
-            list(APPEND DLL_FIXTURES "CodeTest.${REGISTER_CODE_TEST_NAME}_${COMPONENT}_dlls_copied")
-        endforeach()
-        
-        string(JOIN ";" DLL_FIXTURES_STRING ${DLL_FIXTURES})
-        set(ALL_COMPILE_FIXTURES "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured;${DLL_FIXTURES_STRING}")
-    else()
-        set(ALL_COMPILE_FIXTURES "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured")
-    endif()
-
-    # Compilation requires HDAS to be installed, requires the build directory, requires configuration, and DLL copying on Windows
+    
+    set(ALL_COMPILE_FIXTURES "${FIXTURES_REQUIRED_STRING};CodeTest.${REGISTER_CODE_TEST_NAME}_directory;CodeTest.${REGISTER_CODE_TEST_NAME}_configured")
     set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
         PROPERTIES 
             FIXTURES_REQUIRED "${ALL_COMPILE_FIXTURES}"
     )
-    if(WIN32)
-        set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
-            PROPERTIES
-                ENVIRONMENT "PATH=$ENV{PATH};${LD_LIBRARY_PATH_VALUE}"
-        )
-    else()
-        set_tests_properties(CodeTest.test_${REGISTER_CODE_TEST_NAME}_compiles 
-            PROPERTIES
-                ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH_VALUE}"
-        )
-    endif()
 
 endfunction()

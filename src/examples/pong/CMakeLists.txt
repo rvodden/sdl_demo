@@ -63,10 +63,10 @@ target_link_libraries(${PROJECT_NAME}-static PUBLIC ${PROJECT_NAME}-data)
 # Add the data include directory for C++ compilation (both Windows and Linux need this)
 # TODO: this should be done by cmake
 target_include_directories(${PROJECT_NAME}-static PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
-target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl)
-target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_tools)
-target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_main)
-target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_ttf)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl-static)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_tools-static)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_main-static)
+target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_ttf-static)
 
 add_subdirectory(exe)
 

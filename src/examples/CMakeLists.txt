@@ -9,7 +9,7 @@ install_fetched_dependency(NAME GTest COMPONENTS gtest gmock)
 add_subdirectory(tictactoe)
 register_code_test(NAME tictactoe 
     COMPONENTS SDLXX
-    USE_FETCHED_DEPENDENCIES SDL3 SDL3_image
+    USE_FETCHED_DEPENDENCIES SDL3 SDL3_image SDL3_ttf
 )
 
 add_subdirectory(pong)
