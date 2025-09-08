@@ -1,0 +1,4 @@
+                <div class="platform">
+                    <h2><span class="platform-icon">@PLATFORM_ICON@</span>@PLATFORM_NAME@</h2>
+                    <div class="no-data">No benchmark data available</div>
+                </div>

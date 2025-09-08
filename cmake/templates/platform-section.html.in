@@ -1,0 +1,18 @@
+                <div class="results-section">
+                    <div class="platform">
+                        <h2><span class="platform-icon">@PLATFORM_ICON@</span>@PLATFORM_NAME@</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Benchmark</th>
+                                    <th>Pure SDL3</th>
+                                    <th>SDL++ Wrapper</th>
+                                    <th>Overhead</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+@TABLE_ROWS@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>

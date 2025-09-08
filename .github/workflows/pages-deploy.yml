@@ -118,15 +118,22 @@ jobs:
         branch: main
 
     - name: Download benchmark reports artifact
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v11
       continue-on-error: true
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: benchmarks.yml
         name: benchmark-html-report
         path: pages-content/benchmarks
+        branch: main
 
     - name: Create main index page
       run: |
-        cat > pages-content/index.html << 'EOF'
+        # Set variables for HTML template
+        TIMESTAMP="$(date -u)"
+        COMMIT_SHORT="${GITHUB_SHA:0:8}"
+        
+        cat > pages-content/index.html << EOF
         <!DOCTYPE html>
         <html>
         <head>
@@ -146,8 +153,8 @@ jobs:
         <body>
             <div class="header">
                 <h1>SDL Demo - Project Reports</h1>
-                <p class="timestamp">Generated: $(date -u)</p>
-                <p>Commit: <code>${GITHUB_SHA:0:8}</code> | Branch: <code>main</code></p>
+                <p class="timestamp">Generated: ${TIMESTAMP}</p>
+                <p>Commit: <code>${COMMIT_SHORT}</code> | Branch: <code>main</code></p>
             </div>
             
             <div class="section-grid">
@@ -177,7 +184,7 @@ jobs:
             </div>
             
             <div style="text-align: center; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
-                <p>Automatically generated from <a href="https://github.com/${GITHUB_REPOSITORY}">GitHub repository</a></p>
+                <p>Automatically generated from <a href="https://github.com/\${GITHUB_REPOSITORY}">GitHub repository</a></p>
             </div>
         </body>
         </html>
