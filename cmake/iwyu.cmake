@@ -44,11 +44,10 @@ if(IWYU_TOOL)
         # List of known project target names (not external dependencies)
         set(project_targets
             utils
-            sdl sdl_private
-            sdl_tools sdl_tools_private  
-            sdl_ttf sdl_ttf_private
-            sdl_application sdl_application_private
-            sdl_main
+            sdl=static sdl_private
+            sdl_tools-static sdl_tools_private  
+            sdl_ttf-static sdl_ttf_private
+            sdl_main-static
             tictactoe tictactoe_data
             snippets
             visitor_pattern_mockup visitor_pattern_mockup_private

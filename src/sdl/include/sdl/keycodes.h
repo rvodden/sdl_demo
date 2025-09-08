@@ -62,6 +62,8 @@ enum class KeyCode {
  * 
  * This array contains all the key codes for which specific keyboard events
  * (SpecificKeyboardEvent<KeyCode>) will be generated automatically by the event router.
+ * 
+ * This is not the full list of all keys to keep performance in check.
  */
 static constexpr std::array kSpecificKeyboardEventSupportedKeys = {
   KeyCode::kA, KeyCode::kB, KeyCode::kC, KeyCode::kD, KeyCode::kE, KeyCode::kF, KeyCode::kG,

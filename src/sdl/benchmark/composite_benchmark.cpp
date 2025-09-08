@@ -174,10 +174,15 @@ BENCHMARK_DEFINE_F(CompositeFixture, TextureBlendModes_SDL3)(benchmark::State& s
     SDL_BlendMode modes[] = {SDL_BLENDMODE_NONE, SDL_BLENDMODE_BLEND, SDL_BLENDMODE_ADD, SDL_BLENDMODE_MOD};
     
     for (auto _ : state) {
+        SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
+        SDL_RenderClear(sdlRenderer);
+        
         for (auto mode : modes) {
             SDL_SetTextureBlendMode(texture, mode);
             SDL_RenderTexture(sdlRenderer, texture, nullptr, nullptr);
         }
+        
+        SDL_RenderPresent(sdlRenderer);
     }
     
     SDL_DestroyTexture(texture);
@@ -189,11 +194,18 @@ BENCHMARK_DEFINE_F(CompositeFixture, TextureBlendModes_SDLpp)(benchmark::State& 
     
     sdl::Texture::BlendMode modes[] = {sdl::Texture::kNone, sdl::Texture::kBlend, sdl::Texture::kAdd, sdl::Texture::kMod};
     
+    sdl::Color black(0, 0, 0, 255);
+    
     for (auto _ : state) {
+        sdlppRenderer->setDrawColour(black);
+        sdlppRenderer->clear();
+        
         for (auto mode : modes) {
             texture.setTextureBlendMode(mode);
             sdlppRenderer->copy(texture);
         }
+        
+        sdlppRenderer->present();
     }
 }
 
