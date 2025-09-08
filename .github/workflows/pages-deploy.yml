@@ -118,12 +118,12 @@ jobs:
         path: pages-content/coverage
         branch: main
 
-    # - name: Download benchmark reports artifact
-    #   uses: actions/download-artifact@v4
-    #   continue-on-error: true
-    #   with:
-    #     name: benchmark-html-report
-    #     path: pages-content/benchmarks
+    - name: Download benchmark reports artifact
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: benchmark-html-report
+        path: pages-content/benchmarks
 
     - name: Create main index page
       run: |
@@ -170,11 +170,11 @@ jobs:
                     <a href="coverage/index.html">View Coverage</a>
                 </div>
                 
-                # <div class="section-card">
-                #     <h3>⚡ Performance Benchmarks</h3>
-                #     <p>SDL++ wrapper vs pure SDL3 performance comparisons validating zero-overhead abstractions.</p>
-                #     <a href="benchmarks/index.html">View Benchmarks</a>
-                # </div>
+                <div class="section-card">
+                    <h3>⚡ Performance Benchmarks</h3>
+                    <p>SDL++ wrapper vs pure SDL3 performance comparisons validating zero-overhead abstractions.</p>
+                    <a href="benchmarks/index.html">View Benchmarks</a>
+                </div>
             </div>
             
             <div style="text-align: center; color: #666; border-top: 1px solid #eee; padding-top: 20px;">
