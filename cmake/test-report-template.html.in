@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SDL Demo - Test Reports</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .platform-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: #fafafa; }
+        .platform-card h3 { margin-top: 0; color: #333; }
+        .config-links { margin-top: 10px; }
+        .config-links a { display: inline-block; margin-right: 15px; padding: 8px 16px; background: #007acc; color: white; text-decoration: none; border-radius: 4px; }
+        .config-links a:hover { background: #005a9e; }
+        .config-links .no-results { display: inline-block; margin-right: 15px; padding: 8px 16px; background: #999; color: white; border-radius: 4px; }
+        .timestamp { color: #666; font-size: 0.9em; }
+        .reports-list { margin-top: 20px; }
+        .reports-list h3 { color: #333; }
+        .reports-list ul { list-style-type: none; padding: 0; }
+        .reports-list li { margin: 5px 0; }
+        .reports-list li a { color: #007acc; text-decoration: none; }
+        .reports-list li a:hover { text-decoration: underline; }
+        .no-results-section { margin-top: 20px; padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SDL Demo - Test Reports</h1>
+        <p class="timestamp">Generated: @CURRENT_TIME@</p>
+        <p>Commit: <code>@GIT_COMMIT_SHORT@</code> | Branch: <code>@GIT_BRANCH@</code></p>
+    </div>
+    
+    <div class="platform-grid">
+        <div class="platform-card">
+            <h3>Ubuntu</h3>
+            <div class="config-links">
+                @UBUNTU_DEBUG_LINK@
+                @UBUNTU_RELEASE_LINK@
+            </div>
+        </div>
+        <div class="platform-card">
+            <h3>Windows</h3>
+            <div class="config-links">
+                @WINDOWS_DEBUG_LINK@
+                @WINDOWS_RELEASE_LINK@
+            </div>
+        </div>
+    </div>
+    
+    @REPORTS_SECTION@
+    
+    <div style="margin-top: 40px; padding: 20px; background: #f0f8ff; border-radius: 8px;">
+        <h3>Navigation</h3>
+        <p><a href="../index.html">← Back to Documentation</a></p>
+    </div>
+</body>
+</html>
