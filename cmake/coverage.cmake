@@ -112,15 +112,10 @@ function(enable_coverage_for_project_targets)
     # List of known project target names (not external dependencies)
     set(project_targets
         # Core libraries
-        sdl
-        sdl_tools  
-        sdl_ttf
-        sdl_application
-        sdl_main
-        
-        # Applications
-        tictactoe
-        visitor_pattern_mockup
+        sdl-static
+        sdl_tools-static 
+        sdl_ttf-static
+        sdl_main-static
         
         # Test targets
         sdl_test

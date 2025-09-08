@@ -150,8 +150,4 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/impl_test)
-    
-# Include benchmarks if enabled
-if(SDLXX_ENABLE_BENCHMARKS)
-    add_subdirectory(benchmark)
-endif()
+ 
