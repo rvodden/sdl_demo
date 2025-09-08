@@ -110,8 +110,10 @@ function(enable_coverage_for_project_targets)
     endif()
     
     # List of known project target names (not external dependencies)
+    # This includes all libraries and executables that should have coverage
+    # Excluding alias targets that cause issues
     set(project_targets
-        # Core libraries
+        # Core libraries (only -static versions to avoid alias issues)
         sdl-static
         sdl_tools-static 
         sdl_ttf-static
@@ -123,17 +125,36 @@ function(enable_coverage_for_project_targets)
         sdl_ttf_test
         sdl_application_test
         
-        # Example/snippet targets that may exist
+        # Example/snippet targets
         custom_events_example
         lambda_event_handler_test
         font_hello_world
+        tictactoe_exe
+        tictactoe-static
+        tictactoe-data
+        visitor_pattern_mockup
+        visitor_pattern
+        message_box_demo
+        event_adaptor_example
+        application_example
+        sdl_driver_test
+        test_sdl_app_event
+        
+        # Pong example if it exists
+        pong-exe
+        pong-static
+        pong-data
+        pong-test
     )
+    
+    list(LENGTH project_targets num_targets)
+    message(STATUS "Applying coverage flags to ${num_targets} project targets")
     
     foreach(target ${project_targets})
         if(TARGET ${target})
             target_compile_options(${target} PRIVATE ${coverage_compile_flags})
             target_link_options(${target} PRIVATE ${coverage_link_flags})
-            message(STATUS "Coverage enabled for target: ${target}")
+            message(VERBOSE "Coverage enabled for target: ${target}")
         endif()
     endforeach()
 endfunction()
