@@ -32,6 +32,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ❌ **Hardware acceleration info (OpenGL, Vulkan, etc.)**
 
 ### Recent Updates:
+- ✅ **Point Class Enhancement** - Completed Point implementation with copy/move constructors, assignment operators, type conversions, and comprehensive unit tests
 - ✅ **Pong Example Game** - Complete implementation demonstrating collision detection, keyboard input, scoring, and primitive drawing
 - ✅ **Enhanced Rectangle Class** - Added `hasIntersection()` and `getIntersection()` methods for collision detection
 - ✅ **Primitive Drawing** - Implemented `Renderer::drawLine()` and `Renderer::fillRect()` for basic shape rendering

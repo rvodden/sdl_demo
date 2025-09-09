@@ -35,14 +35,14 @@ public:
     /**
      * @brief Default constructor initializing to zero position and size.
      */
-    RectangleImpl() : rect_{0, 0, 0, 0} {}
+    RectangleImpl() : _rect{0, 0, 0, 0} {}
 
     /**
      * @brief Constructs from SDL_Rect.
      * 
      * @param sdlRect The SDL_Rect to initialize from
      */
-    explicit RectangleImpl(SDL_Rect sdlRect) : rect_{sdlRect} {}
+    explicit RectangleImpl(SDL_Rect sdlRect) : _rect{sdlRect} {}
 
     /**
      * @brief Constructs with specified position and dimensions.
@@ -53,24 +53,24 @@ public:
      * @param height Rectangle height
      */
     RectangleImpl(int32_t x, int32_t y, int32_t width, int32_t height) 
-        : rect_{x, y, width, height} {}
+        : _rect{x, y, width, height} {}
 
     /**
      * @brief Gets pointer to the underlying SDL_Rect for SDL API calls.
      * 
      * @return Pointer to the SDL_Rect structure
      */
-    auto getSDLRect() -> SDL_Rect* { return &rect_; }
+    auto getSDLRect() -> SDL_Rect* { return &_rect; }
 
     /**
      * @brief Gets const pointer to the underlying SDL_Rect.
      * 
      * @return Const pointer to the SDL_Rect structure
      */
-    auto getSDLRect() const -> const SDL_Rect* { return &rect_; }
+    auto getSDLRect() const -> const SDL_Rect* { return &_rect; }
 
 private:
-    SDL_Rect rect_;
+    SDL_Rect _rect;
 };
 
 /**
@@ -88,14 +88,14 @@ public:
     /**
      * @brief Default constructor initializing to zero position and size.
      */
-    RectangleImpl() : rect_{0.0f, 0.0f, 0.0f, 0.0f} {}
+    RectangleImpl() : _rect{0.0f, 0.0f, 0.0f, 0.0f} {}
 
     /**
      * @brief Constructs from SDL_FRect.
      * 
      * @param sdlRect The SDL_FRect to initialize from
      */
-    explicit RectangleImpl(SDL_FRect sdlRect) : rect_{sdlRect} {}
+    explicit RectangleImpl(SDL_FRect sdlRect) : _rect{sdlRect} {}
 
     /**
      * @brief Constructs with specified position and dimensions.
@@ -106,24 +106,24 @@ public:
      * @param height Rectangle height
      */
     RectangleImpl(float x, float y, float width, float height) 
-        : rect_{x, y, width, height} {}
+        : _rect{x, y, width, height} {}
 
     /**
      * @brief Gets pointer to the underlying SDL_FRect for SDL API calls.
      * 
      * @return Pointer to the SDL_FRect structure
      */
-    auto getSDLRect() -> SDL_FRect* { return &rect_; }
+    [[nodiscard]] auto getSDLRect() -> SDL_FRect* { return &_rect; }
 
     /**
      * @brief Gets const pointer to the underlying SDL_FRect.
      * 
      * @return Const pointer to the SDL_FRect structure
      */
-    auto getSDLRect() const -> const SDL_FRect* { return &rect_; }
+    [[nodiscard]] auto getSDLRect() const -> const SDL_FRect* { return &_rect; }
 
 private:
-    SDL_FRect rect_;
+    SDL_FRect _rect;
 };
 
 }  // namespace sdl
