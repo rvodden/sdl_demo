@@ -40,7 +40,7 @@ function(setup_coverage)
 
     # Create coverage data collection target
     set(COVERAGE_BASE_DIR ${CMAKE_BINARY_DIR}/coverage)
-    set(COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/docs/output/html/coverage)
+    set(COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/coverage)
     
     add_custom_target(coverage-clean
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${COVERAGE_BASE_DIR}
