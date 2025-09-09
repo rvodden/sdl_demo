@@ -61,7 +61,7 @@ class SDL_EXPORT Window {
    * @note The title parameter is copied, so the original string can be safely destroyed
    * @note Window dimensions cannot be changed after creation in the current API
    */
-  Window(std::string title, uint16_t width, uint16_t height, uint32_t flags);
+  Window(std::string title, uint16_t width, uint16_t height, uint32_t flags = 0);
   
   /**
    * @brief Move constructor - transfers ownership of the window

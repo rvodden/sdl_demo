@@ -12,6 +12,8 @@ register_code_test(NAME tictactoe
     USE_FETCHED_DEPENDENCIES SDL3 SDL3_image SDL3_ttf
 )
 
+add_subdirectory(snake)
+
 add_subdirectory(pong)
 register_code_test(NAME pong
     COMPONENTS SDLXX
