@@ -1,5 +1,5 @@
 #include <list>
-#include <unordered_map>
+#include <unordered_set>
 
 template<typename T, typename Hash = std::hash<T>, typename Eq = std::equal_to<T>>
 class LinkedHashDeque {
@@ -14,23 +14,56 @@ class LinkedHashDeque {
 
     void pushFront(const T& value) {
       _list.push_front(value);
-      _map[value] = _list.begin();
+      _set.insert(value);
     }
     
     void pushBack(const T& value) {
       _list.push_back(value);
-      _map[value] = _list.begin();
+      _set.insert(value);
     }
 
     void popBack() {
       auto it = _list.end();
       --it;
-      _map.erase(*it);
+      _set.erase(*it);
       _list.pop_back();
     }
 
     auto contains(const T& value) const -> bool {
-      return _map.find(value) != _map.end();
+      return _set.contains(value);
+    }
+
+    auto cbegin() -> std::unordered_set<T, Hash, Eq>::const_iterator {
+      return _set.cbegin();
+    }
+
+    auto cend() -> std::unordered_set<T, Hash, Eq>::const_iterator {
+      return _set.cend();
+    }
+    
+    auto set_begin() -> std::unordered_set<T, Hash, Eq>::iterator {
+      return _set.begin();
+    }
+
+    auto set_end() -> std::unordered_set<T, Hash, Eq>::iterator {
+      return _set.end();
+    }
+
+    // Range-based for loop support - iterate over the list to maintain order
+    auto begin() -> typename std::list<T>::iterator {
+      return _list.begin();
+    }
+
+    auto end() -> typename std::list<T>::iterator {
+      return _list.end();
+    }
+
+    auto begin() const -> typename std::list<T>::const_iterator {
+      return _list.begin();
+    }
+
+    auto end() const -> typename std::list<T>::const_iterator {
+      return _list.end();
     }
 
     [[nodiscard]] auto front() const -> const T& { return _list.front(); }
@@ -40,5 +73,5 @@ class LinkedHashDeque {
     
   private: 
     std::list<T> _list;
-    std::unordered_map<T, typename std::list<T>::iterator, Hash, Eq> _map;
+    std::unordered_set<T, Hash, Eq> _set;
 };

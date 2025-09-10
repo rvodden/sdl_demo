@@ -38,6 +38,10 @@ class SDL_EXPORT NamedColor {
       Color{0, 0, 0, static_cast<uint8_t>(Alpha::kOpaque)};
   static constexpr Color kWhite =
       Color{255, 255, 255, static_cast<uint8_t>(Alpha::kOpaque)};
+  static constexpr Color kRed = 
+      Color{0xe5, 0, 0, static_cast<uint8_t>(Alpha::kOpaque)};
+  static constexpr Color kGreen = 
+      Color{0x15, 0xb0, 0x1a, static_cast<uint8_t>(Alpha::kOpaque)};
   static constexpr Color kMagenta =
       Color{0xc2, 0x00, 0x78, static_cast<uint8_t>(Alpha::kOpaque)};
 };

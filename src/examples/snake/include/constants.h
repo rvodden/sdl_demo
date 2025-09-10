@@ -19,7 +19,8 @@ const uint16_t kStartingY = kGridHeight / 2;
 const uint32_t kInitialWindowWidth  = 1024U;
 const uint32_t kInitialWindowHeight =  768U;
 
-const sdl::Color kWallColor = sdl::NamedColor::kWhite;
+const sdl::Color kWallColor  = sdl::NamedColor::kWhite;
+const sdl::Color kSnakeColor = sdl::NamedColor::kRed;
 
 const float kCellBorderThickness = 2.0F;
 

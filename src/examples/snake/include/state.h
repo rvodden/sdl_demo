@@ -39,6 +39,9 @@ class GameState {
     auto operator=(GameState&) -> GameState& = delete;
     auto operator=(GameState&&) noexcept -> GameState& = delete;
 
+    [[nodiscard]] auto getSnakeBody() const -> const SnakeBody& {return _snakeBody;}
+    [[nodiscard]] auto getFood() const -> const GridPoint& {return _food;}
+
   private:
     const SnakeBody& _snakeBody;
     const GridPoint& _food;
