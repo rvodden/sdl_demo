@@ -1,0 +1,70 @@
+{
+  "context": {
+    "date": "2024-09-11 12:34:56",
+    "num_cpus": 8,
+    "mhz_per_cpu": 3200,
+    "cpu_scaling_enabled": false,
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_EventCreation_SDL3",
+      "iterations": 10000000,
+      "real_time": 11.2,
+      "cpu_time": 11.0,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventCreation_SDLpp",
+      "iterations": 10000000,
+      "real_time": 26.8,
+      "cpu_time": 26.5,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventDispatch_SDL3",
+      "iterations": 5000000,
+      "real_time": 18.4,
+      "cpu_time": 18.1,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventDispatch_SDLpp",
+      "iterations": 5000000,
+      "real_time": 22.7,
+      "cpu_time": 22.3,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_WindowCreation_SDL3",
+      "iterations": 1000,
+      "real_time": 1250000,
+      "cpu_time": 1245000,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_WindowCreation_SDLpp",
+      "iterations": 1000,
+      "real_time": 1280000,
+      "cpu_time": 1275000,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_ComplexityTest_BigO",
+      "run_name": "BM_ComplexityTest",
+      "run_type": "aggregate",
+      "aggregate_name": "BigO",
+      "cpu_coefficient": 4.2749856294592886e+00,
+      "real_coefficient": 6.4789275289789780e+00,
+      "big_o": "N",
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_ComplexityTest_RMS",
+      "run_name": "BM_ComplexityTest",
+      "run_type": "aggregate",
+      "aggregate_name": "RMS",
+      "rms": 4.5097802512472874e-03
+    }
+  ]
+}

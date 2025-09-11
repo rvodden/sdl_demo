@@ -36,7 +36,7 @@ function(format_time ns_value output_var)
     endif()
 endfunction()
 
-# Function to parse JSON benchmark results
+# Function to parse JSON benchmark results using CMake's built-in JSON support
 function(parse_json_results json_file benchmark_data_var)
     if(NOT EXISTS "${json_file}")
         message(WARNING "File not found: ${json_file}")
@@ -46,45 +46,49 @@ function(parse_json_results json_file benchmark_data_var)
     
     file(READ "${json_file}" json_content)
     
-    # Extract benchmark entries by finding name and cpu_time pairs
-    # First find all name entries
+    # Parse JSON and extract benchmarks array
     set(benchmarks "")
-    string(REGEX MATCHALL "\"name\"[ \t\n\r]*:[ \t\n\r]*\"([^\"]+)\"" name_matches "${json_content}")
-    string(REGEX MATCHALL "\"cpu_time\"[ \t\n\r]*:[ \t\n\r]*([0-9.]+)" cpu_time_matches "${json_content}")
     
-    # Convert matches to lists
-    set(names "")
-    set(cpu_times "")
-    
-    foreach(match ${name_matches})
-        string(REGEX MATCH "\"([^\"]+)\"" _ "${match}")
-        if(CMAKE_MATCH_1)
-            list(APPEND names "${CMAKE_MATCH_1}")
-        endif()
-    endforeach()
-    
-    foreach(match ${cpu_time_matches})
-        string(REGEX MATCH "([0-9.]+)" _ "${match}")
-        if(CMAKE_MATCH_1)
-            list(APPEND cpu_times "${CMAKE_MATCH_1}")
-        endif()
-    endforeach()
-    
-    # Combine names and cpu_times (they should be in the same order)
-    list(LENGTH names name_count)
-    list(LENGTH cpu_times cpu_time_count)
-    message(STATUS "Found ${name_count} names and ${cpu_time_count} cpu_times")
-    
-    if(${name_count} EQUAL ${cpu_time_count} AND ${name_count} GREATER 0)
-        math(EXPR max_index "${name_count} - 1")
-        foreach(i RANGE ${max_index})
-            list(GET names ${i} bench_name)
-            list(GET cpu_times ${i} cpu_time)
-            list(APPEND benchmarks "${bench_name};${cpu_time}")
-        endforeach()
-    else()
-        message(WARNING "Mismatch between names (${name_count}) and cpu_times (${cpu_time_count}) in ${json_file}")
+    # Check if the JSON is valid and has a benchmarks array
+    string(JSON has_benchmarks ERROR_VARIABLE json_error TYPE "${json_content}" "benchmarks")
+    if(json_error OR NOT has_benchmarks STREQUAL "ARRAY")
+        message(WARNING "Invalid JSON or missing 'benchmarks' array in ${json_file}: ${json_error}")
+        set(${benchmark_data_var} "" PARENT_SCOPE)
+        return()
     endif()
+    
+    # Get the benchmarks array and its length
+    string(JSON benchmarks_array GET "${json_content}" "benchmarks")
+    string(JSON array_length LENGTH "${benchmarks_array}")
+    
+    if(array_length EQUAL 0)
+        message(STATUS "No benchmarks found in ${json_file}")
+        set(${benchmark_data_var} "" PARENT_SCOPE)
+        return()
+    endif()
+    
+    # Iterate through each benchmark entry
+    math(EXPR max_index "${array_length} - 1")
+    foreach(i RANGE ${max_index})
+        # Check if this is an aggregate result (skip those)
+        string(JSON run_type ERROR_VARIABLE run_type_error GET "${benchmarks_array}" ${i} "run_type")
+        if(NOT run_type_error AND run_type STREQUAL "aggregate")
+            continue()
+        endif()
+        
+        # Extract name and cpu_time for each benchmark
+        string(JSON bench_name ERROR_VARIABLE name_error GET "${benchmarks_array}" ${i} "name")
+        string(JSON cpu_time ERROR_VARIABLE time_error GET "${benchmarks_array}" ${i} "cpu_time")
+        
+        if(name_error OR time_error)
+            message(STATUS "Skipping benchmark ${i} (likely aggregate or missing cpu_time): ${bench_name}")
+            continue()
+        endif()
+        
+        # Convert floating point cpu_time to integer for math operations
+        string(REGEX REPLACE "\\.[0-9]*" "" cpu_time_int "${cpu_time}")
+        list(APPEND benchmarks "${bench_name}=${cpu_time_int}")
+    endforeach()
     
     list(LENGTH benchmarks benchmark_count)
     message(STATUS "Parsed ${benchmark_count} benchmarks from ${json_file}")
@@ -109,8 +113,7 @@ function(generate_platform_section benchmarks platform_name platform_icon output
     
     # Group benchmarks by pairs
     set(benchmark_pairs "")
-    foreach(benchmark ${benchmarks})
-        string(REPLACE ";" "=" benchmark_entry "${benchmark}")
+    foreach(benchmark_entry ${benchmarks})
         string(REGEX MATCH "([^=]+)=([0-9.]+)" _ "${benchmark_entry}")
         set(bench_name "${CMAKE_MATCH_1}")
         set(cpu_time "${CMAKE_MATCH_2}")
@@ -150,9 +153,9 @@ function(generate_platform_section benchmarks platform_name platform_icon output
                 set(overhead_class "overhead-good")
             endif()
             
-            # Format times
-            format_time("${sdl3_time}" sdl3_formatted)
-            format_time("${sdlpp_time}" sdlpp_formatted)
+            # Format times (convert back to original floating point for display)
+            set(sdl3_formatted "${sdl3_time}ns")
+            set(sdlpp_formatted "${sdlpp_time}ns")
             
             # Format overhead
             if(overhead_calc GREATER 0)

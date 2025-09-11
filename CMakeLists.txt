@@ -38,6 +38,7 @@ if(NOT SDLXX_DOCS_ONLY)
     enable_testing()
     add_subdirectory(external)
     add_subdirectory(src)
+    add_subdirectory(cmake/test)
     
     # Enable IWYU for all project targets after they've been defined
     if(SDLXX_USE_IWYU)

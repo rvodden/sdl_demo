@@ -1,0 +1,53 @@
+{
+  "context": {
+    "date": "2024-09-11 12:45:12",
+    "num_cpus": 12,
+    "mhz_per_cpu": 3600,
+    "cpu_scaling_enabled": false,
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_EventCreation_SDL3",
+      "iterations": 10000000,
+      "real_time": 13.5,
+      "cpu_time": 13.2,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventCreation_SDLpp",
+      "iterations": 10000000,
+      "real_time": 29.1,
+      "cpu_time": 28.8,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventDispatch_SDL3",
+      "iterations": 5000000,
+      "real_time": 21.2,
+      "cpu_time": 20.9,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_EventDispatch_SDLpp",
+      "iterations": 5000000,
+      "real_time": 25.6,
+      "cpu_time": 25.2,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_WindowCreation_SDL3",
+      "iterations": 1000,
+      "real_time": 1150000,
+      "cpu_time": 1145000,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_WindowCreation_SDLpp",
+      "iterations": 1000,
+      "real_time": 1180000,
+      "cpu_time": 1175000,
+      "time_unit": "ns"
+    }
+  ]
+}
