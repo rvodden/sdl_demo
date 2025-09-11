@@ -33,22 +33,6 @@ class LinkedHashDeque {
       return _set.contains(value);
     }
 
-    auto cbegin() -> std::unordered_set<T, Hash, Eq>::const_iterator {
-      return _set.cbegin();
-    }
-
-    auto cend() -> std::unordered_set<T, Hash, Eq>::const_iterator {
-      return _set.cend();
-    }
-    
-    auto set_begin() -> std::unordered_set<T, Hash, Eq>::iterator {
-      return _set.begin();
-    }
-
-    auto set_end() -> std::unordered_set<T, Hash, Eq>::iterator {
-      return _set.end();
-    }
-
     // Range-based for loop support - iterate over the list to maintain order
     auto begin() -> typename std::list<T>::iterator {
       return _list.begin();

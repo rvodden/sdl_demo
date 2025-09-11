@@ -5,8 +5,8 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 ## Summary
 
 **Total SDL3 Functions Surveyed**: ~200+  
-**Implemented in sdl**: ~42  
-**Implementation Coverage**: ~21%
+**Implemented in sdl**: ~47  
+**Implementation Coverage**: ~23%
 
 ### Key Implementation Areas:
 - ✅ **Core initialization and cleanup** - Well covered
@@ -19,6 +19,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ✅ **Color and rectangle utilities** - Enhanced Rectangle with intersection/collision detection
 - ✅ **Message boxes** - Native dialog support with builder pattern
 - ✅ **Primitive drawing** - Line and rectangle rendering support
+- ✅ **Random number generation** - Thread-safe random generators with template-based range support
 
 ### Major Missing Areas:
 - ❌ **Advanced window management** (positioning, resizing, fullscreen, etc.)
@@ -39,6 +40,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ✅ **Keyboard Event Handling** - Added comprehensive keyboard event support with `KeyboardEvent` class
 - ✅ **Modifier Key Support** - Fixed crash issue with modifier keys (Shift, Ctrl, Alt, etc.) in keycode mapping
 - ✅ **Key Name Resolution** - Implemented `KeyboardEvent::getKeyName()` for human-readable key names
+- ✅ **Random Number Generation** - Complete SDL3 random function wrapper with template-based `Random<T>` class for int32_t and float, plus global convenience functions
 
 ### Notes:
 - sdl follows modern C++ RAII principles with smart pointers and exception-based error handling
@@ -189,6 +191,16 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 |---------------|------------------|
 | `bool SDL_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)` | `MessageBox::show() -> MessageBox::Result` (fluent builder pattern) |
 | `bool SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags flags, const char *title, const char *message, SDL_Window *window)` | `MessageBox(title, message).setType(type).show()` (simplified via builder) |
+
+## Random Number Generation (CategoryRandom)
+
+| SDL3 Function | SDL++ Equivalent |
+|---------------|------------------|
+| `void SDL_srand(Uint64 seed)` | `sdl::random::srand(uint64_t seed)` |
+| `Sint32 SDL_rand(Sint32 n)` | `sdl::random::rand(int32_t n)` |
+| `float SDL_randf(void)` | `sdl::random::randf()` |
+| `Uint32 SDL_rand_bits(void)` | `sdl::random::randBits()` |
+| `Sint32 SDL_rand_r(Uint64 *state, Sint32 n)` | `Random<int32_t>::range(int32_t min, int32_t max)` (thread-safe per-instance) |
 
 ## Time and Delays (CategoryTime/CategoryTimer)
 

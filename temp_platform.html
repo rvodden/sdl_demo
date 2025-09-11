@@ -1,0 +1,36 @@
+                <div class="results-section">
+                    <div class="platform">
+                        <h2><span class="platform-icon">🪟</span>Windows</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Benchmark</th>
+                                    <th>Pure SDL3</th>
+                                    <th>SDL++ Wrapper</th>
+                                    <th>Overhead</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                    <tr>
+                        <td class="benchmark-name">BM_EventCreation</td>
+                        <td class="sdl3-time">13ns</td>
+                        <td class="sdlpp-time">28ns</td>
+                        <td><span class="overhead overhead-bad">+115%</span></td>
+                    </tr>
+                    <tr>
+                        <td class="benchmark-name">BM_EventDispatch</td>
+                        <td class="sdl3-time">20ns</td>
+                        <td class="sdlpp-time">25ns</td>
+                        <td><span class="overhead overhead-bad">+25%</span></td>
+                    </tr>
+                    <tr>
+                        <td class="benchmark-name">BM_WindowCreation</td>
+                        <td class="sdl3-time">1145000ns</td>
+                        <td class="sdlpp-time">1175000ns</td>
+                        <td><span class="overhead overhead-good">+2%</span></td>
+                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
