@@ -5,8 +5,8 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 ## Summary
 
 **Total SDL3 Functions Surveyed**: ~200+  
-**Implemented in sdl**: ~47  
-**Implementation Coverage**: ~23%
+**Implemented in sdl**: ~48  
+**Implementation Coverage**: ~24%
 
 ### Key Implementation Areas:
 - ✅ **Core initialization and cleanup** - Well covered
@@ -20,6 +20,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ✅ **Message boxes** - Native dialog support with builder pattern
 - ✅ **Primitive drawing** - Line and rectangle rendering support
 - ✅ **Random number generation** - Thread-safe random generators with template-based range support
+- ✅ **Timer system** - SDL timer wrapper with RAII management and callback support
 
 ### Major Missing Areas:
 - ❌ **Advanced window management** (positioning, resizing, fullscreen, etc.)
@@ -27,7 +28,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ⚠️ **Input handling** (mouse events implemented, ~~keyboard events~~ ✅ now implemented, gamepad support missing)
 - ⚠️ **Advanced rendering** (viewports, render targets) - Basic primitives implemented
 - ❌ **File I/O abstraction**
-- ❌ **Threading utilities**
+- ⚠️ **Threading utilities** - Basic timer callbacks on SDL timer thread implemented
 - ❌ **Platform information and capabilities**
 - ❌ **Joystick and gamepad support**
 - ❌ **Hardware acceleration info (OpenGL, Vulkan, etc.)**
@@ -41,6 +42,7 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 - ✅ **Modifier Key Support** - Fixed crash issue with modifier keys (Shift, Ctrl, Alt, etc.) in keycode mapping
 - ✅ **Key Name Resolution** - Implemented `KeyboardEvent::getKeyName()` for human-readable key names
 - ✅ **Random Number Generation** - Complete SDL3 random function wrapper with template-based `Random<T>` class for int32_t and float, plus global convenience functions
+- ✅ **Timer System** - SDL timer wrapper with RAII management, callback support, and comprehensive unit tests (non-copyable, non-movable for thread safety)
 
 ### Notes:
 - sdl follows modern C++ RAII principles with smart pointers and exception-based error handling
@@ -211,8 +213,8 @@ This document tracks the implementation status of SDL3 functions in the SDL++ C+
 | `Uint64 SDL_GetTicksNS()` | Not yet implemented |
 | `Uint64 SDL_GetPerformanceCounter()` | Not yet implemented |
 | `Uint64 SDL_GetPerformanceFrequency()` | Not yet implemented |
-| `SDL_TimerID SDL_AddTimer(Uint32 interval, SDL_TimerCallback callback, void *userdata)` | Not yet implemented |
-| `bool SDL_RemoveTimer(SDL_TimerID id)` | Not yet implemented |
+| `SDL_TimerID SDL_AddTimer(Uint32 interval, SDL_TimerCallback callback, void *userdata)` | `Timer::start(std::chrono::milliseconds, Callback)` |
+| `bool SDL_RemoveTimer(SDL_TimerID id)` | `Timer::stop()` (automatic cleanup in destructor) |
 
 ## Error Handling (CategoryError)
 
