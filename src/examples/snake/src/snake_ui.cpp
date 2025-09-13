@@ -36,6 +36,11 @@ void SnakeUI::_renderSnake(const float recWidth, const float recHeight, const Sn
   }
 }
 
+void SnakeUI::_renderFood(const float recWidth, const float recHeight, const GridPoint& food) const {
+  _renderer->setDrawColour(kFoodColor);
+  _drawBrick(recWidth, recHeight, food.first, food.second);
+}
+
 void SnakeUI::render([[maybe_unused]] const GameState& state) {
   const auto size = _window->getSize();
 
@@ -47,6 +52,7 @@ void SnakeUI::render([[maybe_unused]] const GameState& state) {
 
   _renderWalls(recWidth, recHeight);
   _renderSnake(recWidth, recHeight, state.getSnakeBody());
+  _renderFood(recWidth, recHeight, state.getFood());
 
   _renderer->present();
 }

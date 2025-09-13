@@ -50,11 +50,15 @@ class LinkedHashDeque {
       return _list.end();
     }
 
-    [[nodiscard]] auto front() const -> const T& { return _list.front(); }
-    [[nodiscard]] auto back()  const -> const T&{ return _list.back();  }
+    [[nodiscard]] auto head() const -> const T& { return _list.front(); }
+    [[nodiscard]] auto tail()  const -> const T&{ return _list.back();  }
     [[nodiscard]] auto empty() const -> bool { return _list.empty(); }
     [[nodiscard]] auto size() const -> std::size_t { return _list.size(); }
-    
+   
+    void clear() {
+      _list.clear();
+      _set.clear();
+    }
   private: 
     std::list<T> _list;
     std::unordered_set<T, Hash, Eq> _set;

@@ -20,10 +20,10 @@ class SnakeUI {
     std::unique_ptr<sdl::Window> _window = std::make_unique<sdl::Window>("Snake", kInitialWindowWidth, kInitialWindowHeight);
     std::unique_ptr<sdl::Renderer> _renderer = std::make_unique<sdl::Renderer>(*_window);
 
-    void _renderWalls(float recWidth, float recHeight) const;
-    void _renderSnake(float recWidth, float recHeight) const;
     void _drawBrick(float recWidth, float recHeight, uint16_t x, uint16_t y) const;
+    void _renderWalls(float recWidth, float recHeight) const;
     void _renderSnake(float recWidth, float recHeight, const SnakeBody& snakeBody) const;
+    void _renderFood(float recWidth, float recHeight, const GridPoint& food) const;
 };
 
 }
