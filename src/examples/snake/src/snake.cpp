@@ -32,8 +32,17 @@ Snake::Snake(std::shared_ptr<sdl::tools::EventRouter> eventRouter) : _eventRoute
 void Snake::update() {
   _direction = _nextDirection;
   auto nextHead = kDirectionMap[_direction](_snakeBody->head());
+
+  // have we crashed into the snake?
   if (_snakeBody->contains(nextHead)) {
     _reset();
+    return;
+  }
+
+  // have we crashed into the wall?
+  if (nextHead.first == 0 || nextHead.first == kGridWidth - 1 || nextHead.second == 0 || nextHead.second == kGridHeight - 1) {
+    _reset();
+    return;
   }
 
   _snakeBody->pushFront(nextHead);
@@ -60,6 +69,8 @@ void Snake::_reset() {
   _snakeBody->clear();
   _snakeBody->pushFront({kStartingX, kStartingY});
   _direction = kStartingDirection;
+  _nextDirection = kStartingDirection;
+  _food = _placeFood();
 }
 
 }
