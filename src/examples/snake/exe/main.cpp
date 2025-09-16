@@ -1,7 +1,7 @@
 #include <sdl/application.h>
+#include <chrono>
 
 #include <sdl/sdl.h>
-#include <sdl/ticker.h>
 #include <sdl/event_router.h>
 
 #include "snake.h"
@@ -18,18 +18,20 @@ class SnakeApplication : public sdl::BaseApplication {
 
     _snake = std::make_unique<Snake>(eventRouter);
     _snakeUI = std::make_unique<SnakeUI>();
-    _ticker = std::make_unique<sdl::tools::Ticker>(getEventBus(), std::chrono::milliseconds(250));
-
-    eventRouter->registerEventHandler<sdl::tools::TickEvent>([this](const sdl::tools::TickEvent&) {
-      _snake->update();
-    });
-
-    _ticker->start();
+    _lastUpdateTime = std::chrono::steady_clock::now();
 
     return true; 
   };
   
   auto iterate() -> bool override { 
+    auto currentTime = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - _lastUpdateTime);
+    
+    if (elapsed >= std::chrono::milliseconds(250)) {
+      _snake->update();
+      _lastUpdateTime = currentTime;
+    }
+    
     _snakeUI->render(_snake->getState());
     return true; 
   };
@@ -39,7 +41,7 @@ class SnakeApplication : public sdl::BaseApplication {
  private:
   std::unique_ptr<Snake>   _snake = nullptr;
   std::unique_ptr<SnakeUI> _snakeUI = nullptr;
-  std::unique_ptr<sdl::tools::Ticker> _ticker = nullptr;
+  std::chrono::steady_clock::time_point _lastUpdateTime;
 
 };
 

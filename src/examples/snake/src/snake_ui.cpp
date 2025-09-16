@@ -23,7 +23,7 @@ void SnakeUI::_renderWalls(const float recWidth, const float recHeight) const {
     drawSizedBrick(x, kGridHeight - 1);
   }
   
-  for(const uint16_t& y : std::ranges::views::iota(static_cast<uint16_t>(0), kGridWidth)) {
+  for(const uint16_t& y : std::ranges::views::iota(static_cast<uint16_t>(0), kGridHeight)) {
     drawSizedBrick(0, y);
     drawSizedBrick(kGridWidth - 1, y);
   }
