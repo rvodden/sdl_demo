@@ -1,11 +1,8 @@
 #include <iostream>
 #include <memory>
 
-#include "sdl/application.h"
-#include "sdl/event_router.h" 
-#include "sdl/event.h"
-#include "sdl/window.h"
-#include "sdl/renderer.h"
+#include "sdl/sdl_tools.h"
+#include "sdl/sdl.h"
 
 class SDL_AppEventTestApp : public sdl::BaseApplication {
 private:

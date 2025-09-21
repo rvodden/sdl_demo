@@ -20,4 +20,9 @@ class SDL_TTF_EXPORT TTF {
 
 } // namespace sdl::ttf
 
+// Include all SDL TTF library headers
+#include "font.h"
+#include "text.h"
+#include "ttf_service.h"
+
 #endif

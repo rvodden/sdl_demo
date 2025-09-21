@@ -6,8 +6,8 @@
 #include <functional>
 #include <utility>
 
-#include <sdl/constexpr_map.h>
-#include <sdl/event_router.h>
+#include <sdl/sdl.h>
+#include <sdl/sdl_tools.h>
 
 #include "constants.h"
 #include "state.h"

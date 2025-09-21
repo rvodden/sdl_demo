@@ -13,8 +13,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "sdl/event.h"
-#include "sdl/event_router.h"
+#include "sdl/sdl_tools.h"
 
 #include "event_impl.h"
 

@@ -3,17 +3,9 @@
 #include <string>
 #include <cstring>
 
-#include <sdl/application.h>
-#include <sdl/color.h>
-#include <sdl/event.h>
-#include <sdl/event_router.h>
-#include <sdl/font.h>
-#include <sdl/renderer.h>
 #include <sdl/sdl.h>
-#include <sdl/text.h>
+#include <sdl/sdl_tools.h>
 #include <sdl/ttf.h>
-#include <sdl/ttf_service.h>
-#include <sdl/window.h>
 
 #include "tiny_ttf.h"
 

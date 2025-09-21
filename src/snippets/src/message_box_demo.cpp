@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "sdl/message_box.h"
 #include "sdl/sdl.h"
 
 int main() {

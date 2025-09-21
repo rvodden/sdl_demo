@@ -1,12 +1,7 @@
 #include <iostream>
 
-#include <sdl/application.h>
-#include <sdl/color.h>
-#include <sdl/renderer.h>
 #include <sdl/sdl.h>
-#include <sdl/window.h>
-#include <sdl/event.h>
-#include <sdl/event_router.h>
+#include <sdl/sdl_tools.h>
 
 
 using namespace sdl;

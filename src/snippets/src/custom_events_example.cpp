@@ -10,9 +10,8 @@
 #include <iostream>
 #include <memory>
 
-#include <sdl/event.h>
-#include <sdl/event_router.h>
-#include <sdl/user_event.h>
+#include <sdl/sdl.h>
+#include <sdl/sdl_tools.h>
 
 using namespace sdl;
 using namespace sdl::tools;

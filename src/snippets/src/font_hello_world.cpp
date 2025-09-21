@@ -1,14 +1,9 @@
 #include <cassert>
 #include <string_view>
 
-#include <sdl/application.h>
-#include <sdl/font.h>
-#include <sdl/renderer.h>
 #include <sdl/sdl.h>
-#include <sdl/text.h>
+#include <sdl/sdl_tools.h>
 #include <sdl/ttf.h>
-#include <sdl/ttf_service.h>  // Automatically registers TTF service
-#include <sdl/window.h>
 
 #include "tiny_ttf.h"
 

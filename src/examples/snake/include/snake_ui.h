@@ -3,9 +3,7 @@
 
 #include <memory>
 
-#include <sdl/window.h>
-#include <sdl/renderer.h>
-#include <sdl/color.h>
+#include <sdl/sdl.h>
 
 #include "constants.h"
 #include "state.h"

@@ -6,6 +6,26 @@
 
 #include "sdl_export.h"
 
+// Include all SDL library headers
+#include "color.h"
+#include "constexpr_map.h"
+#include "event.h"
+#include "exception.h"
+#include "keycodes.h"
+#include "keymodifiers.h"
+#include "message_box.h"
+#include "pixel.h"
+#include "point.h"
+#include "random.h"
+#include "rectangle.h"
+#include "renderer.h"
+#include "scancodes.h"
+#include "surface.h"
+#include "texture.h"
+#include "timer.h"
+#include "user_event.h"
+#include "window.h"
+
 namespace sdl {
 
 class SDLImpl;

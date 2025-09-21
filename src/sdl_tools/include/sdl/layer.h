@@ -18,6 +18,6 @@ class BaseLayer {
     std::function<void, const State&> _render;
 
     std::shared_ptr<Renderer> _renderer;
-}
+};
 
 #endif // LAYER_H

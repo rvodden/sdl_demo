@@ -7,11 +7,8 @@
 #include <string>
 #include <ranges>
 
-#include "sdl/rectangle.h"
-#include "sdl/text.h"
-#include "sdl/renderer.h"
-#include "sdl/font.h"
-#include "sdl/texture.h"
+#include "sdl/sdl.h"
+#include "sdl/ttf.h"
 
 #include "point.h"
 
