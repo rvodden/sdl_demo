@@ -4,10 +4,13 @@
 #include <functional>
 #include <memory>
 
-template<class State>
-class BaseLayer {
+#include <sdl/sdl.h>
 
-  BaseLayer(
+namespace sdl::tools {
+
+template<class State>
+class Layer {
+  Layer(
     std::function<State, State, BaseLayer> iterate,
     std::function<void, const State&> render,
     std::shared_ptr<Renderer> renderer
@@ -19,5 +22,7 @@ class BaseLayer {
 
     std::shared_ptr<Renderer> _renderer;
 };
+
+}
 
 #endif // LAYER_H

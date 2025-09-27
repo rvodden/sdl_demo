@@ -6,7 +6,7 @@
 #include "application.h"
 #include "button.h"
 #include "event_router.h"
-// #include "layer.h"
+#include "layer.h"
 #include "sprite.h"
 #include "sprite_renderer.h"
 #include "ticker.h"

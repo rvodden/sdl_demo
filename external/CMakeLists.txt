@@ -54,7 +54,7 @@ elseif(SDLXX_USE_VENDORED_SDL3)
         # Disable installation of vendored SDL3 to avoid export conflicts
         # set(SDL_INSTALL_CMAKEDIR_ROOT ${CMAKE_INSTALL_LIBDIR}/cmake/SDL3/ CACHE STRING "" FORCE)
         set(SDL_INSTALL ON)
-        set(SDL_VULKAN OFF)
+        set(SDL_VULKAN ON)
         set(SDL_SHARED ON)
         set(SDL_STATIC ON)
         if(CCACHE_PROGRAM)
@@ -99,6 +99,19 @@ elseif(SDLXX_USE_VENDORED_SDL3)
                 OVERRIDE_FIND_PACKAGE
                 SYSTEM
         )
+
+
+        set(SDLSHADERCROSS_DXC OFF CACHE BOOL "Disable DirectXShaderCompiler to avoid compatibility issues" FORCE)
+        set(SDLSHADERCROSS_VENDORED ON CACHE BOOL "Use vendored dependencies for SDL_shadercross")
+        set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "Link to shared library variants of dependencies")
+        FetchContent_Declare(
+                SDL_shadercross
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL_shadercross
+                GIT_TAG main
+                DOWNLOAD_EXTRACT_TIMESTAMP false
+                OVERRIDE_FIND_PACKAGE
+                SYSTEM
+        )
 endif()
 
 if(SDLXX_USE_VENDORED_GTEST)
@@ -138,4 +151,5 @@ if(SDLXX_USE_VENDORED_SDL3 AND NOT SDLXX_USE_SYSTEM_SDL3)
         FetchContent_MakeAvailable(SDL3)
         FetchContent_MakeAvailable(SDL3_image)
         FetchContent_MakeAvailable(SDL3_ttf)
+        FetchContent_MakeAvailable(SDL_shadercross)
 endif()
