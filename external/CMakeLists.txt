@@ -104,6 +104,29 @@ elseif(SDLXX_USE_VENDORED_SDL3)
         set(SDLSHADERCROSS_DXC OFF CACHE BOOL "Disable DirectXShaderCompiler to avoid compatibility issues" FORCE)
         set(SDLSHADERCROSS_VENDORED ON CACHE BOOL "Use vendored dependencies for SDL_shadercross")
         set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "Link to shared library variants of dependencies")
+
+        # DirectX Shader Compiler binaries for Windows and Linux
+        option(SDLXX_USE_VENDORED_DXC "Download DirectX Shader Compiler binaries" OFF)
+        if(SDLXX_USE_VENDORED_DXC)
+            if(WIN32)
+                FetchContent_Declare(
+                    dxc_windows
+                    URL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505/dxc_2025_05_24.zip
+                    URL_HASH SHA256=81380f3eca156d902d6404fd6df9f4b0886f576ff3e18b2cc10d3075ffc9d119
+                    DOWNLOAD_EXTRACT_TIMESTAMP false
+                    SYSTEM
+                )
+            else()
+                FetchContent_Declare(
+                    dxc_linux
+                    URL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505/linux_dxc_2025_05_24.x86_64.tar.gz
+                    URL_HASH SHA256=b99655f65215287825fcdd49102b17e2a1608eff79ffaf9457514c2676892aa5
+                    DOWNLOAD_EXTRACT_TIMESTAMP false
+                    SYSTEM
+                )
+            endif()
+        endif()
+
         FetchContent_Declare(
                 SDL_shadercross
                 GIT_REPOSITORY https://github.com/libsdl-org/SDL_shadercross
@@ -152,4 +175,12 @@ if(SDLXX_USE_VENDORED_SDL3 AND NOT SDLXX_USE_SYSTEM_SDL3)
         FetchContent_MakeAvailable(SDL3_image)
         FetchContent_MakeAvailable(SDL3_ttf)
         FetchContent_MakeAvailable(SDL_shadercross)
+endif()
+
+if(SDLXX_USE_VENDORED_DXC)
+        if(WIN32)
+                FetchContent_MakeAvailable(dxc_windows)
+        else()
+                FetchContent_MakeAvailable(dxc_linux)
+        endif()
 endif()
