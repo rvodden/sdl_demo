@@ -26,6 +26,7 @@ target_link_libraries(message_box_demo PRIVATE sdl::sdl-static)
 
 # SDL_shadercross demonstrations
 target_link_libraries(shader_demo PRIVATE SDL3::SDL3 SDL3_shadercross::SDL3_shadercross shader_headers)
+target_link_libraries(bloom_shader_demo PRIVATE SDL3::SDL3 SDL3_shadercross::SDL3_shadercross shader_headers)
 
 # Basic SDL3 GPU test
-target_link_libraries(simple_test PRIVATE SDL3::SDL3)
+target_link_libraries(gpu_demo PRIVATE SDL3::SDL3)

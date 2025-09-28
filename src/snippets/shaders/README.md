@@ -25,9 +25,15 @@ This directory contains the GLSL source code for shaders used in the SDL_shaderc
 
 **Description**: Simple fragment shader that outputs a solid red color (1.0, 0.0, 0.0, 1.0) for every pixel.
 
-## CMake-Based SPIRV Compilation
+## Build-Time vs Runtime Compilation
 
-The GLSL source files are automatically compiled to SPIRV bytecode using CMake and `glslang`. The compilation happens during the build process and generates C header files that are included by the demos.
+This project uses a **two-stage shader compilation pipeline**:
+
+### Stage 1: Build-Time (GLSL → SPIR-V)
+GLSL source files are compiled to SPIR-V bytecode using CMake and `glslang` during the build process. This generates C header files that are included by the demos.
+
+### Stage 2: Runtime (SPIR-V → Target GPU Format)
+At runtime, SDL_shadercross compiles the SPIR-V bytecode to the appropriate format for the target GPU (Vulkan, D3D11, D3D12, Metal, etc.).
 
 ### Build Process
 
@@ -74,3 +80,25 @@ To modify the shaders:
 - **Explicit Locations**: All inputs/outputs must have explicit `layout(location = N)`
 - **SPIRV Target**: Compiled SPIRV must be compatible with Vulkan 1.0+
 - **Interface Matching**: Vertex shader outputs must match pipeline vertex input descriptions
+
+## SDL_shadercross Integration
+
+The runtime uses SDL_shadercross to compile SPIR-V bytecode to the target GPU format:
+
+### Key Functions Used:
+- `SDL_ShaderCross_ReflectGraphicsSPIRV()` - Analyzes shader metadata and resource requirements
+- `SDL_ShaderCross_CompileGraphicsShaderFromSPIRV()` - Compiles SPIR-V to target GPU format
+
+### Supported Target Formats:
+- **Vulkan**: SPIR-V (direct use)
+- **D3D11**: DXBC (compiled from SPIR-V)
+- **D3D12**: DXIL (compiled from SPIR-V)
+- **Metal**: MSL (transpiled from SPIR-V)
+
+### Why This Approach?
+- **Portability**: Single SPIR-V source works across all GPU APIs
+- **Build Speed**: GLSL compilation happens once at build time
+- **Runtime Flexibility**: Target format chosen based on available GPU
+- **Optimization**: SDL_shadercross can optimize for specific targets
+
+This approach provides the best of both worlds: fast builds with glslang and runtime flexibility with SDL_shadercross.

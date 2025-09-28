@@ -41,6 +41,15 @@ endfunction()
 compile_shader_to_header(triangle.vert triangleVertexSpirv)
 compile_shader_to_header(triangle.frag triangleFragmentSpirv)
 
+# Bloom effect shaders
+compile_shader_to_header(fullscreen.vert fullscreenVertexSpirv)
+compile_shader_to_header(scene.vert sceneVertexSpirv)
+compile_shader_to_header(scene.frag sceneFragmentSpirv)
+compile_shader_to_header(bright_pass.frag brightPassFragmentSpirv)
+compile_shader_to_header(blur.frag blurFragmentSpirv)
+compile_shader_to_header(composite.frag compositeFragmentSpirv)
+compile_shader_to_header(copy.frag copyFragmentSpirv)
+
 # Create a custom target that depends on all generated headers
 add_custom_target(compile_shaders ALL
     DEPENDS
@@ -48,6 +57,20 @@ add_custom_target(compile_shaders ALL
         ${SHADER_HEADER_triangleFragmentSpirv}
         ${SHADER_SPIRV_triangleVertexSpirv}
         ${SHADER_SPIRV_triangleFragmentSpirv}
+        ${SHADER_HEADER_fullscreenVertexSpirv}
+        ${SHADER_HEADER_sceneVertexSpirv}
+        ${SHADER_HEADER_sceneFragmentSpirv}
+        ${SHADER_HEADER_brightPassFragmentSpirv}
+        ${SHADER_HEADER_blurFragmentSpirv}
+        ${SHADER_HEADER_compositeFragmentSpirv}
+        ${SHADER_HEADER_copyFragmentSpirv}
+        ${SHADER_SPIRV_fullscreenVertexSpirv}
+        ${SHADER_SPIRV_sceneVertexSpirv}
+        ${SHADER_SPIRV_sceneFragmentSpirv}
+        ${SHADER_SPIRV_brightPassFragmentSpirv}
+        ${SHADER_SPIRV_blurFragmentSpirv}
+        ${SHADER_SPIRV_compositeFragmentSpirv}
+        ${SHADER_SPIRV_copyFragmentSpirv}
     COMMENT "Compiling all shaders"
 )
 
@@ -66,6 +89,13 @@ if(SPIRV_VAL)
     add_custom_target(validate_shaders
         COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_triangleVertexSpirv}
         COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_triangleFragmentSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_fullscreenVertexSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_sceneVertexSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_sceneFragmentSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_brightPassFragmentSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_blurFragmentSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_compositeFragmentSpirv}
+        COMMAND ${SPIRV_VAL} ${SHADER_SPIRV_copyFragmentSpirv}
         DEPENDS compile_shaders
         COMMENT "Validating compiled SPIRV"
     )
