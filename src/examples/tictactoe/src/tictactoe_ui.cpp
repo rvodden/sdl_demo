@@ -9,6 +9,11 @@ TicTacToeUI::TicTacToeUI(std::shared_ptr<sdl::BaseEventBus> bus,
                          std::shared_ptr<sdl::tools::EventRouter> router)
     : _eventBus(std::move(bus)),
       _eventRouter(std::move(router)) {
+  auto res = tictactoe::getTicTacToePNG();
+  if (!res) {
+    throw std::runtime_error("Failed to load TicTacToe sprite sheet");
+  }
+  _spriteSheet = std::make_shared<sdl::Texture>(*_renderer, res.data, static_cast<uint32_t>(res.size));
   _spriteSheet->setTextureBlendMode(sdl::Texture::kBlend);
   _buttons.reserve(static_cast<std::size_t>(kCellColumns * kCellRows));
   for (uint8_t x :

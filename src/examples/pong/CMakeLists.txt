@@ -5,12 +5,13 @@ project(pong LANGUAGES CXX VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(data)
-
 find_package(SDLXX REQUIRED)
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
 find_package(SDL3_ttf REQUIRED)
+find_package(resource_tools REQUIRED)
+
+add_subdirectory(data)
 
 option(PONG_BUILD_TESTS "Build the Pong tests" ON)
 
@@ -60,9 +61,7 @@ if(NOT PROJECT_IS_TOP_LEVEL)
 endif()
 
 target_link_libraries(${PROJECT_NAME}-static PUBLIC ${PROJECT_NAME}-data)
-# Add the data include directory for C++ compilation (both Windows and Linux need this)
-# TODO: this should be done by cmake
-target_include_directories(${PROJECT_NAME}-static PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/data/include")
+target_link_libraries(${PROJECT_NAME}-static PUBLIC resource_tools::resource_tools)
 target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl-static)
 target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_tools-static)
 target_link_libraries(${PROJECT_NAME}-static PUBLIC sdl::sdl_main-static)

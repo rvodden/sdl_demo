@@ -16,8 +16,8 @@
 
 #include "events.h"
 #include "game_constants.h"
-#include "images.h"
 #include "tictactoe.h"
+#include <tictactoe/embedded_data.h>
 
 class TicTacToeUI {
  public:
@@ -35,8 +35,7 @@ class TicTacToeUI {
   std::shared_ptr<sdl::tools::SpriteRenderer> _spriteRenderer =
       std::make_shared<sdl::tools::SpriteRenderer>(_renderer);
 
-  std::shared_ptr<sdl::Texture> _spriteSheet = std::make_shared<sdl::Texture>(
-      *_renderer, &_binary_tic_tac_toe_png_start, ticTacToeSize());
+  std::shared_ptr<sdl::Texture> _spriteSheet;
   sdl::tools::Sprite _board{_spriteSheet,
                 {0, 0, kCellWidth* kCellColumns, kCellHeight* kCellRows}};
   sdl::tools::Sprite _letterO{

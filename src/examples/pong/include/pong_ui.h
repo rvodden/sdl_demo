@@ -10,8 +10,8 @@
 
 #include "game_state.h"
 #include "renderers.h"
-#include "resources.h"
 #include "constants.h"
+#include <pong/embedded_data.h>
 
 namespace pong {
 
@@ -34,9 +34,11 @@ class PongUIFactory {
   // Factory helper for font and score renderer creation
   static std::unique_ptr<ScoreRenderer<kMaxScore>> createScoreRenderer(
       std::shared_ptr<sdl::Renderer> renderer) {
-    auto font = std::make_unique<sdl::ttf::Font>(&_binary_PressStart2P_Regular_ttf_start, 
-                                                pressStart2PRegularSize(), 
-                                                kScoreFontSize);
+    auto res = ::pong::getPressstart2pRegularTTF();
+    if (!res) {
+      throw std::runtime_error("Failed to load Press Start 2P font");
+    }
+    auto font = std::make_unique<sdl::ttf::Font>(res.data, static_cast<uint32_t>(res.size), kScoreFontSize);
     return std::make_unique<ScoreRenderer<kMaxScore>>(std::move(font), renderer);
   }
 };

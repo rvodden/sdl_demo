@@ -22,7 +22,6 @@
 #include "pong.h"
 #include "pong_ui.h"
 #include "renderers.h"
-#include "resources.h"
 #include "timer.h"
 #include "constants.h"
 

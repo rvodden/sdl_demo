@@ -1,4 +1,0 @@
-#include <windows.h>
-#include "resource.h"
-
-kPressStart2P_Regular_Ttf RCDATA "@FONT_FILE@"

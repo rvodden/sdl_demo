@@ -4,6 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Be brutally honest, don't be a yes man. If I am wrong, point it out bluntly. I need honest feedback on my code.
 
+## Project Status and Breaking Changes
+
+**Pre-1.0 Development**: This project is in active pre-1.0 development (currently v0.x.x). Breaking changes are acceptable and expected as we iterate toward the best API design. Once we hit v1.0.0, we'll follow semantic versioning strictly and avoid breaking changes. Until then, prioritize good design over backward compatibility.
+
 ## Build System
 
 This project uses CMake with presets for configuration and building. The following commands are for Ubuntu, on Windows `msvcc` should be used instead of `ninja-mc` in all the preset names.
@@ -102,7 +106,78 @@ This is a C++20 SDL3 C++ wrapper project with a layered architecture:
 ### Dependencies
 - SDL3 and SDL3_image are fetched automatically via CMake FetchContent
 - GoogleTest and Google Benchmark for testing and performance measurement
+- resource_tools for cross-platform resource embedding
 - All external dependencies are managed in `external/CMakeLists.txt`
+
+### Resource Embedding
+
+This project uses the [resource_tools](https://github.com/rvodden/resource_tools) library for cross-platform binary resource embedding (images, fonts, etc.). The library handles platform-specific details (Windows RC files, Linux object file linking) and provides a consistent C++20 API.
+
+**Adding resources to a new example:**
+
+1. Add `find_package(resource_tools REQUIRED)` to your example's main CMakeLists.txt (after `find_package(SDLXX)`).
+
+2. In your example's `data/CMakeLists.txt`:
+```cmake
+embed_resources(
+    TARGET ${PROJECT_NAME}
+    RESOURCES your_file.png another_file.ttf
+    RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    HEADER_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/include
+    NAMESPACE your_namespace
+)
+
+target_include_directories(${PROJECT_NAME}-data
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+)
+```
+
+3. Link the data library and resource_tools in your example's main CMakeLists.txt:
+```cmake
+target_link_libraries(${PROJECT_NAME}-static PUBLIC
+    ${PROJECT_NAME}-data
+    resource_tools::resource_tools
+)
+```
+
+4. Use in C++ code:
+```cpp
+#include <your_namespace/embedded_data.h>
+
+// Get resource with error handling
+auto res = your_namespace::getYourFilePNG();
+if (!res) {
+    throw std::runtime_error("Failed to load resource");
+}
+
+// Use the data
+auto texture = std::make_shared<sdl::Texture>(renderer, res.data, static_cast<uint32_t>(res.size));
+```
+
+**Generated API:**
+- Function naming: `get<Filename><Extension>()` (e.g., `getTicTacToePNG()`, `getPressstart2pRegularTTF()`)
+  - Filename is converted to PascalCase with special handling for numbers and hyphens
+  - Extension is uppercase (PNG, TTF, etc.)
+- Returns: `resource_tools::ResourceResult` with `.data` (pointer) and `.size` (size_t) members
+- Error checking: Use `if (!res)` or `if (res.error != ResourceError::Success)`
+
+**Downloading resources at build time (like Pong's font):**
+```cmake
+# Download resource
+add_custom_command(OUTPUT ${FONT_FILE} ...)
+add_custom_target(${PROJECT_NAME}-raw_data DEPENDS ${FONT_FILE})
+
+# Embed it (use relative path from RESOURCE_DIR)
+embed_resources(
+    TARGET ${PROJECT_NAME}
+    RESOURCES PressStart2P-Regular.ttf
+    RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}  # Downloaded files are in build dir
+    ...
+)
+
+# Ensure download happens before embedding
+add_dependencies(${PROJECT_NAME}-data ${PROJECT_NAME}-raw_data)
+```
 
 ### Code Style
 - Raw pointers should never be used.

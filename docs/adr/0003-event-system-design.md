@@ -91,18 +91,46 @@ void castHandler(const EventClass& eventClass, BaseEventHandler& handler) {
 ### Lambda Support via Function Adapters
 ```cpp
 template <typename EventType, typename Callable>
-class FunctionEventHandler : public EventHandler<EventType>, 
+class FunctionEventHandler : public EventHandler<EventType>,
                             public BaseEventHandler {
 public:
     explicit FunctionEventHandler(Callable&& callable);
     void handle(const EventType& event) override { _callable(event); }
 };
 
-// Usage:
-eventRouter.registerEventHandler<MouseButtonEvent>([](const auto& e) {
+// Usage with RAII token (REQUIRED):
+auto registration = eventRouter.registerEventHandler<MouseButtonEvent>([](const auto& e) {
     std::cout << "Button clicked at " << e.x << ", " << e.y << std::endl;
 });
+// Handler remains active while 'registration' is alive
 ```
+
+### RAII-Based Handler Lifetime Management
+```cpp
+class EventRegistration {
+public:
+    EventRegistration() = default;
+    EventRegistration(EventRegistration&& other) noexcept;
+    ~EventRegistration();  // Automatically deregisters handler
+
+    // Move-only semantics (cannot copy)
+    EventRegistration(const EventRegistration&) = delete;
+    EventRegistration& operator=(const EventRegistration&) = delete;
+
+    void unregister();
+    [[nodiscard]] bool isRegistered() const;
+};
+
+// All registration methods return EventRegistration and are [[nodiscard]]
+template <typename EventType, typename Callable>
+[[nodiscard]] auto registerEventHandler(Callable&& callable) -> EventRegistration;
+```
+
+**Key Features:**
+- **Automatic Cleanup**: Handlers are automatically deregistered when EventRegistration is destroyed
+- **Move-Only**: Clear ownership semantics prevent accidental copies
+- **Compile-Time Safety**: `[[nodiscard]]` attribute forces developers to store the token
+- **Scope-Based Lifetime**: Handler lifetime tied to registration token scope
 
 ### Zero-Cost Template Alternative (CRTP)
 ```cpp
@@ -142,6 +170,28 @@ public:
 3. **Template-based**: Zero-cost CRTP for performance-critical paths
 
 **Automatic Event Routing**: The `EventRouter` automatically dispatches events to all registered handlers that can handle them. No manual switch statements required.
+
+**RAII Lifetime Management**: EventRegistration tokens provide automatic handler cleanup:
+```cpp
+class GameState {
+    std::vector<EventRegistration> _registrations;
+
+    void init() {
+        _registrations.push_back(router->registerEventHandler<KeyEvent>(...));
+        _registrations.push_back(router->registerEventHandler<MouseEvent>(...));
+    }
+    // Handlers automatically deregistered when GameState is destroyed
+};
+```
+
+**Compile-Time Safety**: The `[[nodiscard]]` attribute on registration methods prevents accidental handler leaks:
+```cpp
+// Compile error: "ignoring return value declared with attribute 'nodiscard'"
+router->registerEventHandler<Event>([](const auto& e) { /* ... */ });
+
+// Correct: Store the registration
+auto reg = router->registerEventHandler<Event>([](const auto& e) { /* ... */ });
+```
 
 **Performance Options**: Choose between:
 - Polymorphic handling (slight dynamic_cast overhead)

@@ -184,3 +184,25 @@ if(SDLXX_USE_VENDORED_DXC)
                 FetchContent_MakeAvailable(dxc_linux)
         endif()
 endif()
+
+### Resource Tools ###
+# Disable resource_tools tests - we only need the library
+set(RESOURCE_TOOLS_BUILD_TESTS OFF CACHE BOOL "Disable resource_tools tests" FORCE)
+set(BUILD_TESTING_SAVED ${BUILD_TESTING})
+set(BUILD_TESTING OFF CACHE BOOL "Disable testing for resource_tools" FORCE)
+
+FetchContent_Declare(
+        resource_tools
+        GIT_REPOSITORY https://github.com/rvodden/resource_tools.git
+        GIT_TAG main
+        DOWNLOAD_EXTRACT_TIMESTAMP false
+        OVERRIDE_FIND_PACKAGE
+        SYSTEM
+)
+FetchContent_MakeAvailable(resource_tools)
+
+# Re-enable testing for our project
+set(BUILD_TESTING ${BUILD_TESTING_SAVED} CACHE BOOL "Restore testing state" FORCE)
+
+# Note: resource_tools already has install() commands, so it will be installed
+# automatically when SDLXX is installed. The SDLXXConfig.cmake file will find it.
