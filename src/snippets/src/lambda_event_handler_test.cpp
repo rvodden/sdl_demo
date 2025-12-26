@@ -1,8 +1,10 @@
 #include <chrono>
+#include <tuple>
 #include <iostream>
 #include <memory>
 
 #include <sdl/sdl.h>
+#include <vector>
 #include <sdl/sdl_tools.h>
 
 using namespace sdl;
@@ -22,24 +24,25 @@ auto main() -> int {
 
   auto eventBus = createSDLEventBus();
   auto eventRouter = std::make_shared<EventRouter>(eventBus);
+  std::vector<sdl::tools::EventRegistration> _eventRegistrations;
 
   int counter = 0;
   std::string message = "This is a message";
 
   // Test 1: Simple lambda with capture
-  eventRouter->registerEventHandler<TestEvent>(
+  _eventRegistrations.push_back(eventRouter->registerEventHandler<TestEvent>(
       [&counter](const TestEvent& e) -> void {
         counter += e.value;
         std::cout << "Lambda handler 1: Received value " << e.value
                   << ", counter now: " << counter << "\n";
-      });
+      }));
 
   // Test 2: Lambda with different capture
-  eventRouter->registerEventHandler<TestEvent>(
+  _eventRegistrations.push_back(eventRouter->registerEventHandler<TestEvent>(
       [&message](const TestEvent& e) -> void {
         message = "Processed event with value: " + std::to_string(e.value);
         std::cout << "Lambda handler 2: " << message << "\n";
-      });
+      }));
 
   // Simulate event production (normally this would be done in the event loop)
   auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -50,11 +53,11 @@ auto main() -> int {
 
   // Manually trigger event handling (simplified test)
   // In real usage, this would happen in the event loop
-  eventRouter->registerEventHandler<TestEvent>(
+  _eventRegistrations.push_back(eventRouter->registerEventHandler<TestEvent>(
       [](const TestEvent& e) -> void {
         std::cout << "Lambda handler 3: Event received with value " << e.value
                   << "\n";
-      });
+      }));
 
   std::cout << "Lambda event handler registration completed successfully!\n";
   std::cout << "Final counter: " << counter << "\n";

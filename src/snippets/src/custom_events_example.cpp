@@ -178,9 +178,9 @@ auto main() -> int {
     LevelCompleteHandler levelHandler;
     GameEventLogger logger;
 
-    dispatcher.registerEventHandler(scoreHandler);
-    dispatcher.registerEventHandler(levelHandler);
-    dispatcher.registerEventHandler(logger);
+    auto scoreReg = dispatcher.registerEventHandler(scoreHandler);
+    auto levelReg = dispatcher.registerEventHandler(levelHandler);
+    auto loggerReg = dispatcher.registerEventHandler(logger);
 
     std::cout
         << "Starting event loop (will process a few events then quit)...\n";

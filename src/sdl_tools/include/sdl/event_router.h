@@ -10,12 +10,15 @@
 #ifndef SDL_TOOLS_EVENT_ROUTER_H
 #define SDL_TOOLS_EVENT_ROUTER_H
 
+#include <cstdint>
 #include <memory>
 #include <typeindex>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "sdl/event.h"
+#include "sdl/event_registration.h"
 
 #include "sdl_tools_export.h"
 
@@ -276,13 +279,17 @@ class SDL_TOOLS_EXPORT EventRouter {
    *
    * @param baseEventHandler Reference to the event handler to register.
    *                        The handler must remain valid for the lifetime
-   *                        of the dispatcher or until it's unregistered.
+   *                        of the registration token or until manually unregistered.
+   * @return EventRegistration token that will auto-deregister on destruction
    *
    * @note Multiple handlers can be registered, and each event will be
    *       dispatched to all compatible handlers.
    * @note The router does not take ownership of the handler.
+   * @note The handler must remain valid while registered (managed by caller)
+   * @warning The returned EventRegistration MUST be stored to keep the handler active.
+   *          Discarding the return value will immediately deregister the handler!
    */
-  void registerEventHandler(sdl::BaseEventHandler& baseEventHandler);
+  [[nodiscard]] auto registerEventHandler(sdl::BaseEventHandler& baseEventHandler) -> EventRegistration;
 
   /**
    * @brief Register a typed event handler for optimized dispatch (zero vtable lookups)
@@ -294,10 +301,13 @@ class SDL_TOOLS_EXPORT EventRouter {
    *
    * @tparam EventType The specific event type the handler processes
    * @param handler Reference to a typed event handler
+   * @return EventRegistration token that will auto-deregister on destruction
    *
    * @note The handler is registered both for optimized dispatch and fallback polymorphic dispatch
-   * @note The handler must remain valid for the lifetime of the router
+   * @note The handler must remain valid while registered (managed by caller)
    * @note This method provides the best performance for event handling
+   * @warning The returned EventRegistration MUST be stored to keep the handler active.
+   *          Discarding the return value will immediately deregister the handler!
    *
    * Usage example:
    * @code
@@ -307,22 +317,14 @@ class SDL_TOOLS_EXPORT EventRouter {
    *     // Handle mouse button events
    *   }
    * };
-   * 
+   *
    * MyButtonHandler buttonHandler;
-   * router.registerTypedEventHandler<MouseButtonEvent>(buttonHandler);
+   * auto registration = router.registerTypedEventHandler<MouseButtonEvent>(buttonHandler);
+   * // Keep registration alive to keep handler registered
    * @endcode
    */
   template <typename EventType>
-  void registerTypedEventHandler(sdl::EventHandler<EventType>& handler) {
-    static_assert(std::is_base_of_v<sdl::BaseEventHandler, sdl::EventHandler<EventType>>, 
-                  "EventHandler<EventType> must inherit from BaseEventHandler");
-    
-    // Register for optimized dispatch via wrapper function
-    registerTypedEventHandlerImpl(std::type_index(typeid(EventType)), handler);
-    
-    // Also register for fallback polymorphic dispatch
-    registerEventHandler(static_cast<sdl::BaseEventHandler&>(handler));
-  }
+  [[nodiscard]] auto registerTypedEventHandler(sdl::EventHandler<EventType>& handler) -> EventRegistration;
 
 private:
   // Internal wrapper function to avoid template dependency on incomplete type
@@ -331,8 +333,7 @@ private:
 public:
 
   /**
-   * @brief Register a callable object (lambda, function, etc.) as an event
-   * handler
+   * @brief Register a callable object (lambda, function, etc.) as an event handler
    *
    * This template method allows you to register lambdas, function objects,
    * and other callable types as event handlers without needing to create
@@ -342,38 +343,72 @@ public:
    * @tparam EventType The type of event the callable should handle
    * @tparam Callable The type of the callable object (automatically deduced)
    * @param callable The callable object that will handle events of EventType
+   * @return EventRegistration token that will auto-deregister on destruction
+   *
+   * @note The router takes ownership of the created handler and manages its lifetime
+   * @warning The returned EventRegistration MUST be stored to keep the handler active.
+   *          Discarding the return value will immediately deregister the handler!
    *
    * Usage example:
    * @code
-   * router.registerEventHandler<ClickEvent>([](const ClickEvent& e) {
+   * auto registration = router.registerEventHandler<ClickEvent>([](const ClickEvent& e) {
    *     std::cout << "Clicked at: " << e.x << ", " << e.y << std::endl;
    * });
+   * // Keep registration alive to keep handler active
    * @endcode
-   *
-   * @note The router takes ownership of the created handler and manages
-   * its lifetime.
    */
   template <typename EventType, typename Callable>
-  void registerEventHandler(Callable&& callable) {
-    auto handler = std::make_unique<sdl::FunctionEventHandler<EventType, Callable>>(
-        std::forward<Callable>(callable));
-    _functionHandlers.push_back(std::move(handler));
-    
-    // Register for optimized dispatch via wrapper function
-    registerTypedEventHandlerImpl(std::type_index(typeid(EventType)), *_functionHandlers.back());
-    
-    // Also register for fallback polymorphic dispatch
-    registerEventHandler(*_functionHandlers.back());
-  }
+  [[nodiscard]] auto registerEventHandler(Callable&& callable) -> EventRegistration;
 
  private:
-  /** @brief Pointer to implementation (pimpl idiom) */
-  std::unique_ptr<EventRouterImpl> _impl;
+  /** @brief Pointer to implementation (pimpl idiom) - shared to enable EventRegistration weak_ptr */
+  std::shared_ptr<EventRouterImpl> _impl;
 
-  /** @brief Storage for function-based event handlers to manage their
-   * lifetime */
-  std::vector<std::unique_ptr<sdl::BaseEventHandler>> _functionHandlers;
+  /** @brief Storage for function-based event handlers to manage their lifetime (by handler ID) */
+  std::unordered_map<uint64_t, std::unique_ptr<sdl::BaseEventHandler>> _functionHandlers;
+
+  /** @brief Registration token for the default quit handler - must stay alive for EventRouter lifetime */
+  EventRegistration _defaultQuitHandlerRegistration;
+
+  // Private helper methods used by template implementations
+  auto registerHandlerImpl(sdl::BaseEventHandler& handler, std::type_index eventType) -> uint64_t;
+  void storeFunctionHandler(uint64_t handlerId, std::unique_ptr<sdl::BaseEventHandler> handler);
 };
+
+}  // namespace sdl::tools
+
+// Template method implementations (inline, using only public/private non-template methods)
+namespace sdl::tools {
+
+template <typename EventType>
+auto EventRouter::registerTypedEventHandler(sdl::EventHandler<EventType>& handler) -> EventRegistration {
+  // The actual handler object must inherit from both EventHandler<EventType> and BaseEventHandler
+  static_assert(std::is_base_of_v<sdl::BaseEventHandler, std::remove_reference_t<decltype(handler)>>,
+                "Handler must inherit from both EventHandler<EventType> and BaseEventHandler");
+
+  // Use helper method that doesn't need EventRouterImpl to be complete
+  uint64_t handlerId = registerHandlerImpl(
+      static_cast<sdl::BaseEventHandler&>(handler),
+      std::type_index(typeid(EventType)));
+
+  return EventRegistration(_impl, handlerId);
+}
+
+template <typename EventType, typename Callable>
+auto EventRouter::registerEventHandler(Callable&& callable) -> EventRegistration {
+  // Create the function handler
+  auto handler = std::make_unique<sdl::FunctionEventHandler<EventType, Callable>>(
+      std::forward<Callable>(callable));
+
+  // Register and get handler ID using helper method
+  uint64_t handlerId = registerHandlerImpl(*handler, std::type_index(typeid(EventType)));
+
+  // Store the handler using helper method
+  storeFunctionHandler(handlerId, std::move(handler));
+
+  // Return registration token
+  return EventRegistration(_impl, handlerId);
+}
 
 }  // namespace sdl::tools
 

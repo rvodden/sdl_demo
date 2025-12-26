@@ -131,6 +131,7 @@ protected:
     std::unique_ptr<sdl::SDL> sdl_;
     std::shared_ptr<MockEventBus> mockEventBus_;
     std::shared_ptr<EventRouter> eventRouter_;
+    std::vector<EventRegistration> _eventRegistrations;
 };
 
 // Test ticker construction and destruction
@@ -219,11 +220,11 @@ TEST_F(TickerTest, TickEventGeneration) {
     std::condition_variable cv;
     
     // Register handler for tick events
-    eventRouter_->registerEventHandler<TickEvent>([&](const TickEvent& e) {
+    _eventRegistrations.push_back(eventRouter_->registerEventHandler<TickEvent>([&](const TickEvent& e) {
         std::lock_guard<std::mutex> lock(mtx);
         tickCount.store(e.tickNumber);
         cv.notify_one();
-    });
+    }));
     
     // Start ticker
     ticker.start();
@@ -248,13 +249,13 @@ TEST_F(TickerTest, SequentialTickNumbers) {
     std::condition_variable cv;
     
     // Register handler to collect tick numbers
-    eventRouter_->registerEventHandler<TickEvent>([&](const TickEvent& e) {
+    _eventRegistrations.push_back(eventRouter_->registerEventHandler<TickEvent>([&](const TickEvent& e) {
         std::lock_guard<std::mutex> lock(mtx);
         receivedTicks.push_back(e.tickNumber);
         if (receivedTicks.size() >= 3) {
             cv.notify_one();
         }
-    });
+    }));
     
     ticker.start();
     

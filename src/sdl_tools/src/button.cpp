@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <tuple>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -27,7 +28,8 @@ Button::Button(std::shared_ptr<EventRouter> eventProcessor,
                sdl::Rectangle<float> rectangle)
     : _impl{std::make_unique<ButtonImpl>(std::move(eventProcessor),
                                                std::move(rectangle))} {
-  _impl->_eventRouter->registerEventHandler(
+  // Register handler - store token to keep it active for Button's lifetime
+  _impl->_registration = _impl->_eventRouter->registerEventHandler(
       _impl->_mouseEventHandler);
 }
 

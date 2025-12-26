@@ -1,4 +1,5 @@
 #include <sdl/random.h>
+#include <tuple>
 
 #include "snake.h"
 #include "state.h"
@@ -7,25 +8,25 @@ namespace snake {
 
 Snake::Snake(std::shared_ptr<sdl::tools::EventRouter> eventRouter) : _eventRouter(std::move(eventRouter)), _food(_placeFood()) {
 
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kW, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kW, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       if(_direction == Direction::kDown) { return; }
       _nextDirection = Direction::kUp;
-    });
-    
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    }));
+
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       if(_direction == Direction::kRight) { return; }
       _nextDirection = Direction::kLeft;
-    });
-    
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kS, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    }));
+
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kS, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       if(_direction == Direction::kUp) { return; }
       _nextDirection = Direction::kDown;
-    });
-    
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kD, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    }));
+
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kD, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       if(_direction == Direction::kLeft) { return; }
       _nextDirection = Direction::kRight;
-    });
+    }));
 
 };
 

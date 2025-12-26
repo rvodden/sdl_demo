@@ -103,6 +103,11 @@
             "displayName": "Debug Tests",
             "configurePreset": "ninja-mc",
             "configuration": "Debug",
+            "filter": {
+                "exclude": {
+                    "name": "spirv"
+                }
+            },
             "output": {
                 "outputOnFailure": true
             },
@@ -113,9 +118,14 @@
         },
         {
             "name": "ninja-mc-release",
-            "displayName": "Release Tests", 
+            "displayName": "Release Tests",
             "configurePreset": "ninja-mc",
             "configuration": "Release",
+            "filter": {
+                "exclude": {
+                    "name": "spirv"
+                }
+            },
             "output": {
                 "outputOnFailure": true
             },
@@ -129,6 +139,11 @@
             "displayName": "Debug Tests (VS)",
             "configurePreset": "msvcc",
             "configuration": "Debug",
+            "filter": {
+                "exclude": {
+                    "name": "spirv"
+                }
+            },
             "output": {
                 "outputOnFailure": true
             },
@@ -147,6 +162,11 @@
             "displayName": "Release Tests (VS)",
             "configurePreset": "msvcc",
             "configuration": "Release",
+            "filter": {
+                "exclude": {
+                    "name": "spirv"
+                }
+            },
             "output": {
                 "outputOnFailure": true
             },
@@ -165,6 +185,11 @@
             "displayName": "Coverage Tests",
             "configurePreset": "ninja-mc-coverage",
             "configuration": "Debug",
+            "filter": {
+                "exclude": {
+                    "name": "spirv"
+                }
+            },
             "output": {
                 "outputOnFailure": true
             },

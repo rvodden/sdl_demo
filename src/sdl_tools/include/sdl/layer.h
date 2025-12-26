@@ -8,20 +8,17 @@
 
 namespace sdl::tools {
 
-template<class State>
-class Layer {
-  Layer(
-    std::function<State, State, BaseLayer> iterate,
-    std::function<void, const State&> render,
-    std::shared_ptr<Renderer> renderer
-  ) : _iterate(iterate), _render(render), _renderer(renderer) {}
+// template<class State>
+// class Layer {
+//   Layer(
+//     std::function<void> update,
+//     std::function<void(const State&)> render
+//   ) : _update(update), _render(render) {};
 
-  private:
-    std::function<State, State, BaseLayer> _iterate;
-    std::function<void, const State&> _render;
-
-    std::shared_ptr<Renderer> _renderer;
-};
+//   private:
+//     std::function<State(State)> _update;
+//     std::function<void(const State&)> _render;
+// };
 
 }
 

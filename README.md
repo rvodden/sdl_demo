@@ -2,6 +2,8 @@
 
 A comprehensive, type-safe C++20 wrapper around SDL3 that provides RAII resource management, modern C++ idioms, and a clean API for game development and multimedia applications.
 
+> **⚠️ Breaking Change:** Event handler registration now returns an RAII token that must be stored. See [`BREAKING_CHANGES.md`](BREAKING_CHANGES.md) and [`docs/MIGRATION_GUIDE_EVENT_REGISTRATION.md`](docs/MIGRATION_GUIDE_EVENT_REGISTRATION.md) for migration instructions.
+
 ## Features
 
 - **🔒 Type Safety**: Compile-time type checking with comprehensive exception handling

@@ -1,7 +1,9 @@
 #include <iostream>
+#include <tuple>
 #include <memory>
 
 #include "sdl/sdl_tools.h"
+#include <vector>
 #include "sdl/sdl.h"
 
 class SDL_AppEventTestApp : public sdl::BaseApplication {
@@ -10,7 +12,8 @@ private:
     std::unique_ptr<sdl::Renderer> renderer_;
     int frameCount_ = 0;
     bool eventReceived_ = false;
-    
+    std::vector<sdl::tools::EventRegistration> _eventRegistrations;
+
 public:
     auto init() -> bool override {
         std::cout << "SDL_AppEventTestApp: Initializing...\n";
@@ -29,17 +32,17 @@ public:
         if (auto eventRouter = runner.getEventRouter()) {
             std::cout << "✅ SUCCESS: EventRouter accessible during init\n";
             
-            eventRouter->registerEventHandler<sdl::MouseButtonEvent>(
+            _eventRegistrations.push_back(eventRouter->registerEventHandler<sdl::MouseButtonEvent>(
                 [this](const sdl::MouseButtonEvent& event) {
                     std::cout << "✅ SUCCESS: Received mouse event in application handler at (" 
                               << event.x << ", " << event.y << ")\n";
                     eventReceived_ = true;
-                });
+                }));
                 
-            eventRouter->registerEventHandler<sdl::QuitEvent>(
+            _eventRegistrations.push_back(eventRouter->registerEventHandler<sdl::QuitEvent>(
                 [](const sdl::QuitEvent&) {
                     std::cout << "✅ SUCCESS: Received quit event in application handler\n";
-                });
+                }));
         } else {
             std::cout << "❌ FAILURE: EventRouter not available during init\n";
             return false;

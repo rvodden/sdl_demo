@@ -12,7 +12,9 @@ This project uses CMake with presets for configuration and building. The followi
 - **Build Debug**: `cmake --build --preset ninja-mc-debug`
 - **Build Release**: `cmake --build --preset ninja-mc-release`
 - **Run Tests (in Debug mode)**: `ctest --preset ninja-mc-debug` (after Build Debug)
-- **Run Tests (in Release mode)**: `ctest --preset ninja-mc-debug` (after Build Release)
+- **Run Tests (in Release mode)**: `ctest --preset ninja-mc-release` (after Build Release)
+
+**Note:** Test presets automatically exclude SPIRV-Tools tests (dependency tests) and only run SDL project tests. To run ALL tests including SPIRV-Tools, use: `ctest --preset ninja-mc-debug --no-tests-filter` or run ctest directly without a preset.
 
 ## Performance Benchmarks
 

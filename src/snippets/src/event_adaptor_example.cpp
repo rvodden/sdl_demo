@@ -50,11 +50,11 @@ auto main() -> int {
     // 1. Create EventRouter (no longer coupled to EventBus)
     std::cout << "1. Creating EventRouter (decoupled from EventBus)...\n";
     EventRouter router(nullptr);  // No EventBus dependency!
-    
+
     // 2. Register event handler
     std::cout << "2. Registering event handler...\n";
     ExampleEventHandler handler;
-    router.registerEventHandler(handler);
+    auto registration = router.registerEventHandler(handler);
     
     // 3. Create CRTP-based SDL event bus (zero virtual function overhead!)
     std::cout << "3. Creating CRTP-based SDLEventBus (zero-cost abstraction)...\n";

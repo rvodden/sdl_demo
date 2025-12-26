@@ -7,6 +7,7 @@
 #include <optional>
 #include <queue>
 #include <string>
+#include <tuple>
 #include <typeindex>
 #include <utility>
 #include <vector>
@@ -135,6 +136,7 @@ protected:
 
     std::shared_ptr<MockEventBus> mockBus;
     std::unique_ptr<EventRouter> router;
+    std::vector<EventRegistration> _eventRegistrations;
 };
 
 // Test event handlers for verification
@@ -169,27 +171,27 @@ TEST_F(EventRouterTest, ConstructorWithEventBus) {
 TEST_F(EventRouterTest, MoveConstructor) {
     // Test move constructor
     auto movedRouter = std::move(*router);
-    
+
     // Original should be in moved-from state, moved-to should be valid
     // Note: We can't test much about moved-from state due to implementation details
-    
+
     // Test that moved router can still register handlers (basic functionality)
     TestEventHandler handler;
-    EXPECT_NO_THROW(movedRouter.registerEventHandler(handler));
+    EXPECT_NO_THROW(_eventRegistrations.push_back(movedRouter.registerEventHandler(handler)));
 }
 
 // Handler Registration Tests
 TEST_F(EventRouterTest, RegisterSingleEventHandler) {
     TestEventHandler handler;
-    
-    EXPECT_NO_THROW(router->registerEventHandler(handler));
-    
+
+    EXPECT_NO_THROW(_eventRegistrations.push_back(router->registerEventHandler(handler)));
+
     // Inject test event and verify it gets handled
     mockBus->pushEvent(std::make_unique<TestEvent>(42));
     mockBus->injectQuitEvent();
-    
+
     router->run();
-    
+
     EXPECT_EQ(handler.callCount, 1);
     EXPECT_EQ(handler.handledEvents.size(), 1);
     EXPECT_EQ(handler.handledEvents[0], 42);
@@ -198,17 +200,17 @@ TEST_F(EventRouterTest, RegisterSingleEventHandler) {
 TEST_F(EventRouterTest, RegisterLambdaEventHandler) {
     int callCount = 0;
     std::vector<int> handledValues;
-    
-    router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
+
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
         callCount++;
         handledValues.push_back(event.testValue);
-    });
-    
+    }));
+
     mockBus->pushEvent(std::make_unique<TestEvent>(123));
     mockBus->injectQuitEvent();
-    
+
     router->run();
-    
+
     EXPECT_EQ(callCount, 1);
     EXPECT_EQ(handledValues.size(), 1);
     EXPECT_EQ(handledValues[0], 123);
@@ -219,8 +221,8 @@ TEST_F(EventRouterTest, SingleEventToMultipleHandlers) {
     TestEventHandler handler1;
     TestEventHandler handler2;
     
-    router->registerEventHandler(handler1);
-    router->registerEventHandler(handler2);
+    _eventRegistrations.push_back(router->registerEventHandler(handler1));
+    _eventRegistrations.push_back(router->registerEventHandler(handler2));
     
     mockBus->pushEvent(std::make_unique<TestEvent>(99));
     mockBus->injectQuitEvent();
@@ -238,8 +240,8 @@ TEST_F(EventRouterTest, MultipleEventsToAppropriateHandlers) {
     TestEventHandler testHandler;
     AnotherTestEventHandler anotherHandler;
     
-    router->registerEventHandler(testHandler);
-    router->registerEventHandler(anotherHandler);
+    _eventRegistrations.push_back(router->registerEventHandler(testHandler));
+    _eventRegistrations.push_back(router->registerEventHandler(anotherHandler));
     
     mockBus->pushEvent(std::make_unique<TestEvent>(10));
     mockBus->pushEvent(std::make_unique<AnotherTestEvent>("hello"));
@@ -265,17 +267,17 @@ TEST_F(EventRouterTest, HandlersExecuteInRegistrationOrder) {
     std::vector<int> executionOrder;
     
     // Register handlers in specific order
-    router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent&) {
         executionOrder.push_back(1);
-    });
-    
-    router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+    }));
+
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent&) {
         executionOrder.push_back(2);
-    });
-    
-    router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+    }));
+
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent&) {
         executionOrder.push_back(3);
-    });
+    }));
     
     mockBus->pushEvent(std::make_unique<TestEvent>(0));
     mockBus->injectQuitEvent();
@@ -292,7 +294,7 @@ TEST_F(EventRouterTest, HandlersExecuteInRegistrationOrder) {
 // Event Loop Control Tests
 TEST_F(EventRouterTest, QuitEventStopsEventLoop) {
     TestEventHandler handler;
-    router->registerEventHandler(handler);
+    _eventRegistrations.push_back(router->registerEventHandler(handler));
     
     // Inject events before and after quit - only first should be processed
     mockBus->pushEvent(std::make_unique<TestEvent>(1));
@@ -308,7 +310,7 @@ TEST_F(EventRouterTest, QuitEventStopsEventLoop) {
 
 TEST_F(EventRouterTest, EmptyEventQueueStopsLoop) {
     TestEventHandler handler;
-    router->registerEventHandler(handler);
+    _eventRegistrations.push_back(router->registerEventHandler(handler));
     
     // Don't inject any events - MockEventBus will return quit event by default
     router->run();
@@ -320,7 +322,7 @@ TEST_F(EventRouterTest, EmptyEventQueueStopsLoop) {
 // Exception Handling Tests
 TEST_F(EventRouterTest, UnknownEventExceptionHandledGracefully) {
     TestEventHandler handler;
-    router->registerEventHandler(handler);
+    _eventRegistrations.push_back(router->registerEventHandler(handler));
     
     // Make it throw once, then allow normal operation (which will return quit event)
     mockBus->setShouldThrowOnWait(true, 1);
@@ -338,9 +340,9 @@ TEST_F(EventRouterTest, FunctionHandlersLifetimeManagedByRouter) {
     
     {
         // Register lambda handler - router should manage its lifetime
-        router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
+        _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
             capturedValues.push_back(event.testValue);
-        });
+        }));
         // Lambda goes out of scope, but router should keep it alive
     }
     
@@ -357,10 +359,10 @@ TEST_F(EventRouterTest, FunctionHandlersLifetimeManagedByRouter) {
 // Performance/Scale Test
 TEST_F(EventRouterTest, HandlesManyEvents) {
     std::vector<int> receivedValues;
-    
-    router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
+
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
         receivedValues.push_back(event.testValue);
-    });
+    }));
     
     // Inject many events
     const int eventCount = 100;
@@ -381,13 +383,13 @@ TEST_F(EventRouterTest, HandlesManyEvents) {
 TEST_F(EventRouterTest, MixedHandlerTypesWorkTogether) {
     // Object handler
     TestEventHandler objectHandler;
-    router->registerEventHandler(objectHandler);
-    
+    _eventRegistrations.push_back(router->registerEventHandler(objectHandler));
+
     // Lambda handler
     std::vector<int> lambdaResults;
-    router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
+    _eventRegistrations.push_back(router->registerEventHandler<TestEvent>([&](const TestEvent& event) {
         lambdaResults.push_back(event.testValue * 2);
-    });
+    }));
     
     mockBus->pushEvent(std::make_unique<TestEvent>(5));
     mockBus->injectQuitEvent();
@@ -397,6 +399,207 @@ TEST_F(EventRouterTest, MixedHandlerTypesWorkTogether) {
     // Object handler should receive original value
     EXPECT_EQ(objectHandler.handledEvents[0], 5);
     
-    // Lambda handler should receive and process value  
+    // Lambda handler should receive and process value
     EXPECT_EQ(lambdaResults[0], 10);
+}
+
+// ============================================================================
+// Event Deregistration Tests
+// ============================================================================
+
+// Test basic RAII deregistration
+TEST_F(EventRouterTest, EventRegistrationRAIIDeregistersHandler) {
+    int callCount = 0;
+
+    {
+        // Register handler in inner scope
+        auto registration = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+            callCount++;
+        });
+
+        // Handler should work while registration is alive
+        mockBus->pushEvent(std::make_unique<TestEvent>(1));
+        EXPECT_TRUE(router->processNextEvent());
+        EXPECT_EQ(callCount, 1);
+    }
+    // Registration destroyed here - handler should be deregistered
+
+    // Handler should no longer receive events
+    mockBus->pushEvent(std::make_unique<TestEvent>(2));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(callCount, 1);  // Still 1, not incremented
+}
+
+// Test manual deregistration
+TEST_F(EventRouterTest, ManualUnregisterStopsHandlerCalls) {
+    int callCount = 0;
+
+    auto registration = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+        callCount++;
+    });
+
+    // Handler should work initially
+    mockBus->pushEvent(std::make_unique<TestEvent>(1));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(callCount, 1);
+
+    // Manually unregister
+    registration.unregister();
+
+    // Handler should no longer receive events
+    mockBus->pushEvent(std::make_unique<TestEvent>(2));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(callCount, 1);  // Still 1
+}
+
+// Test that isRegistered() works correctly
+TEST_F(EventRouterTest, IsRegisteredReflectsRegistrationState) {
+    auto registration = router->registerEventHandler<TestEvent>([](const TestEvent&) {});
+
+    EXPECT_TRUE(registration.isRegistered());
+
+    registration.unregister();
+
+    EXPECT_FALSE(registration.isRegistered());
+}
+
+// Test double unregister is safe
+TEST_F(EventRouterTest, DoubleUnregisterIsSafe) {
+    auto registration = router->registerEventHandler<TestEvent>([](const TestEvent&) {});
+
+    EXPECT_NO_THROW(registration.unregister());
+    EXPECT_NO_THROW(registration.unregister());  // Should be safe
+
+    EXPECT_FALSE(registration.isRegistered());
+}
+
+// Test move semantics
+TEST_F(EventRouterTest, EventRegistrationMoveSemantics) {
+    int callCount = 0;
+
+    auto registration1 = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+        callCount++;
+    });
+
+    EXPECT_TRUE(registration1.isRegistered());
+
+    // Move registration
+    auto registration2 = std::move(registration1);
+
+    // registration2 should now own the registration
+    EXPECT_TRUE(registration2.isRegistered());
+
+    // Handler should still work
+    mockBus->pushEvent(std::make_unique<TestEvent>(1));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(callCount, 1);
+
+    // Destroying registration2 should deregister
+    registration2.unregister();
+
+    mockBus->pushEvent(std::make_unique<TestEvent>(2));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(callCount, 1);  // Still 1
+}
+
+// Test multiple handlers with selective deregistration
+TEST_F(EventRouterTest, SelectiveDeregistrationLeavesOtherHandlersActive) {
+    int handler1CallCount = 0;
+    int handler2CallCount = 0;
+    int handler3CallCount = 0;
+
+    auto reg1 = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+        handler1CallCount++;
+    });
+
+    auto reg2 = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+        handler2CallCount++;
+    });
+
+    auto reg3 = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+        handler3CallCount++;
+    });
+
+    // All handlers should receive event
+    mockBus->pushEvent(std::make_unique<TestEvent>(1));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(handler1CallCount, 1);
+    EXPECT_EQ(handler2CallCount, 1);
+    EXPECT_EQ(handler3CallCount, 1);
+
+    // Deregister handler 2
+    reg2.unregister();
+
+    // Only handlers 1 and 3 should receive event
+    mockBus->pushEvent(std::make_unique<TestEvent>(2));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(handler1CallCount, 2);
+    EXPECT_EQ(handler2CallCount, 1);  // Still 1
+    EXPECT_EQ(handler3CallCount, 2);
+}
+
+// Test object handler deregistration
+TEST_F(EventRouterTest, ObjectHandlerDeregistration) {
+    TestEventHandler handler;
+
+    auto registration = router->registerEventHandler(handler);
+
+    mockBus->pushEvent(std::make_unique<TestEvent>(42));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(handler.callCount, 1);
+
+    registration.unregister();
+
+    mockBus->pushEvent(std::make_unique<TestEvent>(99));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(handler.callCount, 1);  // Still 1
+}
+
+// Test deregistration with EventRouter destroyed
+TEST_F(EventRouterTest, DeregistrationAfterRouterDestroyedIsSafe) {
+    auto registration = router->registerEventHandler<TestEvent>([](const TestEvent&) {});
+
+    EXPECT_TRUE(registration.isRegistered());
+
+    // Destroy router
+    router.reset();
+
+    // Deregistration should be safe even after router is gone
+    EXPECT_NO_THROW(registration.unregister());
+    EXPECT_FALSE(registration.isRegistered());
+}
+
+// Test registration destroyed after router destroyed
+TEST_F(EventRouterTest, RegistrationDestructorAfterRouterDestroyedIsSafe) {
+    auto registration = router->registerEventHandler<TestEvent>([](const TestEvent&) {});
+
+    // Destroy router first
+    router.reset();
+
+    // Destroying registration should be safe
+    EXPECT_NO_THROW(registration = EventRegistration{});
+}
+
+// Test high-frequency registration/deregistration
+TEST_F(EventRouterTest, HighFrequencyRegistrationDeregistration) {
+    int totalCalls = 0;
+
+    for (int i = 0; i < 100; ++i) {
+        auto registration = router->registerEventHandler<TestEvent>([&](const TestEvent&) {
+            totalCalls++;
+        });
+
+        mockBus->pushEvent(std::make_unique<TestEvent>(i));
+        EXPECT_TRUE(router->processNextEvent());
+
+        // Registration destroyed at end of loop iteration
+    }
+
+    // Each handler should have received exactly one event
+    EXPECT_EQ(totalCalls, 100);
+
+    // No handlers should be active now
+    mockBus->pushEvent(std::make_unique<TestEvent>(999));
+    EXPECT_TRUE(router->processNextEvent());
+    EXPECT_EQ(totalCalls, 100);  // Still 100
 }

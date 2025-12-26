@@ -7,6 +7,7 @@
 
 #include <sdl/event.h>
 #include <sdl/event_router.h>
+#include <vector>
 
 #include "ball.h"
 #include "paddle.h"
@@ -96,45 +97,46 @@ class Pong {
   std::array<Paddle, 2> _paddles;
   std::map<Player, uint16_t> _scores;
   std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
+  std::vector<sdl::tools::EventRegistration> _eventRegistrations;
 
   void _registerEventHandlers() {
     // Left paddle controls - A key for up movement
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(Paddle::Velocity::kUp);
-    });
+    }));
     
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kA, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(Paddle::Velocity::kStopped);
-    });
+    }));
 
     // Left paddle controls - Z key for down movement
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kZ, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kZ, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(Paddle::Velocity::kDown);
-    });
+    }));
     
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kZ, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kZ, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kLeft)).setVelocity(Paddle::Velocity::kStopped);
-    });
+    }));
 
     // Right paddle controls - L key for up movement
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kL, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kL, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(Paddle::Velocity::kUp);
-    });
+    }));
     
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kL, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kL, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(Paddle::Velocity::kStopped);
-    });
+    }));
 
     // Right paddle controls - Comma key for down movement
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kComma, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kComma, sdl::KeyDirection::Down>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(Paddle::Velocity::kDown);
-    });
+    }));
     
-    _eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kComma, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<sdl::SpecificKeyboardEvent<sdl::KeyCode::kComma, sdl::KeyDirection::Up>>([this]([[maybe_unused]] const auto& event) -> void {
       _paddles.at(static_cast<size_t>(Player::kRight)).setVelocity(Paddle::Velocity::kStopped);
-    });
+    }));
 
-    _eventRouter->registerEventHandler<PaddleCollisionEvent>(
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<PaddleCollisionEvent>(
         [this]([[maybe_unused]] const PaddleCollisionEvent& event) -> void {
           float velocityX = -_ball.getVelocity().x;
           float velocityY = 0;
@@ -153,9 +155,9 @@ class Pong {
               break;
           }
           _ball.setVelocity({velocityX, velocityY});
-        });
+        }));
 
-    _eventRouter->registerEventHandler<WallCollisionEvent>([this](const WallCollisionEvent& event) -> void {
+    _eventRegistrations.push_back(_eventRouter->registerEventHandler<WallCollisionEvent>([this](const WallCollisionEvent& event) -> void {
       switch (event.wall) {
         case WallCollisionEvent::Wall::kTop:
         case WallCollisionEvent::Wall::kBottom: {
@@ -176,7 +178,7 @@ class Pong {
           break;
         }
       }
-    });
+    }));
   }
 };
 

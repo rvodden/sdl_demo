@@ -1,9 +1,11 @@
 #include <iostream>
+#include <tuple>
 #include <memory>
 #include <string>
 #include <cstring>
 
 #include <sdl/sdl.h>
+#include <vector>
 #include <sdl/sdl_tools.h>
 #include <sdl/ttf.h>
 
@@ -36,12 +38,12 @@ public:
         
         // Register keyboard event handler
         if (auto eventRouter = getEventRouter()) {
-            eventRouter->registerEventHandler<KeyboardEvent>(
+            _eventRegistrations.push_back(eventRouter->registerEventHandler<KeyboardEvent>(
                 [this](const KeyboardEvent& event) {
                     if (event.down) {  // Only handle key down events, not key up
                         handleKeyPress(event);
                     }
-                });
+                }));
         } else {
             std::cout << "EventRouter not available during init" << std::endl;
             return false;
@@ -112,6 +114,7 @@ private:
     std::unique_ptr<Font> _font;
     std::unique_ptr<Texture> textTexture_;
     std::string currentKeyText_;
+    std::vector<sdl::tools::EventRegistration> _eventRegistrations;
 };
 
 REGISTER_APPLICATION(KeyboardEventExample)

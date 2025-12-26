@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <tuple>
 #include <exception>
 #include <iostream>
 #include <memory>
 #include <string>
 
 #include <sdl/application.h>
+#include <vector>
 #include <sdl/event.h>
 #include <sdl/event_router.h>
 #include <sdl/message_box.h>
@@ -57,22 +59,22 @@ private:
   auto setupEventHandlers() -> void {
     auto eventRouter = getEventRouter();
 
-    eventRouter->registerEventHandler<ClickEvent>(
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<ClickEvent>(
       [this](const ClickEvent& clickEvent) -> void {
         _ticTacToe->play(clickEvent.x, clickEvent.y);
-      });
+      }));
 
-    eventRouter->registerEventHandler<PlayerOTurnEvent>(
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<PlayerOTurnEvent>(
       []([[maybe_unused]] const PlayerOTurnEvent&) -> void {
         std::cout << "O's Turn\n";
-      });
+      }));
     
-      eventRouter->registerEventHandler<PlayerXTurnEvent>(
+      _eventRegistrations.push_back(eventRouter->registerEventHandler<PlayerXTurnEvent>(
       []([[maybe_unused]] const PlayerXTurnEvent&) -> void {
         std::cout << "X's Turn\n";
-      });
+      }));
 
-    eventRouter->registerEventHandler<GameCompletedEvent>(
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<GameCompletedEvent>(
       [this](const GameCompletedEvent& gCE) -> void {
         //not sure why we need to reder here...
         _ticTacToeUI->render(_ticTacToe);
@@ -104,17 +106,18 @@ private:
         MessageBox("Game Over!", message).addButton("OK").show();
 
         getEventBus()->publish(std::make_unique<StartNewGameEvent>());
-      });
+      }));
     
-    eventRouter->registerEventHandler<StartNewGameEvent>(
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<StartNewGameEvent>(
       [this]([[maybe_unused]]const StartNewGameEvent& sNGE) {
         _ticTacToe->reset();
       }
-    );
+    ));
   }
 
   std::shared_ptr<TicTacToe> _ticTacToe;
   std::shared_ptr<TicTacToeUI> _ticTacToeUI;
+  std::vector<EventRegistration> _eventRegistrations;
 };
 
 REGISTER_APPLICATION(TicTacToeApp)

@@ -1,12 +1,14 @@
-#include <iterator>
+#include <algorithm>
 #include <functional>
-#include <optional>
+#include <iterator>
 #include <memory>
+#include <optional>
 #include <typeindex>
 #include <utility>
 #include <vector>
 
 #include "sdl/event.h"
+#include "sdl/event_registration.h"
 #include "sdl/event_router.h"
 
 #include "event_router_impl.h"
@@ -20,8 +22,14 @@ void DefaultQuitEventHandler::handle(
 
 EventRouter::EventRouter(std::shared_ptr<BaseEventBus> eventBus)
     : _impl(
-          std::make_unique<EventRouterImpl>(std::move(eventBus))) {
-  registerEventHandler(_impl->defaultQuitEventHandler);
+          std::make_shared<EventRouterImpl>(std::move(eventBus))) {
+  // Set up callback to clean up function handlers when deregistered
+  _impl->setUnregisterCallback([this](uint64_t handlerId) {
+    _functionHandlers.erase(handlerId);
+  });
+
+  // Register default quit handler - store registration to keep it active for router lifetime
+  _defaultQuitHandlerRegistration = registerEventHandler(_impl->defaultQuitEventHandler);
 }
 
 EventRouter::~EventRouter() = default;
@@ -80,12 +88,23 @@ void EventRouter::routeEvent(const BaseEvent& event) {
   _impl->dispatchEvent(const_cast<BaseEvent&>(event));
 }
 
-void EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) {
-  _impl->_eventHandlers.push_back(std::ref(baseEventHandler));
+auto EventRouter::registerEventHandler(BaseEventHandler& baseEventHandler) -> EventRegistration {
+  // Use typeid(BaseEvent) as a placeholder since we don't know the specific type
+  // This handler will be called for all events via polymorphic dispatch
+  uint64_t handlerId = _impl->registerHandler(baseEventHandler, typeid(BaseEvent));
+  return EventRegistration(_impl, handlerId);
 }
 
 void EventRouter::registerTypedEventHandlerImpl(std::type_index eventType, sdl::BaseEventHandler& handler) {
-  _impl->registerTypedEventHandlerByTypeIndex(eventType, handler);
+  _impl->registerHandler(handler, eventType);
+}
+
+auto EventRouter::registerHandlerImpl(sdl::BaseEventHandler& handler, std::type_index eventType) -> uint64_t {
+  return _impl->registerHandler(handler, eventType);
+}
+
+void EventRouter::storeFunctionHandler(uint64_t handlerId, std::unique_ptr<sdl::BaseEventHandler> handler) {
+  _functionHandlers[handlerId] = std::move(handler);
 }
 
 EventRouterImpl::~EventRouterImpl() = default;
@@ -95,57 +114,125 @@ EventRouterImpl::EventRouterImpl(std::shared_ptr<BaseEventBus> eventBus)
 
 void EventRouterImpl::quit() { quitFlag = true; };
 
+auto EventRouterImpl::registerHandler(sdl::BaseEventHandler& handler, std::type_index eventType) -> uint64_t {
+  uint64_t handlerId = _nextHandlerId.fetch_add(1);
+
+  // Store handler info in registry
+  _handlerRegistry.emplace(handlerId, HandlerInfo{std::ref(handler), eventType});
+
+  // Add to type-indexed map if not BaseEvent (BaseEvent means polymorphic-only dispatch)
+  if (eventType != typeid(BaseEvent)) {
+    _handlersByType[eventType].push_back(handlerId);
+  }
+
+  return handlerId;
+}
+
+void EventRouterImpl::unregisterHandler(uint64_t handlerId) {
+  // Find handler in registry
+  auto it = _handlerRegistry.find(handlerId);
+  if (it == _handlerRegistry.end()) {
+    return;  // Already unregistered or never existed
+  }
+
+  std::type_index eventType = it->second.eventType;
+
+  // Remove from type-indexed map
+  if (eventType != typeid(BaseEvent)) {
+    auto typeIt = _handlersByType.find(eventType);
+    if (typeIt != _handlersByType.end()) {
+      auto& ids = typeIt->second;
+      ids.erase(std::remove(ids.begin(), ids.end(), handlerId), ids.end());
+      if (ids.empty()) {
+        _handlersByType.erase(typeIt);
+      }
+    }
+  }
+
+  // Remove from main registry
+  _handlerRegistry.erase(it);
+
+  // Notify callback (for function handler cleanup)
+  if (_unregisterCallback) {
+    _unregisterCallback(handlerId);
+  }
+}
+
+void EventRouterImpl::setUnregisterCallback(std::function<void(uint64_t)> callback) {
+  _unregisterCallback = std::move(callback);
+}
+
+auto EventRouterImpl::isHandlerRegistered(uint64_t handlerId) const -> bool {
+  return _handlerRegistry.find(handlerId) != _handlerRegistry.end();
+}
+
 
 template<sdl::KeyCode Key>
-static void dispatchSpecificKeyForKey(const KeyboardEvent& keyboardEvent, 
-                                     const std::vector<std::reference_wrapper<sdl::BaseEventHandler>>& handlers) {
+static void dispatchSpecificKeyForKey(const KeyboardEvent& keyboardEvent,
+                                     const std::unordered_map<uint64_t, EventRouterImpl::HandlerInfo>& handlerRegistry) {
   if (keyboardEvent.keycode != Key) {
     return;
   }
-  
+
   // Dispatch key+direction specific event
   if (keyboardEvent.down) {
     auto specificEvent = SpecificKeyboardEvent<Key, KeyDirection::Down>(
       keyboardEvent.timestamp, keyboardEvent.windowId, keyboardEvent.which,
       keyboardEvent.scancode, keyboardEvent.keycode, keyboardEvent.down,
       keyboardEvent.isRepeat, keyboardEvent.keymod);
-    for (const auto& handler : handlers) {
-      specificEvent.handle(handler);
+    for (const auto& [id, info] : handlerRegistry) {
+      specificEvent.handle(info.handler);
     }
   } else {
     auto specificEvent = SpecificKeyboardEvent<Key, KeyDirection::Up>(
       keyboardEvent.timestamp, keyboardEvent.windowId, keyboardEvent.which,
       keyboardEvent.scancode, keyboardEvent.keycode, keyboardEvent.down,
       keyboardEvent.isRepeat, keyboardEvent.keymod);
-    for (const auto& handler : handlers) {
-      specificEvent.handle(handler);
+    for (const auto& [id, info] : handlerRegistry) {
+      specificEvent.handle(info.handler);
     }
   }
-  
+
   // Also dispatch the key-only specific event (both up and down)
   auto keyOnlyEvent = SpecificKeyboardEvent<Key>(
     keyboardEvent.timestamp, keyboardEvent.windowId, keyboardEvent.which,
     keyboardEvent.scancode, keyboardEvent.keycode, keyboardEvent.down,
     keyboardEvent.isRepeat, keyboardEvent.keymod);
-  for (const auto& handler : handlers) {
-    keyOnlyEvent.handle(handler);
+  for (const auto& [id, info] : handlerRegistry) {
+    keyOnlyEvent.handle(info.handler);
   }
 }
 
 template<std::size_t... Is>
 static void dispatchSpecificKeyboardEventsImpl(const KeyboardEvent& keyboardEvent,
-                                              const std::vector<std::reference_wrapper<sdl::BaseEventHandler>>& handlers,
+                                              const std::unordered_map<uint64_t, EventRouterImpl::HandlerInfo>& handlerRegistry,
                                               std::index_sequence<Is...>) {
   // Call dispatchSpecificKeyForKey for each KeyCode in the array
-  (dispatchSpecificKeyForKey<sdl::kSpecificKeyboardEventSupportedKeys[Is]>(keyboardEvent, handlers), ...);
+  (dispatchSpecificKeyForKey<sdl::kSpecificKeyboardEventSupportedKeys[Is]>(keyboardEvent, handlerRegistry), ...);
 }
 
 void EventRouterImpl::dispatchEvent(BaseEvent& event) {
-  // Use standard polymorphic dispatch for all handlers
-  for (const auto& handler : _eventHandlers) {
-    event.handle(handler);
+  // Dispatch to handlers in registration order by iterating through handler IDs
+  // We need to collect all handler IDs first to maintain registration order
+  std::vector<uint64_t> handlerIds;
+  handlerIds.reserve(_handlerRegistry.size());
+
+  // Collect all handler IDs in registration order (handler IDs are sequential)
+  for (const auto& [id, info] : _handlerRegistry) {
+    handlerIds.push_back(id);
   }
-  
+
+  // Sort by handler ID to ensure registration order (lower IDs = registered earlier)
+  std::sort(handlerIds.begin(), handlerIds.end());
+
+  // Dispatch in registration order
+  for (uint64_t id : handlerIds) {
+    auto it = _handlerRegistry.find(id);
+    if (it != _handlerRegistry.end()) {
+      event.handle(it->second.handler);
+    }
+  }
+
   // If this is a keyboard event, also create and dispatch specific keyboard events
   if (auto* keyboardEvent = dynamic_cast<KeyboardEvent*>(&event)) {
     dispatchSpecificKeyboardEvents(*keyboardEvent);
@@ -154,7 +241,7 @@ void EventRouterImpl::dispatchEvent(BaseEvent& event) {
 
 void EventRouterImpl::dispatchSpecificKeyboardEvents(const KeyboardEvent& keyboardEvent) {
   // Use index_sequence to generate template calls for all supported key codes
-  dispatchSpecificKeyboardEventsImpl(keyboardEvent, _eventHandlers, 
+  dispatchSpecificKeyboardEventsImpl(keyboardEvent, _handlerRegistry,
                                    std::make_index_sequence<sdl::kSpecificKeyboardEventSupportedKeys.size()>{});
 }
 

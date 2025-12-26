@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <tuple>
 #include <gmock/gmock.h>
 
 #include <memory>
@@ -27,13 +28,14 @@ protected:
     std::shared_ptr<BaseEventBus> eventBus;
     std::shared_ptr<EventRouter> eventRouter;
     std::vector<std::string> receivedEvents;
+    std::vector<EventRegistration> _eventRegistrations;
 };
 
 TEST_F(SpecificKeyboardEventTest, GeneralKeyboardEventHandlerReceivesAllEvents) {
     // Register handler for all keyboard events
-    eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
         receivedEvents.push_back("General:" + std::to_string(static_cast<int>(event.keycode)) + ":" + (event.down ? "down" : "up"));
-    });
+    }));
 
     // Create and route different keyboard events
     auto aKeyDown = std::make_unique<KeyboardEvent>(
@@ -57,9 +59,9 @@ TEST_F(SpecificKeyboardEventTest, GeneralKeyboardEventHandlerReceivesAllEvents) 
 
 TEST_F(SpecificKeyboardEventTest, SpecificKeyEventHandlerReceivesOnlyMatchingKey) {
     // Register handler for specific A key events (both up and down)
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
         receivedEvents.push_back(std::string("SpecificA:") + (event.down ? "down" : "up"));
-    });
+    }));
 
     // Create and route different keyboard events
     auto aKeyDown = std::make_unique<KeyboardEvent>(
@@ -83,16 +85,16 @@ TEST_F(SpecificKeyboardEventTest, SpecificKeyEventHandlerReceivesOnlyMatchingKey
 
 TEST_F(SpecificKeyboardEventTest, SpecificKeyDirectionHandlerReceivesOnlyMatchingDirection) {
     // Register handler for specific A key DOWN events only
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
         receivedEvents.push_back("SpecificADown");
         EXPECT_TRUE(event.down); // Should always be down for this handler
-    });
+    }));
 
     // Register handler for specific A key UP events only
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Up>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Up>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Up>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Up>& event) {
         receivedEvents.push_back("SpecificAUp");
         EXPECT_FALSE(event.down); // Should always be up for this handler
-    });
+    }));
 
     // Create and route A key events
     auto aKeyDown = std::make_unique<KeyboardEvent>(
@@ -115,19 +117,19 @@ TEST_F(SpecificKeyboardEventTest, MultipleHandlersReceiveEventsPolymorphically) 
     int specificADownEventCount = 0;
 
     // Register general handler
-    eventRouter->registerEventHandler<KeyboardEvent>([&]([[maybe_unused]] const KeyboardEvent& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<KeyboardEvent>([&]([[maybe_unused]] const KeyboardEvent& event) {
         generalEventCount++;
-    });
+    }));
 
     // Register specific A key handler (both up and down)
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&]([[maybe_unused]] const SpecificKeyboardEvent<KeyCode::kA>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&]([[maybe_unused]] const SpecificKeyboardEvent<KeyCode::kA>& event) {
         specificAEventCount++;
-    });
+    }));
 
     // Register specific A key down handler
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&]([[maybe_unused]] const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&]([[maybe_unused]] const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
         specificADownEventCount++;
-    });
+    }));
 
     // Route an A key down event
     auto aKeyDown = std::make_unique<KeyboardEvent>(
@@ -165,14 +167,14 @@ TEST_F(SpecificKeyboardEventTest, MultipleSpecificKeyHandlers) {
     std::vector<std::string> escapeEvents;
 
     // Register handler for Space key events
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kSpace>>([&](const SpecificKeyboardEvent<KeyCode::kSpace>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kSpace>>([&](const SpecificKeyboardEvent<KeyCode::kSpace>& event) {
         spaceEvents.push_back(event.down ? "down" : "up");
-    });
+    }));
 
     // Register handler for Escape key events
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kEscape>>([&](const SpecificKeyboardEvent<KeyCode::kEscape>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kEscape>>([&](const SpecificKeyboardEvent<KeyCode::kEscape>& event) {
         escapeEvents.push_back(event.down ? "down" : "up");
-    });
+    }));
 
     // Route Space key events
     auto spaceKeyDown = std::make_unique<KeyboardEvent>(
@@ -202,21 +204,21 @@ TEST_F(SpecificKeyboardEventTest, GeneralAndSpecificHandlersWorkIndependently) {
     std::vector<std::string> specificADownEvents;
 
     // Register handler for general KeyboardEvent - receives only original KeyboardEvents
-    eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
         std::string eventStr = "KeyboardEvent:" + std::to_string(static_cast<int>(event.keycode)) + ":" + (event.down ? "down" : "up");
         generalEvents.push_back(eventStr);
-    });
+    }));
 
     // Register handler for specific A key events  
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
         specificAEvents.push_back(std::string("SpecificA:") + (event.down ? "down" : "up"));
-    });
+    }));
 
     // Register handler for specific A key down events
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>>([&](const SpecificKeyboardEvent<KeyCode::kA, KeyDirection::Down>& event) {
         specificADownEvents.push_back("SpecificADown");
         EXPECT_TRUE(event.down); // Should always be down for this handler
-    });
+    }));
 
     // Route an A key down event
     auto aKeyDown = std::make_unique<KeyboardEvent>(
@@ -256,18 +258,18 @@ TEST_F(SpecificKeyboardEventTest, KeyboardEventHandlerCalledOncePerEvent) {
     int specificAEventCallCount = 0;
 
     // Register handler for general KeyboardEvent - should be called exactly once per original event
-    eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<KeyboardEvent>([&](const KeyboardEvent& event) {
         keyboardEventCallCount++;
         // Log what we received for debugging
         std::cout << "KeyboardEvent handler called with keycode: " << static_cast<int>(event.keycode) 
                   << ", down: " << event.down << std::endl;
-    });
+    }));
 
     // Register handler for specific A key events
-    eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
+    _eventRegistrations.push_back(eventRouter->registerEventHandler<SpecificKeyboardEvent<KeyCode::kA>>([&](const SpecificKeyboardEvent<KeyCode::kA>& event) {
         specificAEventCallCount++;
         std::cout << "SpecificKeyboardEvent<A> handler called, down: " << event.down << std::endl;
-    });
+    }));
 
     // Route exactly one A key down event
     auto aKeyDown = std::make_unique<KeyboardEvent>(

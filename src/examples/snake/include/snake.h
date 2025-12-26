@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 #include <utility>
+#include <vector>
 
 #include <sdl/sdl.h>
 #include <sdl/sdl_tools.h>
@@ -32,6 +33,7 @@ class Snake {
 
   private:
     std::shared_ptr<sdl::tools::EventRouter> _eventRouter;
+    std::vector<sdl::tools::EventRegistration> _eventRegistrations;
 
     std::unique_ptr<SnakeBody> _snakeBody = std::make_unique<SnakeBody>(std::initializer_list<GridPoint>{{kStartingX, kStartingY}});
     Direction _direction = kStartingDirection;

@@ -19,9 +19,9 @@ class SnakeApplication : public sdl::BaseApplication {
     _snake = std::make_unique<Snake>(eventRouter);
     _snakeUI = std::make_unique<SnakeUI>();
 
-    auto layer = Layer<GameState>(
-      [this]() {}
-    )
+    // auto layer = Layer<GameState>(
+    //   [this]() {}
+    // )
 
     _lastUpdateTime = std::chrono::steady_clock::now();
 

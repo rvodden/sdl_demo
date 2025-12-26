@@ -5,6 +5,7 @@
 
 #include "sdl/button.h"
 #include "sdl/event.h"
+#include "sdl/event_registration.h"
 #include "sdl/rectangle.h"
 
 namespace sdl::tools {
@@ -41,6 +42,7 @@ class ButtonImpl {
   std::shared_ptr<EventRouter> _eventRouter;
   std::shared_ptr<std::vector<Button::Handler>> _eventHandlers;
   MouseEventHandler _mouseEventHandler;
+  EventRegistration _registration;
 };
 
 }  // namespace sdl::tools
