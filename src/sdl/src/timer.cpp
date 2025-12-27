@@ -26,19 +26,21 @@ auto TimerImpl::start(std::chrono::milliseconds interval, Timer::Callback callba
     throw Exception("SDL_AddTimer");
   }
   
-  _running = true;
+  _running.store(true);
 }
 
 auto TimerImpl::stop() -> void {
-  if (_running && _timerId != 0) {
+  if (_running.load() && _timerId != 0) {
+    // Set _running to false BEFORE removing timer to signal callback to exit early
+    // This prevents the callback from doing work while we're stopping
+    _running.store(false);
     SDL_RemoveTimer(_timerId);
     _timerId = 0;
-    _running = false;
   }
 }
 
 auto TimerImpl::isRunning() const -> bool {
-  return _running;
+  return _running.load();
 }
 
 auto TimerImpl::getInterval() const -> std::chrono::milliseconds {
@@ -50,22 +52,22 @@ auto TimerImpl::timerCallback(void* param, SDL_TimerID timerId, Uint32 interval)
   [[maybe_unused]] auto id = timerId;
   
   auto* impl = static_cast<TimerImpl*>(param);
-  if (impl == nullptr || !impl->_running) {
+  if (impl == nullptr || !impl->_running.load()) {
     return 0; // Stop timer
   }
-  
+
   try {
     if (impl->_callback && impl->_callback()) {
       // Continue timer with same interval
       return static_cast<Uint32>(impl->_interval.count());
     } else {
       // Stop timer
-      impl->_running = false;
+      impl->_running.store(false);
       return 0;
     }
   } catch (...) {
     // Stop timer on exception
-    impl->_running = false;
+    impl->_running.store(false);
     return 0;
   }
 }
