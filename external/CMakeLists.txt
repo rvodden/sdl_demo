@@ -102,6 +102,7 @@ elseif(SDLXX_USE_VENDORED_SDL3)
 
 
         set(SDLSHADERCROSS_DXC OFF CACHE BOOL "Disable DirectXShaderCompiler to avoid compatibility issues" FORCE)
+        set(SPIRV_SKIP_TESTS ON CACHE BOOL "Disable SPIRV-Cross tests" FORCE)
         set(SDLSHADERCROSS_VENDORED ON CACHE BOOL "Use vendored dependencies for SDL_shadercross")
         set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "Link to shared library variants of dependencies")
 

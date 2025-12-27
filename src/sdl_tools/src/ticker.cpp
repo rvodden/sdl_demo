@@ -56,9 +56,8 @@ auto TickerImpl::timerCallback() -> bool {
   }
 
   uint32_t newTickCount = _tickCount.fetch_add(1) + 1;
-  
+
   // Publish tick event through the event bus
-  // This is thread-safe as BaseEventBus handles cross-thread event publishing
   auto tickEvent = std::make_unique<TickEvent>(newTickCount);
   _eventBus->publish(std::move(tickEvent));
 

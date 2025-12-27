@@ -2,8 +2,10 @@
 #define SDL_TIMER_IMPL_H
 
 #include <SDL3/SDL.h>
+#include <atomic>
 #include <chrono>
 #include <functional>
+#include <mutex>
 
 #include "sdl/timer.h"
 
@@ -33,7 +35,8 @@ private:
   SDL_TimerID _timerId;
   Timer::Callback _callback;
   std::chrono::milliseconds _interval;
-  bool _running;
+  std::atomic<bool> _running;
+  std::mutex _callbackMutex;
 };
 
 }  // namespace sdl

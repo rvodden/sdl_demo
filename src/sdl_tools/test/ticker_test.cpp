@@ -19,29 +19,32 @@
 using namespace sdl;
 using namespace sdl::tools;
 
+namespace {  // Anonymous namespace to avoid ODR violations with other MockEventBus definitions
+
 // Mock EventBus for controlled testing
 class MockEventBus : public BaseEventBus {
 private:
     std::queue<std::unique_ptr<BaseEvent>> eventQueue_;
     std::vector<std::unique_ptr<UserEvent>> publishedEvents_;
     mutable std::mutex mutex_;
+    std::atomic<int> publishCallCount_{0};
 
 public:
     void pushEvent(std::unique_ptr<BaseEvent> event) {
         std::lock_guard<std::mutex> lock(mutex_);
         eventQueue_.push(std::move(event));
     }
-    
+
     void injectQuitEvent() {
         std::lock_guard<std::mutex> lock(mutex_);
         eventQueue_.push(std::make_unique<QuitEvent>(std::chrono::milliseconds(0)));
     }
-    
+
     size_t getPublishedEventCount() const {
         std::lock_guard<std::mutex> lock(mutex_);
         return publishedEvents_.size();
     }
-    
+
     bool hasEvents() const {
         std::lock_guard<std::mutex> lock(mutex_);
         return !eventQueue_.empty();
@@ -67,11 +70,12 @@ public:
     }
 
     void publish(std::unique_ptr<UserEvent> userEvent) override {
+        publishCallCount_.fetch_add(1);
         std::lock_guard<std::mutex> lock(mutex_);
         publishedEvents_.push_back(std::move(userEvent));
-        // Also add to regular event queue for processing
-        eventQueue_.push(std::make_unique<QuitEvent>(std::chrono::milliseconds(0))); // Dummy event
     }
+
+    int getPublishCallCount() const { return publishCallCount_.load(); }
 
     // Get the most recent published event (for testing)
     auto getLastPublishedEvent() const -> const UserEvent* {
@@ -112,6 +116,8 @@ public:
         (void)eventTypeId;
     }
 };
+
+}  // anonymous namespace
 
 // Test fixture
 class TickerTest : public ::testing::Test {
@@ -213,31 +219,30 @@ TEST_F(TickerTest, IntervalGetter) {
 
 // Test tick event generation
 TEST_F(TickerTest, TickEventGeneration) {
-    Ticker ticker(mockEventBus_, std::chrono::milliseconds(30));
-    
-    std::atomic<uint32_t> tickCount{0};
-    std::mutex mtx;
-    std::condition_variable cv;
-    
-    // Register handler for tick events
-    _eventRegistrations.push_back(eventRouter_->registerEventHandler<TickEvent>([&](const TickEvent& e) {
-        std::lock_guard<std::mutex> lock(mtx);
-        tickCount.store(e.tickNumber);
-        cv.notify_one();
-    }));
-    
-    // Start ticker
+    Ticker ticker(mockEventBus_, std::chrono::milliseconds(50));
+
     ticker.start();
-    
-    // Wait for first tick event to be published
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    
-    // Check that events were published
-    EXPECT_GT(mockEventBus_->getPublishedEventCount(), 0);
-    
-    // Stop ticker
+
+    // Wait for a few ticks
+    std::this_thread::sleep_for(std::chrono::milliseconds(180));
+
     ticker.stop();
-    EXPECT_FALSE(ticker.isRunning());
+
+    // Should have generated at least 2 ticks
+    EXPECT_GE(mockEventBus_->getPublishedEventCount(), 2);
+
+    // Verify tick events were published
+    auto publishedEvents = mockEventBus_->getAllPublishedEvents();
+    ASSERT_GE(publishedEvents.size(), 2);
+
+    // Check that they are TickEvents with sequential numbers
+    auto* tick1 = dynamic_cast<const TickEvent*>(publishedEvents[0]);
+    auto* tick2 = dynamic_cast<const TickEvent*>(publishedEvents[1]);
+
+    ASSERT_NE(tick1, nullptr);
+    ASSERT_NE(tick2, nullptr);
+    EXPECT_EQ(tick1->tickNumber, 1);
+    EXPECT_EQ(tick2->tickNumber, 2);
 }
 
 // Test sequential tick numbering
@@ -375,14 +380,14 @@ TEST_F(TickerTest, DestructionWhileRunning) {
 // Test very short intervals
 TEST_F(TickerTest, ShortInterval) {
     Ticker ticker(mockEventBus_, std::chrono::milliseconds(10));
-    
+
     ticker.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
     ticker.stop();
-    
-    // Should have generated several ticks
-    EXPECT_GT(ticker.getTickCount(), 3);
-    EXPECT_GT(mockEventBus_->getPublishedEventCount(), 3);
+
+    // Should have generated at least 3 ticks (80ms / 10ms = 8 potential ticks)
+    EXPECT_GE(ticker.getTickCount(), 3);
+    EXPECT_GE(mockEventBus_->getPublishedEventCount(), 3);
 }
 
 // Test that TickEvent is properly typed

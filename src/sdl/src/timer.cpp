@@ -26,19 +26,25 @@ auto TimerImpl::start(std::chrono::milliseconds interval, Timer::Callback callba
     throw Exception("SDL_AddTimer");
   }
   
-  _running = true;
+  _running.store(true);
 }
 
 auto TimerImpl::stop() -> void {
-  if (_running && _timerId != 0) {
+  if (_running.load() && _timerId != 0) {
+    // Set _running to false BEFORE removing timer to signal callback to exit early
+    _running.store(false);
     SDL_RemoveTimer(_timerId);
     _timerId = 0;
-    _running = false;
+
+    // Acquire callback mutex to ensure no callback is currently running
+    // The callback holds this mutex for its entire duration, so once we
+    // acquire it we know the callback has fully exited
+    std::lock_guard<std::mutex> lock(_callbackMutex);
   }
 }
 
 auto TimerImpl::isRunning() const -> bool {
-  return _running;
+  return _running.load();
 }
 
 auto TimerImpl::getInterval() const -> std::chrono::milliseconds {
@@ -48,26 +54,34 @@ auto TimerImpl::getInterval() const -> std::chrono::milliseconds {
 auto TimerImpl::timerCallback(void* param, SDL_TimerID timerId, Uint32 interval) -> Uint32 {
   [[maybe_unused]] auto intervalMs = interval;
   [[maybe_unused]] auto id = timerId;
-  
+
   auto* impl = static_cast<TimerImpl*>(param);
-  if (impl == nullptr || !impl->_running) {
+  if (impl == nullptr) {
     return 0; // Stop timer
   }
-  
+
+  // Hold the callback mutex for the entire duration to ensure stop() waits for us
+  std::lock_guard<std::mutex> lock(impl->_callbackMutex);
+
+  // Check if we should stop (before doing any work)
+  if (!impl->_running.load()) {
+    return 0; // Stop timer
+  }
+
+  Uint32 result = 0;
   try {
     if (impl->_callback && impl->_callback()) {
       // Continue timer with same interval
-      return static_cast<Uint32>(impl->_interval.count());
+      result = static_cast<Uint32>(impl->_interval.count());
     } else {
       // Stop timer
-      impl->_running = false;
-      return 0;
+      impl->_running.store(false);
     }
   } catch (...) {
-    // Stop timer on exception
-    impl->_running = false;
-    return 0;
+    impl->_running.store(false);
   }
+
+  return result;
 }
 
 // Timer public interface implementation
