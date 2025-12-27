@@ -8,14 +8,25 @@ function(setup_coverage)
     endif()
 
     # Check for required tools
-    find_program(GCOV_PATH gcov NAMES gcov-14 gcov)
+    # gcov must match the compiler version that generated the .gcda files
+    # We detect the compiler version and look for the matching gcov
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # Extract major version from CMAKE_CXX_COMPILER_VERSION (e.g., "13.2.0" -> "13")
+        string(REGEX MATCH "^[0-9]+" GCC_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
+        find_program(GCOV_PATH NAMES gcov-${GCC_MAJOR_VERSION} gcov)
+        if(GCOV_PATH)
+            message(STATUS "Using gcov for GCC ${GCC_MAJOR_VERSION}")
+        endif()
+    else()
+        find_program(GCOV_PATH gcov)
+    endif()
     find_program(GCOVR_PATH gcovr)
-    
+
     if(NOT GCOV_PATH)
         message(WARNING "gcov not found! Coverage analysis will not be available.")
         return()
     endif()
-    
+
     if(NOT GCOVR_PATH)
         message(WARNING "gcovr not found! Please install gcovr for HTML coverage reports.")
         message(WARNING "On Ubuntu/Debian: sudo apt install gcovr")
@@ -26,17 +37,10 @@ function(setup_coverage)
     message(STATUS "gcov found: ${GCOV_PATH}")
     message(STATUS "gcovr found: ${GCOVR_PATH}")
 
-    # Coverage compiler flags
-    set(COVERAGE_COMPILER_FLAGS "--coverage -fprofile-arcs -ftest-coverage -O0")
-    set(COVERAGE_LINKER_FLAGS "--coverage")
-
-    # Store coverage flags for later application
-    set(COVERAGE_COMPILER_FLAGS_LIST --coverage -fprofile-arcs -ftest-coverage -O0)
-    set(COVERAGE_LINKER_FLAGS_LIST --coverage)
-    
-    # Store in global properties so they can be used later
-    set_property(GLOBAL PROPERTY COVERAGE_COMPILER_FLAGS "${COVERAGE_COMPILER_FLAGS_LIST}")
-    set_property(GLOBAL PROPERTY COVERAGE_LINKER_FLAGS "${COVERAGE_LINKER_FLAGS_LIST}")
+    # Add coverage flags to standard_compiler_options so all project targets get them automatically
+    # This is more maintainable than a hardcoded list of targets
+    target_compile_options(standard_compiler_options INTERFACE --coverage -fprofile-arcs -ftest-coverage -O0)
+    target_link_options(standard_compiler_options INTERFACE --coverage)
 
     # Create coverage data collection target
     set(COVERAGE_BASE_DIR ${CMAKE_BINARY_DIR}/coverage)
@@ -53,6 +57,9 @@ function(setup_coverage)
     list(APPEND GCOVR_COMMAND -v)
     list(APPEND GCOVR_COMMAND --gcov-executable)
     list(APPEND GCOVR_COMMAND ${GCOV_PATH})
+    # Ignore gcov errors for files that can't be processed (e.g., from external dependencies)
+    list(APPEND GCOVR_COMMAND --gcov-ignore-errors=all)
+    list(APPEND GCOVR_COMMAND --gcov-ignore-parse-errors=all)
     list(APPEND GCOVR_COMMAND --html-details)
     list(APPEND GCOVR_COMMAND --output)
     list(APPEND GCOVR_COMMAND ${COVERAGE_OUTPUT_DIR}/index.html)
@@ -66,7 +73,8 @@ function(setup_coverage)
     list(APPEND GCOVR_COMMAND [[.*/examples/.*]])
     list(APPEND GCOVR_COMMAND --root)
     list(APPEND GCOVR_COMMAND ${CMAKE_SOURCE_DIR}/src)
-    list(APPEND GCOVR_COMMAND ${CMAKE_BINARY_DIR})
+    # Only scan the src build directory, not external dependencies
+    list(APPEND GCOVR_COMMAND ${CMAKE_BINARY_DIR}/src)
 
     add_custom_target(coverage-html
         COMMAND ${CMAKE_COMMAND} -E make_directory ${COVERAGE_OUTPUT_DIR}
@@ -77,84 +85,17 @@ function(setup_coverage)
     )
 
     # Create convenience target that runs tests and generates coverage
+    # Use -C Debug for multi-config generators (Ninja Multi-Config, Visual Studio)
     add_custom_target(coverage
-        # Run tests to generate coverage data (ignore failures from missing tests)
-        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure || true
-        
-        # Generate HTML coverage report  
+        # Run tests to generate coverage data (ignore test failures, we still want coverage)
+        COMMAND ${CMAKE_CTEST_COMMAND} -C Debug --output-on-failure
+
+        # Generate HTML coverage report
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target coverage-html
-        
+
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running tests and generating coverage report"
         VERBATIM
     )
 
-    # Export function for use in main CMakeLists.txt
-    set_property(GLOBAL PROPERTY COVERAGE_FUNCTION_AVAILABLE TRUE)
-    
-endfunction()
-
-# Function to be called after all project targets are defined
-function(enable_coverage_for_project_targets)
-    if(NOT SDLXX_ENABLE_COVERAGE)
-        return()
-    endif()
-    
-    # Get coverage flags from global properties
-    get_property(coverage_compile_flags GLOBAL PROPERTY COVERAGE_COMPILER_FLAGS)
-    get_property(coverage_link_flags GLOBAL PROPERTY COVERAGE_LINKER_FLAGS)
-    
-    if(NOT coverage_compile_flags)
-        message(WARNING "Coverage flags not found - setup_coverage() may not have been called")
-        return()
-    endif()
-    
-    # List of known project target names (not external dependencies)
-    # This includes all libraries and executables that should have coverage
-    # Excluding alias targets that cause issues
-    set(project_targets
-        # Core libraries (only -static versions to avoid alias issues)
-        sdl-static
-        sdl_tools-static 
-        sdl_ttf-static
-        sdl_main-static
-        
-        # Test targets
-        sdl_test
-        sdl_tools_test
-        sdl_ttf_test
-        sdl_application_test
-        
-        # Example/snippet targets
-        custom_events_example
-        lambda_event_handler_test
-        font_hello_world
-        tictactoe_exe
-        tictactoe-static
-        tictactoe-data
-        visitor_pattern_mockup
-        visitor_pattern
-        message_box_demo
-        event_adaptor_example
-        application_example
-        sdl_driver_test
-        test_sdl_app_event
-        
-        # Pong example if it exists
-        pong-exe
-        pong-static
-        pong-data
-        pong-test
-    )
-    
-    list(LENGTH project_targets num_targets)
-    message(STATUS "Applying coverage flags to ${num_targets} project targets")
-    
-    foreach(target ${project_targets})
-        if(TARGET ${target})
-            target_compile_options(${target} PRIVATE ${coverage_compile_flags})
-            target_link_options(${target} PRIVATE ${coverage_link_flags})
-            message(VERBOSE "Coverage enabled for target: ${target}")
-        endif()
-    endforeach()
 endfunction()

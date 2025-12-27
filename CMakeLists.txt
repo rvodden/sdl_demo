@@ -44,11 +44,6 @@ if(NOT SDLXX_DOCS_ONLY)
     if(SDLXX_USE_IWYU)
         enable_iwyu_for_project_targets()
     endif()
-    
-    # Enable coverage for all project targets after they've been defined
-    if(SDLXX_ENABLE_COVERAGE)
-        enable_coverage_for_project_targets()
-    endif()
 endif()
 
 # Setup documentation generation (doxygen-awesome is handled internally)
