@@ -1,15 +1,14 @@
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
+#include "mocks/mock_event_bus.h"
 #include "sdl/event.h"
 #include "sdl/event_router.h"
 #include "sdl/sdl.h"
@@ -18,106 +17,7 @@
 
 using namespace sdl;
 using namespace sdl::tools;
-
-namespace {  // Anonymous namespace to avoid ODR violations with other MockEventBus definitions
-
-// Mock EventBus for controlled testing
-class MockEventBus : public BaseEventBus {
-private:
-    std::queue<std::unique_ptr<BaseEvent>> eventQueue_;
-    std::vector<std::unique_ptr<UserEvent>> publishedEvents_;
-    mutable std::mutex mutex_;
-    std::atomic<int> publishCallCount_{0};
-
-public:
-    void pushEvent(std::unique_ptr<BaseEvent> event) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        eventQueue_.push(std::move(event));
-    }
-
-    void injectQuitEvent() {
-        std::lock_guard<std::mutex> lock(mutex_);
-        eventQueue_.push(std::make_unique<QuitEvent>(std::chrono::milliseconds(0)));
-    }
-
-    size_t getPublishedEventCount() const {
-        std::lock_guard<std::mutex> lock(mutex_);
-        return publishedEvents_.size();
-    }
-
-    bool hasEvents() const {
-        std::lock_guard<std::mutex> lock(mutex_);
-        return !eventQueue_.empty();
-    }
-
-    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (eventQueue_.empty()) {
-            return std::nullopt;
-        }
-        auto event = std::move(eventQueue_.front());
-        eventQueue_.pop();
-        return event;
-    }
-
-    auto wait() -> std::unique_ptr<BaseEvent> override {
-        // For testing, just return a quit event if no events are available
-        auto event = poll();
-        if (event) {
-            return std::move(*event);
-        }
-        return std::make_unique<QuitEvent>(std::chrono::milliseconds(0));
-    }
-
-    void publish(std::unique_ptr<UserEvent> userEvent) override {
-        publishCallCount_.fetch_add(1);
-        std::lock_guard<std::mutex> lock(mutex_);
-        publishedEvents_.push_back(std::move(userEvent));
-    }
-
-    int getPublishCallCount() const { return publishCallCount_.load(); }
-
-    // Get the most recent published event (for testing)
-    auto getLastPublishedEvent() const -> const UserEvent* {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (publishedEvents_.empty()) {
-            return nullptr;
-        }
-        return publishedEvents_.back().get();
-    }
-
-    // Get all published events (for testing)
-    auto getAllPublishedEvents() const -> std::vector<const UserEvent*> {
-        std::lock_guard<std::mutex> lock(mutex_);
-        std::vector<const UserEvent*> result;
-        for (const auto& event : publishedEvents_) {
-            result.push_back(event.get());
-        }
-        return result;
-    }
-
-    void clearEvents() {
-        std::lock_guard<std::mutex> lock(mutex_);
-        publishedEvents_.clear();
-        while (!eventQueue_.empty()) {
-            eventQueue_.pop();
-        }
-    }
-
-    // Abstract method implementations (not used in ticker tests but required)
-    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
-        // Not used in these tests
-        (void)callback;
-    }
-
-    void injectEvent(const std::any& eventData, std::type_index eventTypeId) override {
-        // Not used in these tests
-        (void)eventData;
-        (void)eventTypeId;
-    }
-};
-
-}  // anonymous namespace
+using sdl::test::MockEventBus;
 
 // Test fixture
 class TickerTest : public ::testing::Test {

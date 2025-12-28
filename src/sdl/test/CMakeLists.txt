@@ -3,6 +3,9 @@ set( TEST_NAME "${PROJECT_NAME}_test" )
 file( GLOB_RECURSE TEST_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h )
 add_executable( ${TEST_NAME} ${TEST_SOURCE_FILES} )
 
+# Add test directory to include path (for mocks subdirectory)
+target_include_directories( ${TEST_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+
 if(NOT PROJECT_IS_TOP_LEVEL)
     target_link_libraries(${TEST_NAME} PRIVATE standard_compiler_options)
 

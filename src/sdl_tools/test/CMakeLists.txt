@@ -3,6 +3,9 @@ set( TEST_NAME "${PROJECT_NAME}_test" )
 file( GLOB_RECURSE TEST_SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h )
 add_executable( ${TEST_NAME} ${TEST_SOURCE_FILES} )
 
+# Add sdl test directory to include path (for shared mocks)
+target_include_directories( ${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../sdl/test )
+
 if(NOT PROJECT_IS_TOP_LEVEL)
     target_link_libraries(${TEST_NAME} PRIVATE standard_compiler_options)
 

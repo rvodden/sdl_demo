@@ -1,21 +1,17 @@
 #include <algorithm>
-#include <any>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <iterator>
 #include <memory>
-#include <queue>
-#include <optional>
 #include <stdexcept>
 #include <string>
-#include <typeindex>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
+#include "mocks/mock_event_bus.h"
 #include "sdl/button.h"
 #include "sdl/event.h"
 #include "sdl/event_router.h"
@@ -24,69 +20,7 @@
 
 using namespace sdl;
 using namespace sdl::tools;
-
-// Mock EventBus for controlled testing
-class MockEventBus : public BaseEventBus {
-private:
-    std::queue<std::unique_ptr<BaseEvent>> eventQueue_;
-    std::vector<std::unique_ptr<UserEvent>> publishedEvents_;
-
-public:
-    void pushEvent(std::unique_ptr<BaseEvent> event) {
-        eventQueue_.push(std::move(event));
-    }
-    
-    void injectQuitEvent() {
-        eventQueue_.push(std::make_unique<QuitEvent>(std::chrono::milliseconds(0)));
-    }
-    
-    size_t getPublishedEventCount() const {
-        return publishedEvents_.size();
-    }
-    
-    bool hasEvents() const {
-        return !eventQueue_.empty();
-    }
-
-    // BaseEventBus interface implementation
-    auto wait() -> std::unique_ptr<BaseEvent> override {
-        if (eventQueue_.empty()) {
-            // If no events queued, return a quit event to prevent infinite loops in tests
-            return std::make_unique<QuitEvent>(std::chrono::milliseconds(0));
-        }
-        
-        auto event = std::move(eventQueue_.front());
-        eventQueue_.pop();
-        return event;
-    }
-    
-    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
-        if (eventQueue_.empty()) {
-            return std::nullopt;
-        }
-        
-        auto event = std::move(eventQueue_.front());
-        eventQueue_.pop();
-        return event;
-    }
-    
-    void publish(std::unique_ptr<UserEvent> event) override {
-        publishedEvents_.push_back(std::move(event));
-    }
-
-    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
-        // Mock implementation - store callback if needed for testing
-        routeCallback_ = std::move(callback);
-    }
-
-    void injectEvent(const std::any&, std::type_index) override {
-        // Mock implementation - do nothing
-        // Real event injection happens via pushEvent method
-    }
-
-private:
-    std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
-};
+using sdl::test::MockEventBus;
 
 // Test EventRouter wrapper that allows controlled event injection
 class TestEventRouter {

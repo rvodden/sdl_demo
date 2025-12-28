@@ -1,45 +1,45 @@
-#include <any>
 #include <chrono>
 #include <memory>
 #include <string>
-#include <typeindex>
 #include <vector>
 
 #include <gtest/gtest.h>
 
+#include "mocks/mock_event_bus.h"
 #include <sdl/event.h>
 #include <sdl/sdl.h>
 #include <sdl/user_event.h>
 
 using namespace sdl;
+using sdl::test::MockEventBus;
 
 // Test event types for isolated testing
 class TestEvent : public Event {
 public:
-    TestEvent(int value) : Event(std::chrono::milliseconds(100)), testValue(value) {}
-    
+    explicit TestEvent(int value) : Event(std::chrono::milliseconds(100)), testValue(value) {}
+
     void handle(BaseEventHandler& baseEventHandler) override {
         castHandler(*this, baseEventHandler);
     }
-    
+
     int testValue;
 };
 
 class AnotherTestEvent : public Event {
 public:
-    AnotherTestEvent(std::string data) : Event(std::chrono::milliseconds(200)), testData(std::move(data)) {}
-    
+    explicit AnotherTestEvent(std::string data) : Event(std::chrono::milliseconds(200)), testData(std::move(data)) {}
+
     void handle(BaseEventHandler& baseEventHandler) override {
         castHandler(*this, baseEventHandler);
     }
-    
+
     std::string testData;
 };
 
 // Custom user event for testing
 class CustomTestEvent : public CustomUserEvent<CustomTestEvent> {
 public:
-    CustomTestEvent(int data) : customData(data) {}
+    explicit CustomTestEvent(int data) : customData(data) {}
     int customData;
 };
 
@@ -50,7 +50,7 @@ public:
         handledEvents.push_back(event.testValue);
         callCount++;
     }
-    
+
     std::vector<int> handledEvents;
     int callCount = 0;
 };
@@ -61,7 +61,7 @@ public:
         handledData.push_back(event.testData);
         callCount++;
     }
-    
+
     std::vector<std::string> handledData;
     int callCount = 0;
 };
@@ -72,7 +72,7 @@ public:
         handledCustomData.push_back(event.customData);
         callCount++;
     }
-    
+
     std::vector<int> handledCustomData;
     int callCount = 0;
 };
@@ -83,79 +83,16 @@ public:
         testEventCalls++;
         testValues.push_back(event.testValue);
     }
-    
+
     void handle(const AnotherTestEvent& event) override {
         anotherEventCalls++;
         anotherValues.push_back(event.testData);
     }
-    
+
     int testEventCalls = 0;
     int anotherEventCalls = 0;
     std::vector<int> testValues;
     std::vector<std::string> anotherValues;
-};
-
-// Mock event bus for testing polymorphic operations
-class MockEventBus : public BaseEventBus {
-private:
-    std::vector<std::unique_ptr<BaseEvent>> storedEvents_;
-    std::vector<std::unique_ptr<UserEvent>> publishedUserEvents_;
-    std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
-    bool shouldReturnNullOnWait_ = false;
-    bool shouldReturnEmptyOnPoll_ = true;
-
-public:
-    void addEvent(std::unique_ptr<BaseEvent> event) {
-        storedEvents_.push_back(std::move(event));
-    }
-    
-    void setShouldReturnNullOnWait(bool shouldReturn) {
-        shouldReturnNullOnWait_ = shouldReturn;
-    }
-    
-    void setShouldReturnEmptyOnPoll(bool shouldReturn) {
-        shouldReturnEmptyOnPoll_ = shouldReturn;
-    }
-    
-    size_t getPublishedUserEventCount() const {
-        return publishedUserEvents_.size();
-    }
-    
-    const auto& getStoredEvents() const {
-        return storedEvents_;
-    }
-
-    auto wait() -> std::unique_ptr<BaseEvent> override {
-        if (shouldReturnNullOnWait_ || storedEvents_.empty()) {
-            return std::make_unique<QuitEvent>(std::chrono::milliseconds(0));
-        }
-        auto event = std::move(storedEvents_.front());
-        storedEvents_.erase(storedEvents_.begin());
-        return event;
-    }
-    
-    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
-        if (shouldReturnEmptyOnPoll_ || storedEvents_.empty()) {
-            return std::nullopt;
-        }
-        auto event = std::move(storedEvents_.front());
-        storedEvents_.erase(storedEvents_.begin());
-        return event;
-    }
-    
-    void publish(std::unique_ptr<UserEvent> event) override {
-        publishedUserEvents_.push_back(std::move(event));
-    }
-    
-    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
-        routeCallback_ = std::move(callback);
-    }
-    
-    void injectEvent(const std::any& eventData, std::type_index eventTypeId) override {
-        // Mock implementation - store for verification if needed
-        (void)eventData;
-        (void)eventTypeId;
-    }
 };
 
 // BaseEvent Tests
@@ -593,8 +530,7 @@ TEST(BaseEventBusTest, MockEventBusWaitFunctionality) {
     auto event = mockBus.wait();
     EXPECT_NE(event, nullptr);
     
-    // When no events, should return QuitEvent
-    mockBus.setShouldReturnNullOnWait(true);
+    // When no events, should return QuitEvent (default behavior)
     auto quitEvent = mockBus.wait();
     EXPECT_NE(quitEvent, nullptr);
 }

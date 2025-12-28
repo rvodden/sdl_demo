@@ -1,124 +1,44 @@
 #include <algorithm>
-#include <any>
 #include <chrono>
 #include <cstddef>
-#include <functional>
 #include <memory>
-#include <optional>
-#include <queue>
 #include <string>
 #include <tuple>
-#include <typeindex>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "sdl/event_router.h"
+#include "mocks/mock_event_bus.h"
 #include "sdl/event.h"
+#include "sdl/event_router.h"
 #include "sdl/user_event.h"
 
 using namespace sdl;
 using namespace sdl::tools;
+using sdl::test::MockEventBus;
 
 // Test event types for isolated testing
 class TestEvent : public Event {
 public:
-    TestEvent(int value) : Event(std::chrono::milliseconds(0)), testValue(value) {}
-    
+    explicit TestEvent(int value) : Event(std::chrono::milliseconds(0)), testValue(value) {}
+
     void handle(BaseEventHandler& baseEventHandler) override {
         castHandler(*this, baseEventHandler);
     }
-    
+
     int testValue;
 };
 
 class AnotherTestEvent : public Event {
 public:
-    AnotherTestEvent(std::string data) : Event(std::chrono::milliseconds(0)), testData(std::move(data)) {}
-    
+    explicit AnotherTestEvent(std::string data) : Event(std::chrono::milliseconds(0)), testData(std::move(data)) {}
+
     void handle(BaseEventHandler& baseEventHandler) override {
         castHandler(*this, baseEventHandler);
     }
-    
+
     std::string testData;
-};
-
-// Mock EventBus for controlled testing
-class MockEventBus : public BaseEventBus {
-private:
-    std::queue<std::unique_ptr<BaseEvent>> eventQueue_;
-    std::vector<std::unique_ptr<UserEvent>> publishedEvents_;
-    bool shouldThrowOnWait_ = false;
-    int throwCount_ = 0;
-    int maxThrows_ = 1;
-
-public:
-    void pushEvent(std::unique_ptr<BaseEvent> event) {
-        eventQueue_.push(std::move(event));
-    }
-    
-    void injectQuitEvent() {
-        eventQueue_.push(std::make_unique<QuitEvent>(std::chrono::milliseconds(0)));
-    }
-    
-    void setShouldThrowOnWait(bool shouldThrow, int maxThrows = 1) {
-        shouldThrowOnWait_ = shouldThrow;
-        throwCount_ = 0;
-        maxThrows_ = maxThrows;
-    }
-    
-    size_t getPublishedEventCount() const {
-        return publishedEvents_.size();
-    }
-    
-    bool hasEvents() const {
-        return !eventQueue_.empty();
-    }
-
-    // BaseEventBus interface implementation
-    auto wait() -> std::unique_ptr<BaseEvent> override {
-        if (shouldThrowOnWait_ && throwCount_ < maxThrows_) {
-            throwCount_++;
-            throw UnknownEventException("Mock exception for testing");
-        }
-        
-        if (eventQueue_.empty()) {
-            // If no events queued, return a quit event to prevent infinite loops in tests
-            return std::make_unique<QuitEvent>(std::chrono::milliseconds(0));
-        }
-        
-        auto event = std::move(eventQueue_.front());
-        eventQueue_.pop();
-        return event;
-    }
-    
-    auto poll() -> std::optional<std::unique_ptr<BaseEvent>> override {
-        if (eventQueue_.empty()) {
-            return std::nullopt;
-        }
-        
-        auto event = std::move(eventQueue_.front());
-        eventQueue_.pop();
-        return event;
-    }
-    
-    void publish(std::unique_ptr<UserEvent> event) override {
-        publishedEvents_.push_back(std::move(event));
-    }
-
-    void setRouteCallback(std::function<void(std::unique_ptr<BaseEvent>)> callback) override {
-        // Mock implementation - store callback if needed for testing
-        routeCallback_ = std::move(callback);
-    }
-
-    void injectEvent(const std::any&, std::type_index) override {
-        // Mock implementation - do nothing
-        // Real event injection happens via pushEvent method
-    }
-
-private:
-    std::function<void(std::unique_ptr<BaseEvent>)> routeCallback_;
 };
 
 // Test fixture for EventRouter tests
