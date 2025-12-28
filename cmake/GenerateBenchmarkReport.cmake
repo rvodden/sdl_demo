@@ -70,18 +70,29 @@ function(parse_json_results json_file benchmark_data_var)
     # Iterate through each benchmark entry
     math(EXPR max_index "${array_length} - 1")
     foreach(i RANGE ${max_index})
-        # Check if this is an aggregate result (skip those)
-        string(JSON run_type ERROR_VARIABLE run_type_error GET "${benchmarks_array}" ${i} "run_type")
-        if(NOT run_type_error AND run_type STREQUAL "aggregate")
+        # Extract name first to check aggregate type
+        string(JSON bench_name ERROR_VARIABLE name_error GET "${benchmarks_array}" ${i} "name")
+        if(name_error)
             continue()
         endif()
-        
-        # Extract name and cpu_time for each benchmark
-        string(JSON bench_name ERROR_VARIABLE name_error GET "${benchmarks_array}" ${i} "name")
+
+        # Check if this is an aggregate result
+        string(JSON run_type ERROR_VARIABLE run_type_error GET "${benchmarks_array}" ${i} "run_type")
+        if(NOT run_type_error AND run_type STREQUAL "aggregate")
+            # For aggregate results, only use the "mean" values (skip median, stddev, cv)
+            string(JSON aggregate_name ERROR_VARIABLE agg_error GET "${benchmarks_array}" ${i} "aggregate_name")
+            if(agg_error OR NOT aggregate_name STREQUAL "mean")
+                continue()
+            endif()
+            # Remove the _mean suffix from the name for processing
+            string(REGEX REPLACE "_mean$" "" bench_name "${bench_name}")
+        endif()
+
+        # Extract cpu_time for each benchmark
         string(JSON cpu_time ERROR_VARIABLE time_error GET "${benchmarks_array}" ${i} "cpu_time")
-        
-        if(name_error OR time_error)
-            message(STATUS "Skipping benchmark ${i} (likely aggregate or missing cpu_time): ${bench_name}")
+
+        if(time_error)
+            message(STATUS "Skipping benchmark ${i} (missing cpu_time): ${bench_name}")
             continue()
         endif()
         

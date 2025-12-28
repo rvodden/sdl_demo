@@ -140,6 +140,7 @@ jobs:
         retention-days: 30
 
   generate-report:
+    name: Generate Benchmark Report
     needs: benchmarks
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
