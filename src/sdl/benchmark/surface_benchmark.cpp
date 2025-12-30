@@ -133,23 +133,79 @@ BENCHMARK_DEFINE_F(SurfaceFixture, SurfaceBlit_SDLpp)(benchmark::State& state) {
 
 BENCHMARK_DEFINE_F(SurfaceFixture, SurfaceGetPixels_SDL3)(benchmark::State& state) {
     SDL_Surface* surface = SDL_CreateSurface(256, 256, SDL_PIXELFORMAT_RGBA8888);
-    
+
     for (auto _ : state) {
-        SDL_LockSurface(surface);
+        // Direct pointer access - this is the baseline for zero-cost
         void* pixels = surface->pixels;
         benchmark::DoNotOptimize(pixels);
-        SDL_UnlockSurface(surface);
     }
-    
+
     SDL_DestroySurface(surface);
 }
 
 BENCHMARK_DEFINE_F(SurfaceFixture, SurfaceGetPixels_SDLpp)(benchmark::State& state) {
     sdl::Surface surface(256, 256);
-    
+
+    for (auto _ : state) {
+        // PixelAccess provides zero-copy access - should be comparable to SDL3
+        auto pixels = surface.getPixels();
+        benchmark::DoNotOptimize(pixels.data());
+    }
+}
+
+// Benchmark pixel manipulation with getPixels() call inside the loop
+// This measures the overhead of obtaining pixel access repeatedly
+BENCHMARK_DEFINE_F(SurfaceFixture, SurfacePixelManipulation_SDL3)(benchmark::State& state) {
+    SDL_Surface* surface = SDL_CreateSurface(256, 256, SDL_PIXELFORMAT_RGBA8888);
+
+    for (auto _ : state) {
+        uint8_t* pixels = static_cast<uint8_t*>(surface->pixels);
+        for (int i = 0; i < 1000; ++i) {
+            pixels[i] = static_cast<uint8_t>(i & 0xFF);
+        }
+        benchmark::DoNotOptimize(pixels);
+    }
+
+    SDL_DestroySurface(surface);
+}
+
+BENCHMARK_DEFINE_F(SurfaceFixture, SurfacePixelManipulation_SDLpp)(benchmark::State& state) {
+    sdl::Surface surface(256, 256);
+
     for (auto _ : state) {
         auto pixels = surface.getPixels();
+        for (int i = 0; i < 1000; ++i) {
+            pixels[i] = static_cast<uint8_t>(i & 0xFF);
+        }
+        benchmark::DoNotOptimize(pixels.data());
+    }
+}
+
+// Benchmark sustained pixel manipulation with PixelAccess obtained once
+// This is the recommended usage pattern - get access once, use many times
+BENCHMARK_DEFINE_F(SurfaceFixture, SurfacePixelManipulationSustained_SDL3)(benchmark::State& state) {
+    SDL_Surface* surface = SDL_CreateSurface(256, 256, SDL_PIXELFORMAT_RGBA8888);
+    uint8_t* pixels = static_cast<uint8_t*>(surface->pixels);
+
+    for (auto _ : state) {
+        for (int i = 0; i < 1000; ++i) {
+            pixels[i] = static_cast<uint8_t>(i & 0xFF);
+        }
         benchmark::DoNotOptimize(pixels);
+    }
+
+    SDL_DestroySurface(surface);
+}
+
+BENCHMARK_DEFINE_F(SurfaceFixture, SurfacePixelManipulationSustained_SDLpp)(benchmark::State& state) {
+    sdl::Surface surface(256, 256);
+    auto pixels = surface.getPixels();
+
+    for (auto _ : state) {
+        for (int i = 0; i < 1000; ++i) {
+            pixels[i] = static_cast<uint8_t>(i & 0xFF);
+        }
+        benchmark::DoNotOptimize(pixels.data());
     }
 }
 
@@ -166,3 +222,7 @@ BENCHMARK_REGISTER_F(SurfaceFixture, SurfaceBlit_SDL3);
 BENCHMARK_REGISTER_F(SurfaceFixture, SurfaceBlit_SDLpp);
 BENCHMARK_REGISTER_F(SurfaceFixture, SurfaceGetPixels_SDL3);
 BENCHMARK_REGISTER_F(SurfaceFixture, SurfaceGetPixels_SDLpp);
+BENCHMARK_REGISTER_F(SurfaceFixture, SurfacePixelManipulation_SDL3);
+BENCHMARK_REGISTER_F(SurfaceFixture, SurfacePixelManipulation_SDLpp);
+BENCHMARK_REGISTER_F(SurfaceFixture, SurfacePixelManipulationSustained_SDL3);
+BENCHMARK_REGISTER_F(SurfaceFixture, SurfacePixelManipulationSustained_SDLpp);

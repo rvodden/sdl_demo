@@ -86,19 +86,22 @@ auto Surface::getHeight() const -> uint32_t {
   return static_cast<uint32_t>(_impl->_sdlSurface->h);
 }
 
-auto Surface::getPixels() const -> std::vector<uint8_t> {
+auto Surface::getPixels() -> PixelAccess {
   auto* surface = _impl->_sdlSurface;
-  const size_t pixelCount = static_cast<size_t>(surface->w) * static_cast<size_t>(surface->h) * 4;
-  std::vector<uint8_t> pixels(pixelCount);
-
-  // SDL3 surfaces may not require locking for direct access
-  if (surface->pixels != nullptr) {
-    std::memcpy(pixels.data(), surface->pixels, pixelCount);
-  } else {
+  if (surface->pixels == nullptr) {
     throw Exception("Surface pixels not accessible");
   }
+  const size_t pixelCount = static_cast<size_t>(surface->w) * static_cast<size_t>(surface->h) * 4;
+  return PixelAccess(std::span<uint8_t>(static_cast<uint8_t*>(surface->pixels), pixelCount));
+}
 
-  return pixels;
+auto Surface::getPixels() const -> ConstPixelAccess {
+  auto* surface = _impl->_sdlSurface;
+  if (surface->pixels == nullptr) {
+    throw Exception("Surface pixels not accessible");
+  }
+  const size_t pixelCount = static_cast<size_t>(surface->w) * static_cast<size_t>(surface->h) * 4;
+  return ConstPixelAccess(std::span<const uint8_t>(static_cast<const uint8_t*>(surface->pixels), pixelCount));
 }
 
 void Surface::setPixels(const std::vector<uint8_t>& pixels) {

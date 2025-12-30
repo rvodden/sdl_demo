@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "sdl/color.h"
+#include "sdl/pixel_access.h"
 
 #include "sdl_export.h"
 
@@ -150,18 +151,38 @@ class SDL_EXPORT Surface {
   [[nodiscard]] auto getHeight() const -> uint32_t;
 
   /**
-   * @brief Get a copy of all pixel data in RGBA format
-   * @return Vector containing all pixel data (4 bytes per pixel)
+   * @brief Get direct zero-copy access to pixel data (mutable)
+   * @return PixelAccess guard providing direct access to pixel buffer
    *
-   * Returns a complete copy of the surface's pixel data. The returned
-   * vector contains width * height * 4 bytes in RGBA format, organized
-   * row by row from top-left to bottom-right.
+   * Returns a RAII guard that provides zero-copy access to the surface's
+   * pixel data. The returned PixelAccess object contains a span view of
+   * the internal pixel buffer in RGBA format (4 bytes per pixel).
    *
-   * @warning This operation copies potentially large amounts of data
-   * @note The returned data can be modified without affecting the surface
-   * @note Consider getPixel() for accessing individual pixels
+   * @warning The returned PixelAccess must not outlive this Surface
+   * @warning Moving or destroying the Surface invalidates the PixelAccess
+   * @note This is a zero-cost operation - no data is copied
+   * @note The PixelAccess is move-only to emphasize the borrowing relationship
+   *
+   * Example:
+   * @code
+   * auto pixels = surface.getPixels();
+   * pixels[0] = 255;  // Modify first byte directly
+   * std::fill(pixels.begin(), pixels.end(), 0);  // Clear all
+   * @endcode
    */
-  [[nodiscard]] auto getPixels() const -> std::vector<uint8_t>;
+  [[nodiscard]] auto getPixels() -> PixelAccess;
+
+  /**
+   * @brief Get direct zero-copy access to pixel data (read-only)
+   * @return ConstPixelAccess guard providing read-only access to pixel buffer
+   *
+   * Returns a RAII guard that provides zero-copy read-only access to the
+   * surface's pixel data. Use this when you only need to read pixel values.
+   *
+   * @warning The returned ConstPixelAccess must not outlive this Surface
+   * @note This is a zero-cost operation - no data is copied
+   */
+  [[nodiscard]] auto getPixels() const -> ConstPixelAccess;
 
   /**
    * @brief Replace all pixel data with new RGBA values
